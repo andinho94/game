@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEARNING LIBRARY HUB</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            color: #0f0;
+            overflow-x: hidden;
+        }
+        
+        .game-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            background: #222;
+            border: 8px solid #0ff;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+            position: relative;
+        }
+        
+        .crt-effect {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 1000;
+        }
+        
+        .screen {
+            background: #000;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .main-title {
+            text-align: center;
+            font-size: 24px;
+            color: #0ff;
+            text-shadow: 3px 3px #f0f;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 10px;
+            color: #ff0;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin: 50px 0 30px 0;
+            padding: 20px;
+            border-top: 3px solid #0ff;
+            border-bottom: 3px solid #0ff;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #0ff;
+            text-shadow: 2px 2px #f0f;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .section-subtitle {
+            font-size: 8px;
+            color: #f0f;
+            letter-spacing: 2px;
+        }
+        
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .module-card {
+            background: linear-gradient(135deg, #001a1a 0%, #000 100%);
+            border: 4px solid #333;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .module-card.psychodynamic {
+            border-color: #0f0;
+        }
+        
+        .module-card.psychodynamic:hover {
+            border-color: #0ff;
+            background: linear-gradient(135deg, #001a00 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3);
+        }
+        
+        .module-card.mate {
+            border-color: #f90;
+        }
+        
+        .module-card.mate:hover {
+            border-color: #ff0;
+            background: linear-gradient(135deg, #1a0a00 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 153, 0, 0.3);
+        }
+        
+        .module-card.vdk {
+            border-color: #f0f;
+        }
+        
+        .module-card.vdk:hover {
+            border-color: #0ff;
+            background: linear-gradient(135deg, #1a001a 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+        }
+        
+        .module-card.stdp {
+            border-color: #f00;
+        }
+        
+        .module-card.stdp:hover {
+            border-color: #ff0;
+            background: linear-gradient(135deg, #1a0000 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .module-card.ci {
+            border-color: #0cf;
+        }
+        
+        .module-card.ci:hover {
+            border-color: #0ff;
+            background: linear-gradient(135deg, #001a1a 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(0, 204, 255, 0.3);
+        }
+
+        .module-card.miller {
+            border-color: #fa0;
+        }
+        
+        .module-card.miller:hover {
+            border-color: #fc0;
+            background: linear-gradient(135deg, #1a0f00 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 170, 0, 0.3);
+        }
+        
+        .module-card.berne {
+            border-color: #d0f;
+        }
+        
+        .module-card.berne:hover {
+            border-color: #f0f;
+            background: linear-gradient(135deg, #1a001a 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(221, 0, 255, 0.3);
+        }
+        
+        .module-card.coming-soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        
+        .module-card.coming-soon:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .module-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .module-title {
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .psychodynamic .module-title {
+            color: #0f0;
+        }
+        
+        .mate .module-title {
+            color: #f90;
+        }
+        
+        .vdk .module-title {
+            color: #f0f;
+        }
+        
+        .stdp .module-title {
+            color: #f00;
+        }
+
+        .ci .module-title {
+            color: #0cf;
+        }
+
+        .miller .module-title {
+            color: #fa0;
+        }
+        
+        .berne .module-title {
+            color: #d0f;
+        }
+        
+        .coming-soon .module-title {
+            color: #666;
+        }
+        
+        .module-author {
+            font-size: 8px;
+            text-align: center;
+            color: #999;
+            margin-bottom: 15px;
+        }
+        
+        .module-description {
+            font-size: 8px;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .module-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 15px;
+            border-top: 2px solid #333;
+            font-size: 7px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 10px;
+        }
+        
+        .psychodynamic .stat-value {
+            color: #0f0;
+        }
+        
+        .mate .stat-value {
+            color: #f90;
+        }
+        
+        .vdk .stat-value {
+            color: #f0f;
+        }
+        
+        .stdp .stat-value {
+            color: #f00;
+        }
+
+        .ci .stat-value {
+            color: #0cf;
+        }
+
+        .miller .stat-value {
+            color: #fa0;
+        }
+        
+        .coming-soon-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #333;
+            color: #666;
+            padding: 5px 10px;
+            font-size: 6px;
+            border: 2px solid #666;
+        }
+        
+        .info-section {
+            background: #111;
+            border: 4px solid #0ff;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-title {
+            color: #0ff;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .info-text {
+            color: #999;
+            font-size: 8px;
+            line-height: 1.8;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 7px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+        }
+        
+        .launch-btn {
+            background: #003300;
+            border: 3px solid #0f0;
+            color: #0f0;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+            transition: all 0.2s;
+        }
+        
+        .launch-btn:hover {
+            background: #005500;
+            border-color: #0ff;
+            color: #0ff;
+            transform: scale(1.05);
+        }
+        
+        .mate .launch-btn {
+            background: #331a00;
+            border-color: #f90;
+            color: #f90;
+        }
+        
+        .mate .launch-btn:hover {
+            background: #4d2600;
+            border-color: #ff0;
+            color: #ff0;
+        }
+        
+        .vdk .launch-btn {
+            background: #330033;
+            border-color: #f0f;
+            color: #f0f;
+        }
+        
+        .vdk .launch-btn:hover {
+            background: #4d004d;
+            border-color: #0ff;
+            color: #0ff;
+        }
+        
+        .stdp .launch-btn {
+            background: #330000;
+            border-color: #f00;
+            color: #f00;
+        }
+        
+        .stdp .launch-btn:hover {
+            background: #4d0000;
+            border-color: #ff0;
+            color: #ff0;
+        }
+
+        .ci .launch-btn {
+            background: #001a1a;
+            border-color: #0cf;
+            color: #0cf;
+        }
+        
+        .ci .launch-btn:hover {
+            background: #003333;
+            border-color: #0ff;
+            color: #0ff;
+        }
+
+        .miller .launch-btn {
+            background: #331a00;
+            border-color: #fa0;
+            color: #fa0;
+        }
+
+        .miller .launch-btn:hover {
+            background: #4d2600;
+            border-color: #fc0;
+            color: #fc0;
+        }
+        
+        .placeholder-btn {
+            background: #1a1a1a;
+            border: 3px dashed #666;
+            color: #666;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            width: 100%;
+            margin-top: auto;
+            cursor: not-allowed;
+        }
+
+        /* Tooltip for locked modules */
+        .tooltip {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            border: 2px solid #0ff;
+            padding: 8px 12px;
+            font-size: 7px;
+            color: #0ff;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .module-card.coming-soon:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* Improved hover effects */
+        .module-card:not(.coming-soon):hover .launch-btn {
+            animation: btnPulse 0.5s ease-in-out;
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Keyboard focus states */
+        .module-card:focus-within {
+            outline: 3px solid #0ff;
+            outline-offset: 4px;
+        }
+
+        .launch-btn:focus,
+        .placeholder-btn:focus {
+            outline: 2px solid #ff0;
+            outline-offset: 2px;
+        }
+        
+        .placeholder-btn {
+            background: #1a1a1a;
+            border: 3px dashed #333;
+            color: #666;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: not-allowed;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .progress-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #0ff;
+            padding: 5px 10px;
+            font-size: 6px;
+            border: 2px solid #0ff;
+        }
+
+        .module-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #ff0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ff0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .progress-badge {
+            position: absolute;
+            top: 10px;
+            left: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #0ff;
+            padding: 5px 10px;
+            font-size: 6px;
+            border: 2px solid #0ff;
+        }
+
+        .coming-soon .progress-badge {
+            left: 10px;
+        }
+
+        .progress-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #000;
+            padding: 5px 10px;
+            font-size: 7px;
+            border: 2px solid;
+        }
+
+        .psychodynamic .progress-badge {
+            border-color: #0f0;
+            color: #0f0;
+        }
+
+        .mate .progress-badge {
+            border-color: #f90;
+            color: #f90;
+        }
+
+        .vdk .progress-badge {
+            border-color: #f0f;
+            color: #f0f;
+        }
+
+        .stdp .progress-badge {
+            border-color: #f00;
+            color: #f00;
+        }
+
+        .miller .progress-badge {
+            border-color: #fa0;
+            color: #fa0;
+        }
+
+        .quick-stats {
+            background: #111;
+            border: 4px solid #0ff;
+            padding: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .quick-stat-value {
+            font-size: 20px;
+            color: #0ff;
+            margin-bottom: 5px;
+        }
+
+        .quick-stat-label {
+            font-size: 7px;
+            color: #999;
+        }
+
+        .quick-stat-hint {
+            font-size: 6px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="crt-effect"></div>
+            <div class="screen">
+                <div class="main-title">📚 LEARNING LIBRARY 📚</div>
+                <div class="subtitle">THERAPEUTIC KNOWLEDGE BASE</div>
+                
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-modules">5</div>
+                        <div class="quick-stat-label">MODULES</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-skills">48</div>
+                        <div class="quick-stat-label">SKILLS</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-completed">0</div>
+                        <div class="quick-stat-label">COMPLETED</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-xp">0</div>
+                        <div class="quick-stat-label">TOTAL XP</div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">⚡ WELCOME TO YOUR LEARNING HUB ⚡</div>
+                    <div class="info-text">
+                        Each module is a comprehensive, progressive learning path. Start from foundations and work your way to mastery. 
+                        Your progress is saved locally - pick up where you left off anytime.<br><br>
+                        Click any module below to begin your journey!<br><br>
+                        ⌨️ <strong style="color: #0ff;">SHORTCUTS:</strong> Press 1-4 to launch modules • ESC to refresh stats • TAB to navigate
+                    </div>
+                </div>
+                
+                <!-- THERAPEUTIC APPROACHES Section -->
+                <div class="section-header">
+                    <div class="section-title">⚡ THERAPEUTIC APPROACHES ⚡</div>
+                    <div class="section-subtitle">Core modalities and treatment methods</div>
+                </div>
+                
+                <div class="library-grid">
+                    <!-- Psychodynamic Module -->
+                    <div class="module-card psychodynamic" onclick="launchModule('psychodynamic')">
+                        <div class="module-number">1</div>
+                        <div class="progress-badge" id="psychodynamic-progress">0% COMPLETE</div>
+                        <div class="module-icon">⚡</div>
+                        <div class="module-title">PSYCHODYNAMIC THERAPY</div>
+                        <div class="module-author">Classical & Contemporary Theory</div>
+                        <div class="module-description">
+                            Master psychodynamic concepts from foundations to expert level. Learn: unconscious processes, 
+                            defense mechanisms, transference & countertransference, resistance, dream work, object relations, 
+                            interpretation, working through, enactments, and termination.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">12</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">4</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">36</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+
+                    <!-- STDP Module -->
+                    <div class="module-card stdp" onclick="launchModule('stdp')">
+                        <div class="progress-badge" id="stdp-progress">0% COMPLETE</div>
+                        <div class="module-icon">⚡</div>
+                        <div class="module-title">SHORT-TERM DYNAMIC PSYCHOTHERAPY</div>
+                        <div class="module-author">ISTDP / Davanloo / Abbass</div>
+                        <div class="module-description">
+                            Master intensive affect-focused psychodynamic work. Learn: triangle of conflict, triangle of person, 
+                            pressure & challenge, anxiety pathways, defense restructuring, unlocking unconscious, complex mixed feelings, 
+                            character resistance, clinical mastery.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">9</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">3</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">27</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+
+                    <!-- Compassionate Inquiry Module -->
+                    <div class="module-card ci" onclick="launchModule('ci')">
+                        <div class="module-number">3</div>
+                        <div class="progress-badge" id="ci-progress">0% COMPLETE</div>
+                        <div class="module-icon">💙</div>
+                        <div class="module-title">COMPASSIONATE INQUIRY</div>
+                        <div class="module-author">Gabor Maté Method</div>
+                        <div class="module-description">
+                            Master Maté's therapeutic approach. Learn: curious presence, body awareness, belief exploration, 
+                            tracking process, authentic self reconnection, trauma-informed pacing, therapist presence, 
+                            integration in practice, advanced application.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">9</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">3</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">27</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+                </div>
+
+                <!-- SEMINAL BOOKS Section -->
+                <div class="section-header">
+                    <div class="section-title">📚 SEMINAL BOOKS 📚</div>
+                    <div class="section-subtitle">Foundational texts that shaped the field</div>
+                </div>
+
+                <div class="library-grid">
+                    <!-- Gabor Maté Module -->
+                    <div class="module-card mate" onclick="launchModule('mate')">
+                        <div class="module-number">3</div>
+                        <div class="progress-badge" id="mate-progress">0% COMPLETE</div>
+                        <div class="module-icon">👻</div>
+                        <div class="module-title">IN THE REALM OF HUNGRY GHOSTS</div>
+                        <div class="module-author">Gabor Maté</div>
+                        <div class="module-description">
+                            Explore Maté's revolutionary understanding of addiction, trauma, and compassion. Learn: hungry ghosts metaphor, 
+                            trauma as disconnection, compassionate inquiry, brain development, self-compassion, authenticity, 
+                            societal context, harm reduction, and integration.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">9</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">3</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">27</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+
+                    <!-- Body Keeps Score Module -->
+                    <div class="module-card vdk" onclick="launchModule('vdk')">
+                        <div class="module-number">4</div>
+                        <div class="progress-badge" id="vdk-progress">0% COMPLETE</div>
+                        <div class="module-icon">💜</div>
+                        <div class="module-title">THE BODY KEEPS THE SCORE</div>
+                        <div class="module-author">Bessel van der Kolk</div>
+                        <div class="module-description">
+                            Master van der Kolk's groundbreaking neuroscience of trauma. Learn: how trauma lives in the body, 
+                            window of tolerance, brain changes, developmental trauma, EMDR, yoga & movement, neurofeedback, 
+                            theater & community healing, comprehensive treatment.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">9</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">3</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">27</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+
+                    <!-- Alice Miller Module -->
+                    <div class="module-card miller" onclick="launchModule('miller')">
+                        <div class="progress-badge" id="miller-progress">0% COMPLETE</div>
+                        <div class="module-icon">🎭</div>
+                        <div class="module-title">THE DRAMA OF THE GIFTED CHILD</div>
+                        <div class="module-author">Alice Miller</div>
+                        <div class="module-description">
+                            Explore Miller's revolutionary understanding of the false self. Learn: adaptation to narcissistic parents, 
+                            repressed feelings, depression's meaning, poisonous pedagogy, compulsion to repeat, enlightened witness, 
+                            therapeutic process, societal implications.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">9</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">3</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">27</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+
+                    <!-- Games People Play Module -->
+                    <div class="module-card berne" onclick="launchModule('berne')">
+                        <div class="progress-badge" id="berne-progress">0% COMPLETE</div>
+                        <div class="module-icon">🎭</div>
+                        <div class="module-title">GAMES PEOPLE PLAY</div>
+                        <div class="module-author">Eric Berne</div>
+                        <div class="module-description">
+                            Master Transactional Analysis and understand psychological games. Learn: ego states (Parent/Adult/Child), 
+                            transactions, strokes, life positions, games, drama triangle, life scripts, achieving autonomy, 
+                            clinical integration.
+                        </div>
+                        <div class="module-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">SKILLS</div>
+                                <div class="stat-value">9</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">LEVELS</div>
+                                <div class="stat-value">3</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">QUESTIONS</div>
+                                <div class="stat-value">27</div>
+                            </div>
+                        </div>
+                        <button class="launch-btn">→ LAUNCH MODULE</button>
+                    </div>
+
+                    <!-- Placeholder for future books -->
+                    <div class="module-card coming-soon">
+                        <div class="coming-soon-badge">COMING SOON</div>
+                        <div class="tooltip">💭 Suggest new modules!</div>
+                        <div class="module-icon">📖</div>
+                        <div class="module-title">MORE BOOKS</div>
+                        <div class="module-author">Expanding Library</div>
+                        <div class="module-description">
+                            More transformative books coming soon to expand your therapeutic knowledge...
+                        </div>
+                        <button class="placeholder-btn">🔜 SOON</button>
+                    </div>
+                </div>
+
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load progress for each module
+        function loadProgress() {
+            // Psychodynamic
+            const psychoSaved = localStorage.getItem('psychodynamicAcademy');
+            if (psychoSaved) {
+                const psychoState = JSON.parse(psychoSaved);
+                const psychoTotal = 12; // Total skills in psychodynamic
+                const psychoCompleted = psychoState.completedSkills.length;
+                const psychoPercent = Math.round((psychoCompleted / psychoTotal) * 100);
+                document.getElementById('psychodynamic-progress').textContent = psychoPercent + '% COMPLETE';
+            }
+
+            // Hungry Ghosts
+            const mateSaved = localStorage.getItem('hungryGhostsAcademy');
+            if (mateSaved) {
+                const mateState = JSON.parse(mateSaved);
+                const mateTotal = 9; // Total skills in mate
+                const mateCompleted = mateState.completedSkills.length;
+                const matePercent = Math.round((mateCompleted / mateTotal) * 100);
+                document.getElementById('mate-progress').textContent = matePercent + '% COMPLETE';
+            }
+
+            // Body Keeps Score
+            const vdkSaved = localStorage.getItem('bodyKeepsScoreAcademy');
+            if (vdkSaved) {
+                const vdkState = JSON.parse(vdkSaved);
+                const vdkTotal = 9; // Total skills in vdk
+                const vdkCompleted = vdkState.completedSkills.length;
+                const vdkPercent = Math.round((vdkCompleted / vdkTotal) * 100);
+                document.getElementById('vdk-progress').textContent = vdkPercent + '% COMPLETE';
+            }
+
+            // STDP
+            const stdpSaved = localStorage.getItem('stdpAcademy');
+            if (stdpSaved) {
+                const stdpState = JSON.parse(stdpSaved);
+                const stdpTotal = 9; // Total skills in stdp
+                const stdpCompleted = stdpState.completedSkills.length;
+                const stdpPercent = Math.round((stdpCompleted / stdpTotal) * 100);
+                document.getElementById('stdp-progress').textContent = stdpPercent + '% COMPLETE';
+            }
+
+            // Compassionate Inquiry
+            const ciSaved = localStorage.getItem('compassionateInquiryAcademy');
+            if (ciSaved) {
+                const ciState = JSON.parse(ciSaved);
+                const ciTotal = 9; // Total skills
+                const ciCompleted = ciState.completedSkills.length;
+                const ciPercent = Math.round((ciCompleted / ciTotal) * 100);
+                document.getElementById('ci-progress').textContent = ciPercent + '% COMPLETE';
+            }
+
+            // Alice Miller
+            const millerSaved = localStorage.getItem('giftedChildAcademy');
+            if (millerSaved) {
+                const millerState = JSON.parse(millerSaved);
+                const millerTotal = 9; // Total skills
+                const millerCompleted = millerState.completedSkills.length;
+                const millerPercent = Math.round((millerCompleted / millerTotal) * 100);
+                document.getElementById('miller-progress').textContent = millerPercent + '% COMPLETE';
+            }
+
+            // Games People Play
+            const berneSaved = localStorage.getItem('gamesPeoplePlayAcademy');
+            if (berneSaved) {
+                const berneState = JSON.parse(berneSaved);
+                const berneTotal = 9; // Total skills
+                const berneCompleted = berneState.completedSkills.length;
+                const bernePercent = Math.round((berneCompleted / berneTotal) * 100);
+                document.getElementById('berne-progress').textContent = bernePercent + '% COMPLETE';
+            }
+
+            // Update quick stats
+            updateQuickStats();
+        }
+
+        function updateQuickStats() {
+            let totalCompleted = 0;
+            let totalXP = 0;
+
+            // Psychodynamic
+            const psychoSaved = localStorage.getItem('psychodynamicAcademy');
+            if (psychoSaved) {
+                const psychoState = JSON.parse(psychoSaved);
+                totalCompleted += psychoState.completedSkills.length;
+                totalXP += psychoState.totalXp || 0;
+            }
+
+            // Hungry Ghosts
+            const mateSaved = localStorage.getItem('hungryGhostsAcademy');
+            if (mateSaved) {
+                const mateState = JSON.parse(mateSaved);
+                totalCompleted += mateState.completedSkills.length;
+                totalXP += mateState.totalXp || 0;
+            }
+
+            // Body Keeps Score
+            const vdkSaved = localStorage.getItem('bodyKeepsScoreAcademy');
+            if (vdkSaved) {
+                const vdkState = JSON.parse(vdkSaved);
+                totalCompleted += vdkState.completedSkills.length;
+                totalXP += vdkState.totalXp || 0;
+            }
+
+            // STDP
+            const stdpSaved = localStorage.getItem('stdpAcademy');
+            if (stdpSaved) {
+                const stdpState = JSON.parse(stdpSaved);
+                totalCompleted += stdpState.completedSkills.length;
+                totalXP += stdpState.totalXp || 0;
+            }
+
+            // Alice Miller
+            const millerSaved = localStorage.getItem('giftedChildAcademy');
+            if (millerSaved) {
+                const millerState = JSON.parse(millerSaved);
+                totalCompleted += millerState.completedSkills.length;
+                totalXP += millerState.totalXp || 0;
+            }
+
+            // Games People Play
+            const berneSaved = localStorage.getItem('gamesPeoplePlayAcademy');
+            if (berneSaved) {
+                const berneState = JSON.parse(berneSaved);
+                totalCompleted += berneState.completedSkills.length;
+                totalXP += berneState.totalXp || 0;
+            }
+
+            document.getElementById('total-completed').textContent = totalCompleted;
+            document.getElementById('total-xp').textContent = totalXP;
+        }
+
+        function launchModule(moduleType) {
+            if (moduleType === 'psychodynamic') {
+                window.location.href = 'psychodynamic-academy.html';
+            } else if (moduleType === 'mate') {
+                window.location.href = 'hungry-ghosts-academy.html';
+            } else if (moduleType === 'vdk') {
+                window.location.href = 'body-keeps-score-academy.html';
+            } else if (moduleType === 'stdp') {
+                window.location.href = 'stdp-academy.html';
+            } else if (moduleType === 'ci') {
+                window.location.href = 'compassionate-inquiry-academy.html';
+            } else if (moduleType === 'miller') {
+                window.location.href = 'gifted-child-academy.html';
+            } else if (moduleType === 'berne') {
+                window.location.href = 'games-people-play-academy.html';
+            }
+        }
+
+        // Initialize
+        loadProgress();
+
+        // Refresh progress every few seconds in case user has multiple tabs open
+        setInterval(loadProgress, 3000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC to reload/refresh stats
+            if (e.key === 'Escape') {
+                loadProgress();
+            }
+            
+            // Number keys 1-4 to launch modules
+            const keyMap = {
+                '1': 'psychodynamic',
+                '2': 'mate',
+                '3': 'vdk',
+                '4': 'stdp'
+            };
+            
+            if (keyMap[e.key]) {
+                launchModule(keyMap[e.key]);
+            }
+        });
+
+        // Make module cards keyboard accessible
+        document.querySelectorAll('.module-card:not(.coming-soon)').forEach((card, index) => {
+            card.setAttribute('tabindex', '0');
+            card.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+
+        // Add visual feedback for available modules
+        console.log('%c🎮 LEARNING LIBRARY LOADED', 'color: #0ff; font-size: 16px; font-weight: bold;');
+        console.log('%c⌨️  Keyboard Shortcuts:', 'color: #0f0; font-size: 12px;');
+        console.log('  • Press 1-4 to launch modules');
+        console.log('  • Press ESC to refresh stats');
+        console.log('  • Use TAB to navigate');
+    </script>
+</body>
+</html>
