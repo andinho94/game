@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHORT-TERM DYNAMIC PSYCHOTHERAPY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            color: #f00;
+            overflow-x: hidden;
+        }
+        
+        .game-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background: #222;
+            border: 8px solid #f00;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .crt-effect {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 1000;
+        }
+        
+        .screen {
+            background: #000;
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 14px;
+            color: #f00;
+            text-shadow: 2px 2px #ff0;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 8px;
+            color: #ff0;
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            background: #111;
+            border: 4px solid #f00;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .xp-bar-container {
+            background: #333;
+            border: 2px solid #f00;
+            height: 20px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, #f00 0%, #ff0 100%);
+            height: 100%;
+            transition: width 0.5s;
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8px;
+            color: #fff;
+            text-shadow: 1px 1px #000;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            font-size: 8px;
+        }
+        
+        .stat-item {
+            color: #f00;
+        }
+        
+        .stat-value {
+            color: #ff0;
+        }
+        
+        .skill-tree {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .skill-node {
+            background: #1a0000;
+            border: 4px solid #333;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        .skill-node.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .skill-node.unlocked {
+            border-color: #f00;
+        }
+        
+        .skill-node.unlocked:hover {
+            background: #330000;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        
+        .skill-node.completed {
+            border-color: #ff0;
+            background: #1a1a00;
+        }
+        
+        .skill-icon {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .skill-title {
+            font-size: 8px;
+            color: #f00;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .skill-progress {
+            font-size: 7px;
+            color: #ff0;
+            text-align: center;
+        }
+        
+        .skill-lock {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 16px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        .modal-content {
+            background: #000;
+            border: 8px solid #f00;
+            padding: 20px;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+        
+        .lesson-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .lesson-title {
+            font-size: 14px;
+            color: #f00;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-subtitle {
+            font-size: 8px;
+            color: #ff0;
+        }
+        
+        .teaching-section {
+            background: #1a0000;
+            border: 2px solid #f00;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .teaching-text {
+            font-size: 9px;
+            line-height: 1.8;
+            color: #f00;
+            margin-bottom: 15px;
+        }
+        
+        .key-concept {
+            background: #000;
+            border-left: 4px solid #ff0;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        
+        .concept-title {
+            color: #ff0;
+            font-size: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .concept-text {
+            color: #f00;
+            font-size: 8px;
+            line-height: 1.6;
+        }
+        
+        .question-section {
+            background: #000;
+            border: 4px solid #f00;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 10px;
+            color: #ff0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .answer-btn {
+            background: #330000;
+            border: 4px solid #f00;
+            color: #f00;
+            padding: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        
+        .answer-btn:hover:not(.disabled) {
+            background: #4d0000;
+            border-color: #ff0;
+            transform: translateX(5px);
+        }
+        
+        .answer-btn.correct {
+            background: #003300;
+            border-color: #0f0;
+            animation: correctPulse 0.5s;
+        }
+        
+        .answer-btn.incorrect {
+            background: #330000;
+            border-color: #f00;
+            animation: shake 0.5s;
+        }
+        
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border: 2px solid #f00;
+            font-size: 8px;
+            line-height: 1.6;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: #001a00;
+            border-color: #0f0;
+            color: #0f0;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background: #1a0000;
+            border-color: #f00;
+            color: #f00;
+            display: block;
+        }
+        
+        .continue-btn {
+            background: #330000;
+            border: 4px solid #f00;
+            color: #f00;
+            padding: 12px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            cursor: pointer;
+            margin-top: 20px;
+            float: right;
+        }
+        
+        .continue-btn:hover {
+            background: #4d0000;
+            border-color: #ff0;
+            color: #ff0;
+        }
+        
+        .back-btn {
+            background: #330000;
+            border: 4px solid #f00;
+            color: #f00;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            float: left;
+        }
+        
+        .back-btn:hover {
+            background: #550000;
+            color: #ff0;
+        }
+        
+        .completion-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .completion-title {
+            font-size: 16px;
+            color: #f00;
+            margin-bottom: 20px;
+        }
+        
+        .xp-earned {
+            font-size: 12px;
+            color: #ff0;
+            margin-bottom: 30px;
+        }
+
+        .level-indicator {
+            background: #000;
+            border: 2px solid #ff0;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .level-text {
+            color: #ff0;
+            font-size: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: #330000;
+            border: 4px solid #f00;
+            color: #f00;
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: #4d0000;
+            border-color: #ff0;
+            color: #ff0;
+        }
+
+        .home-btn {
+            background: #001a1a;
+            border-color: #0ff;
+            color: #0ff;
+        }
+
+        .home-btn:hover {
+            background: #003333;
+            border-color: #f0f;
+            color: #f0f;
+        }
+
+        /* Keyboard focus improvements */
+        .skill-node:focus {
+            outline: 3px solid #ff0;
+            outline-offset: 3px;
+        }
+
+        .answer-btn:focus,
+        .continue-btn:focus,
+        .back-btn:focus,
+        .nav-btn:focus {
+            outline: 2px solid #ff0;
+            outline-offset: 2px;
+        }
+
+        /* Skill prerequisites tooltip */
+        .skill-prereq {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6px;
+            color: #666;
+            text-align: center;
+        }
+
+        .skill-node.locked .skill-prereq {
+            color: #f00;
+        }
+
+        /* Running score display */
+        .score-tracker {
+            background: #1a0000;
+            border: 2px solid #f00;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 8px;
+            color: #ff0;
+        }
+
+        .score-value {
+            color: #0ff;
+            font-size: 10px;
+        }
+
+        /* Next skill button */
+        .next-skill-btn {
+            background: #330000;
+            border: 4px solid #f00;
+            color: #f00;
+            padding: 12px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            cursor: pointer;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .next-skill-btn:hover {
+            background: #4d0000;
+            border-color: #ff0;
+            color: #ff0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="crt-effect"></div>
+            <div class="screen">
+                <div class="title">⚡ SHORT-TERM DYNAMIC PSYCHOTHERAPY ⚡</div>
+                <div class="subtitle">ISTDP - INTENSIVE AFFECT-FOCUSED WORK</div>
+                
+                <div class="progress-header">
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xp-bar"></div>
+                        <div class="xp-text" id="xp-text">0 / 100 XP</div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-item">LEVEL: <span class="stat-value" id="level-display">1</span></div>
+                        <div class="stat-item">MASTERY: <span class="stat-value" id="mastery-display">0%</span></div>
+                        <div class="stat-item">STREAK: <span class="stat-value" id="streak-display">0🔥</span></div>
+                    </div>
+                </div>
+
+                <div class="level-indicator">
+                    <div class="level-text">CURRENT PATH: <span id="current-path">FOUNDATIONS</span></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="nav-btn home-btn" onclick="window.location.href='learning-library-hub.html'">🏠 HOME</button>
+                    <button class="nav-btn" onclick="saveProgress()">💾 SAVE</button>
+                    <button class="nav-btn" onclick="loadProgress()">📁 LOAD</button>
+                    <button class="nav-btn" onclick="resetProgress()">🔄 RESET</button>
+                </div>
+                
+                <div style="text-align: center; font-size: 6px; color: #666; margin-bottom: 15px;">
+                    ⌨️ SHORTCUTS: ESC=close • H=home • S=save • TAB=navigate
+                </div>
+                
+                <div class="skill-tree" id="skill-tree"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            totalXp: 0,
+            streak: 0,
+            completedSkills: [],
+            skillProgress: {},
+            currentLesson: null,
+            currentQuestion: 0,
+            correctAnswers: 0
+        };
+
+        const skillTree = [
+            // LEVEL 1: FOUNDATIONS
+            {
+                id: 'triangle-conflict',
+                title: 'Triangle of Conflict',
+                icon: '🔺',
+                level: 1,
+                xp: 20,
+                prereq: null,
+                lessons: [
+                    {
+                        title: 'The Core Model',
+                        teaching: `The TRIANGLE OF CONFLICT is the foundational map of ISTDP (Intensive Short-Term Dynamic Psychotherapy), developed by Habib Davanloo and refined by Allan Abbass, Patricia Coughlin, Jon Frederickson and others.
+
+THREE CORNERS:
+1. IMPULSE/FEELING (bottom left): True emotional experience - often unconscious. Rage, grief, guilt, love, sexual feelings.
+2. ANXIETY (bottom right): Body's response to feeling - the signal that feeling is dangerous. Shows in: tension, pain, cognitive disruption.
+3. DEFENSE (top): What you do to AVOID feeling and anxiety. Includes: deflection, projection, denial, compliance, dissociation, etc.
+
+The pattern: FEELING arises → triggers ANXIETY (body says "danger!") → activates DEFENSE (to avoid both feeling and anxiety).
+
+ISTDP works by: helping client SEE this pattern, build capacity to BEAR anxiety, dismantle defenses, access and experience TRUE FEELING.`,
+                        concepts: [
+                            {
+                                title: 'Why Feelings Create Anxiety',
+                                text: 'Feelings became dangerous in past - expressing anger got you punished, showing sadness led to rejection, loving made you vulnerable. Psyche learned: "This feeling = threat." Now, even POTENTIAL of feeling triggers anxiety automatically. This is unconscious conditioning.'
+                            },
+                            {
+                                title: 'Defenses Are Solutions',
+                                text: 'Defenses aren\'t bad - they WORKED. They protected you from overwhelm, punishment, rejection. Problem: they persist when no longer needed, prevent intimacy/growth, and create symptoms. ISTDP respects defenses while helping client see their cost.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says "I\'m frustrated with my partner" but smiles and laughs. Using Triangle of Conflict, what\'s happening?',
+                                answers: [
+                                    { text: 'They\'re not actually frustrated', correct: false, feedback: 'The verbal content (frustration) IS real. The smile is DEFENSE against the feeling, not evidence feeling is absent.' },
+                                    { text: 'DEFENSE (smiling/laughing) is covering FEELING (anger/frustration) to avoid ANXIETY that anger would trigger', correct: true, feedback: 'PERFECT! Triangle at work: IMPULSE = anger at partner. ANXIETY = (unconscious) danger signal about expressing anger. DEFENSE = smile/laugh to neutralize the anger, make it "not serious." This is classic intellectualization + deflection. ISTDP response: "I notice you smile when you mention frustration. What happens inside when you feel that frustration toward your partner without the smile?" Point to the defense, invite dropping it to access feeling beneath.' },
+                                    { text: 'They have a neurological problem', correct: false, feedback: 'This is psychological defense, not neurological. Very common pattern - smiling/laughing when discussing painful material.' },
+                                    { text: 'Just ignore the smile', correct: false, feedback: 'The smile IS the clinical data! It reveals defense. ISTDP therapist actively points to defenses like this.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the role of ANXIETY in the triangle?',
+                                answers: [
+                                    { text: 'It\'s the enemy that must be eliminated', correct: false, feedback: 'Anxiety isn\'t enemy - it\'s SIGNAL system. Can\'t eliminate it, need to understand and work with it.' },
+                                    { text: 'Signal that feeling is approaching - warns client "danger ahead" based on past conditioning, triggers defense to avoid the feeling', correct: true, feedback: 'YES! Anxiety is ALARM SYSTEM. When true feeling starts to emerge (anger, grief, guilt), anxiety spikes because psyche learned "this feeling is dangerous." Anxiety is BRIDGE between feeling and defense. ISTDP tracks anxiety carefully: Where in body? How intense? What pathway (striated muscle tension, smooth muscle, cognitive-perceptual)? Too little = client won\'t be motivated. Too much = overwhelm, can\'t access feeling. Just right = enough activation to work but not flood. We help client BUILD CAPACITY to tolerate anxiety so they can face feeling without needing defense.' },
+                                    { text: 'Anxiety only exists in anxious people', correct: false, feedback: 'Everyone experiences anxiety when approaching unconscious feelings! It\'s universal mechanism, not pathology.' },
+                                    { text: 'Anxiety is the same as the feeling', correct: false, feedback: 'No! Anxiety is RESPONSE to feeling. Feeling = emotion itself (rage, grief). Anxiety = body\'s physiological reaction signaling "this is dangerous." Different phenomena.' }
+                                ]
+                            },
+                            {
+                                question: 'Why does ISTDP focus on identifying defenses rather than just exploring feelings?',
+                                answers: [
+                                    { text: 'Defenses are more important than feelings', correct: false, feedback: 'Both matter! But defenses BLOCK access to feelings. Can\'t get to feelings without addressing defenses first.' },
+                                    { text: 'Defenses prevent access to true feelings - must be seen and relinquished before deep emotional work can happen', correct: true, feedback: 'EXACTLY! Can\'t access unconscious feeling while defense is operating. It\'s like trying to open a door while someone holds it shut. ISTDP sequence: 1) Point to defense ("Notice you change subject when anger comes up"), 2) Explore cost ("What\'s the price of avoiding this?"), 3) Invite relinquishing ("What if we faced it together?"), 4) THEN access feeling. Trying to "explore feelings" while defenses are active = talking ABOUT feelings intellectually, not EXPERIENCING them. This is why traditional therapy often stays surface. ISTDP systematically dismantles defenses first.' },
+                                    { text: 'Feelings don\'t matter in ISTDP', correct: false, feedback: 'Feelings are CENTRAL! But they\'re accessed through defense work. The goal IS to reach and metabolize unconscious feelings.' },
+                                    { text: 'Defenses can\'t be changed', correct: false, feedback: 'Defenses CAN be relinquished when client sees their operation and cost. This is core of ISTDP - building alliance against defenses.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'triangle-person',
+                title: 'Triangle of Person',
+                icon: '👥',
+                level: 1,
+                xp: 25,
+                prereq: 'triangle-conflict',
+                lessons: [
+                    {
+                        title: 'Past, Present, Transference',
+                        teaching: `The TRIANGLE OF PERSON maps where feelings show up across three relationships:
+
+1. CURRENT (C): Present-day relationships - partner, boss, friend, family member NOW
+2. PAST (P): Original figures - usually parents, early caregivers where patterns formed  
+3. TRANSFERENCE (T): Feelings toward THERAPIST - client unconsciously relates to you as if you were past figure
+
+Same FEELING (from Triangle of Conflict) appears in all three corners. Example: Rage at critical boss (C) = rage at critical father (P) = rage at therapist when they challenge (T).
+
+ISTDP uses Triangle of Person to: link present to past, make unconscious patterns conscious, work with "here and now" feelings toward therapist (most potent because alive in room).
+
+Pattern: Current problem → Connect to Past origin → Emerges in Transference → Process here and now.`,
+                        concepts: [
+                            {
+                                title: 'Why Transference Is Most Powerful',
+                                text: 'Feelings toward therapist are PRESENT, immediate, observable. Not memory or report - happening RIGHT NOW. This directness allows deep work. When client feels anger at you for challenging them, you can: witness it, help them bear it, show you won\'t retaliate like past figures. This is corrective experience.'
+                            },
+                            {
+                                title: 'Linking Creates Insight',
+                                text: 'When client sees: "I feel dismissed by my partner (C), the way I felt dismissed by my mother (P), and I notice I felt dismissed just now when you questioned me (T)" - this creates VISCERAL understanding. Not intellectual insight - FELT recognition of pattern. This is transformative.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client complains boss micromanages and doesn\'t trust them. Using Triangle of Person, where do you explore next?',
+                                answers: [
+                                    { text: 'Give advice about how to handle the boss', correct: false, feedback: 'Behavioral advice misses the pattern. ISTDP explores emotional/relational dynamics, not problem-solving.' },
+                                    { text: 'Explore: "Does this feeling - not being trusted - feel familiar from earlier in your life?" Link CURRENT to PAST', correct: true, feedback: 'YES! Use Current as entry point to explore Past origins. "The feeling of not being trusted by your boss - does this bring up anyone else? Perhaps earlier in life?" Often leads to: "My father never trusted me, always checked my homework, assumed I\'d mess up." NOW you have the pattern: mistrust from authority figures, rooted in father relationship. THEN watch for it in Transference: "I wonder if you sometimes feel I don\'t trust your perceptions when I ask these questions?" All three corners - same wound. This linking creates deep insight.' },
+                                    { text: 'Tell them their boss is the problem', correct: false, feedback: 'Externalizes. ISTDP explores internal experience and patterns, not whether external person is "right/wrong."' },
+                                    { text: 'Ignore it and change topics', correct: false, feedback: 'This is the material! Current relationship struggles are royal road to unconscious patterns. Don\'t ignore - explore!' }
+                                ]
+                            },
+                            {
+                                question: 'Why work with transference feelings rather than just past/current?',
+                                answers: [
+                                    { text: 'Transference isn\'t real, so it\'s safer', correct: false, feedback: 'Transference IS real - real feelings happening now. And it\'s not about "safer" - it\'s about MOST POTENT.' },
+                                    { text: 'Feelings toward therapist are alive in the room - immediate, observable, can be worked with directly rather than just discussed', correct: true, feedback: 'EXACTLY! Past = memory (can intellectualize). Current = report ("my boss did this" - outside the room). Transference = HAPPENING NOW between you and client. You can: witness the feeling directly, observe defenses against it in real-time, stay present as they experience it, respond differently than past figure. Example: Client feels rage at you for pointing to their defense. Instead of punishing (like past), you: welcome the anger, stay curious, help them express it fully, don\'t retaliate. This LIVED EXPERIENCE of "anger is safe to feel, other person doesn\'t reject me" changes the conditioning at visceral level. Talk alone can\'t do this.' },
+                                    { text: 'Past and current don\'t matter', correct: false, feedback: 'They all matter! But transference offers unique opportunity for immediacy and corrective experience.' },
+                                    { text: 'To make therapy longer and more expensive', correct: false, feedback: 'ISTDP is SHORT-TERM! Working with transference can actually SPEED change by accessing feelings directly rather than just discussing them.' }
+                                ]
+                            },
+                            {
+                                question: 'Client shares conflict with mother (P) but shows no emotion. What\'s the ISTDP move?',
+                                answers: [
+                                    { text: 'Accept the intellectual discussion', correct: false, feedback: 'Intellectual discussion of past = defense! ISTDP doesn\'t accept this, points to it.' },
+                                    { text: 'Point to defense: "You describe painful conflict but I don\'t see feeling. What happens inside as you tell me this?" Then watch for transference: how do they relate to YOU?', correct: true, feedback: 'PERFECT! Two-part intervention: 1) Point to DEFENSE (describing painful content without affect = intellectualization). "As you tell me about this painful conflict with your mother, I notice you tell it like reporting facts. Where is the FEELING?" 2) Build pressure to drop defense. 3) Watch what emerges toward YOU (Transference): Do they get compliant ("I should feel something")? Angry ("You\'re pushing me")? Deflect ("Let\'s talk about something else")? The way they defend against past feelings will show up in how they relate to you NOW. Work with this live dynamic.' },
+                                    { text: 'Tell them what they should feel', correct: false, feedback: 'Never tell client what to feel! Invite them to DROP DEFENSE and discover what\'s actually there. They must access feeling themselves.' },
+                                    { text: 'Move on to different topic', correct: false, feedback: 'This is rich clinical moment! Intellectualization about past trauma is COMMON defense. Must be addressed, not bypassed.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'pressure-challenge',
+                title: 'Pressure & Challenge',
+                icon: '💪',
+                level: 1,
+                xp: 30,
+                prereq: 'triangle-person',
+                lessons: [
+                    {
+                        title: 'Building the Work',
+                        teaching: `PRESSURE and CHALLENGE are active ISTDP interventions that differ from traditional "supportive" therapy:
+
+PRESSURE: Inviting client to look at something they're avoiding. "What's the feeling toward your mother RIGHT NOW as we talk?" or "Let's look directly at what you're turning away from."
+
+CHALLENGE: Pointing to defenses/cost. "I notice you laugh when you mention pain - what's the price of this?" or "You say you want help but avoid every feeling I invite you toward. This creates a problem for us."
+
+These aren't confrontational or hostile - they're ACTIVATING. Bypassing defenses, creating productive tension, mobilizing unconscious material.
+
+Balance needed: Too much pressure = overwhelm, client shuts down. Too little = stay surface, nothing moves. Right amount = activate feeling without flooding, build capacity.`,
+                        concepts: [
+                            {
+                                title: 'Why Traditional Support Isn\'t Enough',
+                                text: 'Pure support can collude with defenses. "I understand, take your time" when client deflects = reinforcing avoidance. ISTDP compassionately but actively challenges: "I care about you AND I see you avoiding something important. What are we running from?" This is therapeutic pressure - loving but firm.'
+                            },
+                            {
+                                title: 'Reading Capacity',
+                                text: 'Before pressuring, assess: Can they tolerate this? Check anxiety pathway (striated muscle = good, can bear it. Smooth muscle/cognitive = fragile, back off). Match intervention to capacity. Fragile client = build slowly. Neurotic client = can handle more pressure. This is art of ISTDP.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client deflects every time you approach their anger: changes subject, makes jokes, goes vague. What\'s the ISTDP intervention?',
+                                answers: [
+                                    { text: 'Let them avoid it, they\'ll come to it when ready', correct: false, feedback: 'This colludes with defense. May never "be ready" without active intervention. Defense protects them from feeling - won\'t just drop spontaneously.' },
+                                    { text: 'CHALLENGE the pattern: "I notice every time we approach your anger, you change subject or make a joke. This is a problem - it prevents us from helping you. Do you see this?"', correct: true, feedback: 'EXCELLENT! This is direct challenge to defense: 1) NAME the pattern specifically, 2) Point to COST ("prevents us from helping"), 3) Invite AWARENESS ("Do you see this?"), 4) Create choice point. Client must decide: keep defending OR face feeling. The challenge creates therapeutic tension - uncomfortable but necessary. Done with compassion: "I\'m not criticizing you - this pattern makes sense given your history. AND it\'s keeping you stuck. Want to try something different?" This activates motivation to relinquish defense.' },
+                                    { text: 'Tell them they\'re being difficult', correct: false, feedback: 'Judgmental, breaks alliance. Challenge targets BEHAVIOR pattern, not person\'s character. Frame as: "This DEFENSE is the problem" not "YOU are the problem."' },
+                                    { text: 'Give up on working with anger', correct: false, feedback: 'Anger is likely core issue! Can\'t give up. Need to persist with appropriate pressure, adjusting based on their capacity.' }
+                                ]
+                            },
+                            {
+                                question: 'When is pressure contraindicated (shouldn\'t be used)?',
+                                answers: [
+                                    { text: 'Never - always use maximum pressure', correct: false, feedback: 'Dangerous! Too much pressure with fragile client = decompensation. Must assess capacity first.' },
+                                    { text: 'When anxiety goes to cognitive-perceptual disruption or smooth muscle pathway - client is too fragile, need to build capacity first', correct: true, feedback: 'CRITICAL SAFETY! Anxiety pathways: STRIATED MUSCLE (tension, headache, back pain) = can tolerate pressure, good sign. SMOOTH MUSCLE (migraine, IBS, asthma) = more fragile. COGNITIVE-PERCEPTUAL (spacing out, vision blurring, derealization) = very fragile, overwhelmed. If client shows smooth muscle or C-P pathway, STOP pressure! Instead: build capacity through anxiety regulation, gradual exposure, supportive work. Resume pressure only when they can tolerate it. Pressuring fragile client = retraumatizing. This is why careful assessment is crucial in ISTDP.' },
+                                    { text: 'Pressure is never appropriate in therapy', correct: false, feedback: 'ISTDP is built on appropriate pressure! But must match client\'s capacity. With robust client, pressure is essential tool.' },
+                                    { text: 'Only when client asks you to stop', correct: false, feedback: 'Client may not ask to stop even when overwhelmed (compliance defense). Therapist must track anxiety pathway and titrate pressure accordingly. Client safety is therapist\'s responsibility.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s difference between CHALLENGE and being confrontational/harsh?',
+                                answers: [
+                                    { text: 'There is no difference', correct: false, feedback: 'Big difference! Challenge is precise, compassionate, therapeutic. Confrontation is hostile, shaming.' },
+                                    { text: 'CHALLENGE points to PATTERN with compassion ("This defense makes sense AND it costs you"). Confrontation attacks PERSON ("You\'re resistant/difficult")', correct: true, feedback: 'PERFECT distinction! CHALLENGE: "I see you turning away every time sadness appears. I understand - sadness feels dangerous given what you experienced. AND this pattern keeps you from grieving, which keeps you stuck. Shall we try facing it together?" This: 1) Names pattern specifically, 2) Normalizes ("makes sense"), 3) Points to cost, 4) Invites collaboration. CONFRONTATION: "You\'re just being resistant." This: shames person, creates power struggle, breaks alliance. Challenge enlists client as ALLY against defense. "This defense is the enemy, not you. Let\'s fight it together." Firm but loving. High warmth + high challenge = ISTDP stance.' },
+                                    { text: 'Challenge is about making client uncomfortable', correct: false, feedback: 'Goal isn\'t discomfort for its own sake - it\'s helping client SEE and relinquish defenses. Discomfort is sometimes byproduct, not the aim.' },
+                                    { text: 'Only harsh confrontation creates change', correct: false, feedback: 'False! Harshness creates shame/shutdown. Compassionate but firm challenge creates: awareness, motivation, willingness to try differently. This is what moves the work.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 2: INTERMEDIATE  
+            {
+                id: 'anxiety-pathways',
+                title: 'Anxiety Pathways',
+                icon: '⚡',
+                level: 2,
+                xp: 35,
+                prereq: 'pressure-challenge',
+                lessons: [
+                    {
+                        title: 'Reading the Body',
+                        teaching: `ISTDP maps three ANXIETY PATHWAYS - how anxiety discharges in body. This guides intervention:
+
+1. STRIATED MUSCLE (Optimal): Tension in voluntary muscles - shoulders, jaw, fists, back. Shows as: headache, muscle pain, tightness. Client is MOBILIZING against threat. Can tolerate feeling work.
+
+2. SMOOTH MUSCLE (Fragile): Involuntary muscles affected - gut, blood vessels, airways. Shows as: IBS, migraines, asthma, heart palpitations. System more overwhelmed. Need gentle approach, capacity building first.
+
+3. COGNITIVE-PERCEPTUAL (Very Fragile): Brain functions disrupted. Shows as: vision blurring, spacing out, dissociation, confusion, "can't think." System is flooding. STOP pressure immediately, regulate, build safety.
+
+Therapist constantly monitors: "Where do you notice that in your body?" This tells you: Can I increase pressure? Must I back off? Is client building capacity?`,
+                        concepts: [
+                            {
+                                title: 'Why Pathway Matters',
+                                text: 'Same level of feeling creates different anxiety responses in different people based on nervous system resilience. Striated = robust system, can mobilize effectively. Smooth muscle = fragile system, overwhelms easily. C-P = very fragile, dissociates. Must match intervention to capacity or you harm client.'
+                            },
+                            {
+                                title: 'Building Capacity',
+                                text: 'Therapy can shift pathway! Person who starts in smooth muscle can learn to channel anxiety into striated muscle through: titrated exposure to feeling, anxiety regulation techniques, building window of tolerance. This is structural change - nervous system learning new response pattern.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'You ask about anger toward father. Client says "My vision just got blurry and I feel spacey." What do you do?',
+                                answers: [
+                                    { text: 'Keep pressuring toward the anger', correct: false, feedback: 'DANGEROUS! C-P pathway = client is dissociating, overwhelmed. More pressure = more fragmentation. Must STOP and regulate.' },
+                                    { text: 'STOP pressure immediately. "Let\'s pause. Look around the room, tell me what you see. Feel your feet on floor." REGULATE, then assess fragility', correct: true, feedback: 'EXACTLY RIGHT! Vision blurring + spacey = COGNITIVE-PERCEPTUAL pathway = system overwhelmed, dissociating. This is RED LIGHT - stop everything! Intervention: 1) Stop pressure, 2) Bring to present ("Look at me, what do you see?"), 3) Ground ("Feet on floor, hands on chair"), 4) THEN assess: Is this characteristic pattern or unusual spike? If characteristic = very fragile client, need months of capacity building before affect work. If unusual = something about THIS content is overwhelming, approach differently. Never push through C-P disruption - you\'ll retraumatize.' },
+                                    { text: 'Tell them they\'re being resistant', correct: false, feedback: 'This is FRAGILITY not resistance! Blaming them for neurobiological overwhelm is harmful and wrong.' },
+                                    { text: 'Ignore the symptoms and continue', correct: false, feedback: 'These symptoms are crucial data about system capacity! Ignoring them risks serious harm - dissociation can worsen, client can decompensate.' }
+                                ]
+                            },
+                            {
+                                question: 'Client reports: "My shoulders are so tight right now, my jaw is clenched." What does this tell you?',
+                                answers: [
+                                    { text: 'They need massage therapy', correct: false, feedback: 'This is ANXIETY in striated muscle, not structural muscle problem. It\'s psychological discharge, very useful clinically!' },
+                                    { text: 'STRIATED MUSCLE pathway - good sign! Client can tolerate affect work, anxiety is channeling into mobilization', correct: true, feedback: 'YES! Striated muscle tension = OPTIMAL pathway. Shows: 1) System is MOBILIZING (fight response), 2) Anxiety channeling into voluntary muscles, 3) Can bear the work. This is GREEN LIGHT for affect work. Response: "Good - you\'re mobilizing. That tension in shoulders and jaw - that\'s your body getting ready. What\'s it getting ready to DO? If those clenched fists could act, what would they do?" Use the striated muscle activation to ACCESS the impulse beneath (usually rage). The tension IS the rage trying to express - help it complete.' },
+                                    { text: 'Client is faking symptoms', correct: false, feedback: 'These are real somatic manifestations of anxiety! Don\'t doubt client\'s experience.' },
+                                    { text: 'Stop all affect work immediately', correct: false, feedback: 'Opposite! Striated muscle = system can HANDLE the work. This is when to go deeper, not stop.' }
+                                ]
+                            },
+                            {
+                                question: 'Why does ISTDP constantly ask "Where do you notice that in your body?"',
+                                answers: [
+                                    { text: 'To distract from emotional content', correct: false, feedback: 'Not distraction - this IS the emotional content! Feelings live in body, not just mind.' },
+                                    { text: 'To track anxiety pathway (striated/smooth/C-P), assess capacity, guide intervention intensity, and keep client connected to somatic experience', correct: true, feedback: 'EXACTLY! Multiple crucial functions: 1) SAFETY - pathway tells you if client can tolerate more or needs regulation, 2) TRACKING - monitor if capacity building (smooth→striated) or declining (striated→C-P), 3) ACCESSING FEELING - emotions are embodied, asking about body keeps client in felt experience vs intellectual discussion, 4) TEACHING - client learns to notice their own responses, builds interoception. "Where in body" = most important ISTDP question! Asked repeatedly throughout session. It\'s both assessment tool and intervention - grounds client in somatic reality of emotion.' },
+                                    { text: 'Because ISTDP is a body-based therapy only', correct: false, feedback: 'ISTDP is psychodynamic therapy that INCLUDES body awareness as crucial component. Not purely somatic work - integrates cognitive, emotional, somatic, relational.' },
+                                    { text: 'To make sessions longer', correct: false, feedback: 'ISTDP is SHORT-term! Body focus actually speeds access to unconscious material by bypassing cognitive defenses.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'defense-restructuring',
+                title: 'Defense Restructuring',
+                icon: '🛡️',
+                level: 2,
+                xp: 40,
+                prereq: 'anxiety-pathways',
+                lessons: [
+                    {
+                        title: 'Systematic Dismantling',
+                        teaching: `DEFENSE RESTRUCTURING is systematic process of helping client:
+1. SEE their defenses (build awareness)
+2. Understand COST (what defenses prevent - intimacy, growth, healing)
+3. RELINQUISH defenses (choose to face feeling instead)
+
+Not attacking defenses or trying to strip them away. Creating conditions where client CHOOSES to drop defense because they understand: "This protected me once but now it imprisons me."
+
+Process: Label defense → Point to cost → Build alliance against it → Invite dropping → Support bearing the feeling beneath.
+
+Common defenses in ISTDP: Intellectualization, deflection (changing subject), vagueness, projection, compliance (being "good patient"), passivity, somatization.`,
+                        concepts: [
+                            {
+                                title: 'Defenses vs Character',
+                                text: 'CRITICAL: Challenge the DEFENSE not the PERSON. "This pattern of avoiding eye contact prevents intimacy" NOT "You avoid intimacy." Defense is behavior that can change. Attacking character creates shame and resistance. Frame as: "This defense is your enemy, let\'s fight it together."'
+                            },
+                            {
+                                title: 'When Defense Won\'t Budge',
+                                text: 'If client clings to defense after clear challenge: 1) Fear beneath is too great (need more capacity building), 2) Secondary gain (defense provides something valuable), 3) Therapist\'s timing/approach was off, or 4) Defense is characterological (needs longer work). Respect resistance, adjust approach, don\'t force.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client responds to every question with "I don\'t know" even for things they clearly do know. How do you restructure this defense?',
+                                answers: [
+                                    { text: 'Accept "I don\'t know" and move on', correct: false, feedback: 'This colludes with defense! "I don\'t know" is often AVOIDANCE masquerading as ignorance. Must be challenged.' },
+                                    { text: 'Label it: "I notice \'I don\'t know\' appears frequently. This is actually a way of not looking." Point to cost: "But if we don\'t look, we can\'t help you." Challenge: "Could we try looking together?"', correct: true, feedback: 'PERFECT restructuring sequence! 1) LABEL - name the pattern without judgment, 2) REFRAME - "This isn\'t ignorance, it\'s avoidance" (client often not conscious of this), 3) COST - "This prevents us from helping you, keeps you stuck", 4) INVITATION - "What if we tried looking instead of saying \'I don\'t know\'?" This: respects that defense served purpose, shows current cost, offers collaborative alternative. If client still resists: "So this \'I don\'t know\' is important to hold onto. What would happen if you DID know? What would you have to face?" Explore the fear beneath the defense.' },
+                                    { text: 'Tell them they\'re lying', correct: false, feedback: 'Accusatory and false! "I don\'t know" is unconscious defense, not deliberate lie. Treating it as deception breaks alliance.' },
+                                    { text: 'Give them multiple choice answers', correct: false, feedback: 'This enables the defense! Does the work FOR them. ISTDP invites client to do the emotional work of looking, not therapist providing answers.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the purpose of pointing to COST of defenses?',
+                                answers: [
+                                    { text: 'To shame the client', correct: false, feedback: 'Never! Pointing to cost creates MOTIVATION to change, not shame. Done with compassion: "This defense makes sense AND it costs you..."' },
+                                    { text: 'To create motivation for relinquishing defense - when client sees what defense PREVENTS (intimacy, growth, healing), they become willing to try differently', correct: true, feedback: 'YES! Defenses persist because client doesn\'t see cost OR cost seems worth it (feeling is scarier than loneliness). Pointing to cost makes implicit explicit: "This deflecting every time we approach grief - it keeps grief away, yes. AND it prevents you from healing the loss, keeps you stuck in depression, blocks intimacy with your partner who wants to comfort you but can\'t reach you. Is this price worth it?" When cost becomes VISIBLE and FELT, motivation shifts: "I\'m tired of being alone. Maybe facing grief is less costly than this isolation." This is decision point for change. Without seeing cost, no motivation to relinquish familiar defense.' },
+                                    { text: 'Because defenses have no function', correct: false, feedback: 'Defenses DO have function - protection! But they also have COST. Both are true. We emphasize cost to create change motivation.' },
+                                    { text: 'To prove therapist is right', correct: false, feedback: 'Not about being right! About helping client see their own pattern and its consequences so THEY can choose differently.' }
+                                ]
+                            },
+                            {
+                                question: 'Client becomes compliant after you challenge their defenses - agrees with everything, tries to be "good patient." What\'s happening?',
+                                answers: [
+                                    { text: 'They\'re genuinely changing', correct: false, feedback: 'Unlikely to be real change this fast. More likely this IS the defense - compliance replacing previous defense.' },
+                                    { text: 'COMPLIANCE itself is a defense - appearing to cooperate while avoiding true feeling. Must challenge this new defense', correct: true, feedback: 'EXCELLENT catch! Compliance is SNEAKY defense - looks like cooperation but is avoidance. Client learned: "Be good = stay safe." Now applies this to therapy: "If I agree, therapist won\'t push harder." Intervention: "I notice you\'re agreeing with everything I say. But I don\'t feel YOU in this - where are your true feelings? What\'s it like to have me challenging you? Could there be frustration or anger?" Point to the compliance as defense just like any other. Real change = client expresses AUTHENTIC response (which might be anger at your challenging!), not compliant agreement. Compliance prevents intimacy, keeps therapist at distance, avoids vulnerability. Must be restructured.' },
+                                    { text: 'You succeeded, stop challenging', correct: false, feedback: 'If you stop challenging compliance, you collude with new defense. Real success = authentic feeling emerges, not polite agreement.' },
+                                    { text: 'Increase pressure to break through compliance', correct: false, feedback: 'More pressure on compliant client often = more compliance (or collapse into C-P). Instead, NAME the compliance directly, explore what it defends against.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'unlocking-unconscious',
+                title: 'Unlocking the Unconscious',
+                icon: '🔓',
+                level: 2,
+                xp: 35,
+                prereq: 'defense-restructuring',
+                lessons: [
+                    {
+                        title: 'The Breakthrough',
+                        teaching: `UNLOCKING THE UNCONSCIOUS is the moment when defenses drop and true feeling emerges - what ISTDP works toward. Also called "breakthrough" or "de-repression."
+
+Signs of unlocking:
+- Sudden shift from intellectual to visceral
+- Body activation increases dramatically (striated muscle mobilizes)
+- Affect floods in - rage, grief, or complex feeling
+- Client accesses previously unavailable material
+- Eye contact becomes direct, real
+- "I" statements replace "you/one/people"
+
+This is NOT catharsis for its own sake. It's accessing and EXPERIENCING repressed feeling so it can be METABOLIZED and no longer drives symptoms.
+
+Therapist's role: Support the bearing of feeling, help it complete, integrate the experience, link to pattern across triangle of person.`,
+                        concepts: [
+                            {
+                                title: 'Difference from Catharsis',
+                                text: 'Pure catharsis (screaming, crying) without structure can retraumatize. ISTDP unlocking is: 1) Prepared (defenses already weakened), 2) Supported (therapist present, guiding), 3) Structured (tracked in body, linked to relationships), 4) Integrated (meaning made afterward). This makes it therapeutic, not just ventilation.'
+                            },
+                            {
+                                title: 'What Happens After',
+                                text: 'Post-unlocking: Relief, clarity, energy shift, symptom reduction often immediate. Then: consolidation phase - integrate insight, test new behaviors, generalize learning. One unlocking rarely "cures" - but it SHIFTS something fundamental. Client knows: "I CAN feel this and survive."'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'During session, client suddenly stops mid-sentence, face flushes, fists clench, breathing deepens. Eyes well up. What\'s happening and what do you do?',
+                                answers: [
+                                    { text: 'They\'re having a panic attack, call 911', correct: false, feedback: 'Not panic! This is BREAKTHROUGH - unconscious material surfacing. Exactly what ISTDP works toward.' },
+                                    { text: 'UNLOCKING - defenses dropped, true feeling emerging. Say: "Stay with that. What\'s happening in your body right now? Let it come."', correct: true, feedback: 'PERFECT! This is THE moment - unconscious breaking through. Your job: 1) SUPPORT - "Stay with it, I\'m here", 2) TRACK - "What\'s happening in body?", 3) DON\'T INTERRUPT - resist urge to rescue or interpret, 4) HELP IT COMPLETE - "Those fists - what do they want to do? Let the feeling move through." Client is accessing rage/grief that\'s been buried. Might sob, might rage, might feel impulse to destroy. All okay - help them BEAR and COMPLETE it. Afterward: "What just happened? What did you experience?" Integrate, link to pattern. This moment changes therapy - they\'ve touched the unconscious truth.' },
+                                    { text: 'Distract them with different topic', correct: false, feedback: 'NO! This is precious therapeutic moment! Distracting = colluding with defense, preventing the work. Stay WITH the activation.' },
+                                    { text: 'Tell them to calm down', correct: false, feedback: 'Opposite of what\'s needed! They need to GO INTO the feeling, not calm it. "Calm down" reinforces defense. ISTDP: "Let it intensify, I\'m with you."' }
+                                ]
+                            },
+                            {
+                                question: 'After intense unlocking session where client accessed deep rage at father, they call next day saying they feel worse, symptoms increased. What happened?',
+                                answers: [
+                                    { text: 'The therapy harmed them, stop ISTDP', correct: false, feedback: 'Temporary increase post-unlocking is COMMON, not harm. This is integration phase, often uncomfortable.' },
+                                    { text: 'Normal post-unlocking response - system is reorganizing, integrating new material. Guilt may have emerged after rage. Support through it', correct: true, feedback: 'YES - this is EXPECTED! After unlocking rage, client often experiences: 1) GUILT - "I\'m bad for feeling that rage", 2) GRIEF - "I needed love and got hurt instead", 3) DISORIENTATION - old defenses gone, new patterns not yet established, 4) Temporary symptom spike as system recalibrates. This is WORKING, not failing. Response: "This makes sense - you touched something real yesterday. The aftermath can be uncomfortable as you integrate it. Let\'s meet and work with what\'s coming up." Next session: process the guilt/grief that followed rage. This is layered work. Rage → Guilt about rage → Grief about needing to hate loved one. Each layer must be metabolized.' },
+                                    { text: 'They\'re being dramatic', correct: false, feedback: 'Dismissive! Post-unlocking distress is real neurobiological reorganization, not drama.' },
+                                    { text: 'You did the technique wrong', correct: false, feedback: 'Temporary worsening often means technique worked! Unconscious material is now active, being processed. This can be uncomfortable but is part of healing.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the difference between healthy unlocking and retraumatization?',
+                                answers: [
+                                    { text: 'There is no difference', correct: false, feedback: 'Huge difference! Unlocking is structured, therapeutic. Retraumatization is uncontained flooding.' },
+                                    { text: 'UNLOCKING: Client can bear affect, therapist present, body stays in striated muscle, integrates after. RETRAUMATIZATION: Client floods into C-P, dissociates, therapist pushed too hard, no integration', correct: true, feedback: 'CRITICAL DISTINCTION! HEALTHY UNLOCKING: 1) Adequate preparation (defenses worked through first), 2) Client capacity assessed (striated muscle pathway), 3) Therapist regulates intensity (titrates), 4) Bearing not flooding (uncomfortable but tolerable), 5) Integration follows (meaning-making, linking), 6) Client feels RELIEF after, not fragmented. RETRAUMATIZATION: 1) Premature (defenses not addressed), 2) Exceeds capacity (C-P pathway), 3) Therapist doesn\'t track/adjust, 4) Client overwhelmed, dissociates, 5) No integration, 6) Aftermath = worse, fragmented, symptomatic. THIS is why careful assessment is crucial! Don\'t push fragile client to unlocking - build capacity FIRST. Robust client can handle intense affect work. Wrong assessment = harm.' },
+                                    { text: 'All emotional intensity is harmful', correct: false, feedback: 'No! Intensity within window of tolerance is HEALING. Avoiding all intensity keeps client stuck. It\'s about matching intensity to capacity.' },
+                                    { text: 'Only medication prevents retraumatization', correct: false, feedback: 'Medication might help regulation but skilled assessment and titration of therapeutic intensity is what prevents retraumatization in ISTDP.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 3: ADVANCED
+            {
+                id: 'complex-mixed-feelings',
+                title: 'Complex Mixed Feelings',
+                icon: '🌊',
+                level: 3,
+                xp: 45,
+                prereq: 'unlocking-unconscious',
+                lessons: [
+                    {
+                        title: 'The Layered Truth',
+                        teaching: `COMPLEX MIXED FEELINGS are the reality of attachment relationships: LOVE and RAGE toward same person simultaneously. Child loves parent AND rages at neglect/abuse. This creates unbearable conflict.
+
+Defense: Split the feelings - "all love" OR "all rage" but not both. Result: Can't integrate ambivalence, relationships become idealized or demonized.
+
+ISTDP work: Help client HOLD both feelings at once. "You loved your father deeply AND you hated what he did to you. Both are true."
+
+The grief comes when client can bear: "I needed love from someone who hurt me. I still love them AND I rage at the harm. I wanted them to be different AND they never will be."
+
+This is most advanced work - tolerating complexity of real relationships.`,
+                        concepts: [
+                            {
+                                title: 'Why Mixed Feelings Are Unbearable',
+                                text: 'For child: "If I hate the parent I need, I\'ll lose them" (loss terror). "If I hate someone I love, I\'m bad" (guilt). Can\'t consciously hold both, so: split (all good/all bad), or repress rage (keep only love conscious), or repress love (keep only rage). All create problems. Healing = integrate both.'
+                            },
+                            {
+                                title: 'Murderous Rage in Love Relationships',
+                                text: 'Most disturbing for clients: discovering MURDEROUS rage toward loved one. "I wanted to kill my mother" feels incompatible with "I loved her." Must normalize: rage at someone you depended on who hurt you is INEVITABLE. It doesn\'t mean you\'re bad or didn\'t love them. Both existed. This integration is liberation.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client idealizes deceased mother: "She was perfect, gave me everything." But symptoms (depression, rage at partner) suggest unprocessed anger. How do you work with this?',
+                                answers: [
+                                    { text: 'Tell them their mother was actually bad', correct: false, feedback: 'Don\'t impose your view! Client must discover complexity themselves. Attacking idealized figure = attack on client, breaks alliance.' },
+                                    { text: 'Gently explore: "You describe her as perfect. I wonder... were there times you needed something she couldn\'t give? What was hard about relationship with her?"', correct: true, feedback: 'EXCELLENT gentle challenge to idealization! Not attacking mother, just inviting complexity. Often client will offer: "Well, she was depressed, not always available" or "She was critical sometimes." THEN: "So there was love AND moments of pain. What\'s the feeling toward her about those moments?" Access the split-off anger. Client might resist: "But she did her best!" Validate AND persist: "I\'m sure she did. AND it sounds like you sometimes needed more than she could give. What\'s the feeling about that?" This is delicate - idealizing protects from grief ("If she was perfect, I wasn\'t deprived"). Facing anger means facing loss of what was never there.' },
+                                    { text: 'Accept idealization and don\'t explore', correct: false, feedback: 'Idealization IS the defense preventing healing! Symptoms tell you: unprocessed rage exists. Must explore despite resistance.' },
+                                    { text: 'Focus only on rage, ignore the love', correct: false, feedback: 'Must hold BOTH! Love existed too. Goal is integration of complexity, not replacing one split (all love) with opposite split (all rage).' }
+                                ]
+                            },
+                            {
+                                question: 'Client accesses rage at father for abuse, then immediately says "But I still loved him. I\'m a terrible person for feeling that rage." What do you address?',
+                                answers: [
+                                    { text: 'The rage - stay with it and ignore the guilt', correct: false, feedback: 'Guilt IS the next layer to work with! Can\'t ignore it. Rage triggered guilt - this is the complexity.' },
+                                    { text: 'BOTH: "You loved him AND raged at what he did. Both are true. The guilt says you\'re terrible for the rage - but is that true? Or is it natural to rage at harm even from someone you loved?"', correct: true, feedback: 'PERFECT! Addressing complex mixed feelings: 1) NORMALIZE both - "Of course you loved him, he was your father. Of course you raged, he hurt you. Both make sense.", 2) CHALLENGE guilt - "The guilt says rage makes you bad. But does raging at someone who harmed you actually make you bad? Or human?", 3) HOLD complexity - "You can love him AND rage at him. These aren\'t opposite - they\'re both your truth." This integration is healing. The self-attack (guilt) is defense against rage. Work through it: "What would happen if you let yourself rage at him WITHOUT calling yourself terrible?" Client often weeps here - grief about needing to hate someone they loved. This is resolution.' },
+                                    { text: 'Tell them to choose love or rage', correct: false, feedback: 'No! Can\'t choose. Both exist. Goal is integrating both, not picking one.' },
+                                    { text: 'Change subject to avoid the conflict', correct: false, feedback: 'This IS the work - the unbearable complexity that needs bearing. Don\'t avoid it, help client metabolize it.' }
+                                ]
+                            },
+                            {
+                                question: 'Why is work with complex mixed feelings considered most advanced ISTDP?',
+                                answers: [
+                                    { text: 'It\'s not actually important', correct: false, feedback: 'This is CORE of depth work! Most transformative when client can integrate ambivalence.' },
+                                    { text: 'Requires client to tolerate maximum psychological pain - holding love and murderous rage toward same person simultaneously, bearing the grief this creates', correct: true, feedback: 'YES! This is hardest work because: 1) PAIN - "I loved someone who hurt me" is devastating truth, 2) GUILT - rage at loved one triggers intense self-attack, 3) COMPLEXITY - holding both feelings simultaneously (not splitting) requires high capacity, 4) GRIEF - facing "I needed different parent than I got" = profound loss, 5) INTEGRATION - can\'t resolve by choosing one feeling. Must bear BOTH. This work requires: strong therapeutic alliance, adequate capacity building, worked through defenses, tolerance for intense affect. Can\'t rush here. But when client achieves it - when they can say: "I loved my father deeply AND I hate what he did. I wanted him to be different AND he never will be. I grieve both the love I had and the love I never got" - THIS is integration. Depression often lifts, relationships improve, self-compassion grows. They\'ve metabolized the unbearable truth.' },
+                                    { text: 'Only smart clients can do this work', correct: false, feedback: 'Not about intelligence - about EMOTIONAL capacity. Client needs strong enough ego to hold paradox. This is built through therapy, not IQ.' },
+                                    { text: 'Therapists prefer to avoid it', correct: false, feedback: 'Skilled ISTDP therapist actively works toward this! It\'s the deepest healing. But yes, it requires therapist comfort with intense, complex affect.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'character-resistance',
+                title: 'Character Resistance',
+                icon: '🗿',
+                level: 3,
+                xp: 40,
+                prereq: 'complex-mixed-feelings',
+                lessons: [
+                    {
+                        title: 'When Defenses Are Identity',
+                        teaching: `CHARACTER RESISTANCE: Defenses so deeply embedded they feel like "who I am" rather than "what I do." Examples: "I'm a people-pleaser" (not "I sometimes please others to avoid conflict"). "I'm emotionally unavailable" (not "I defend against closeness").
+
+These defenses are EGO-SYNTONIC - feel like self, not problem. Client doesn't experience them as defense. This makes them harder to work with.
+
+ISTDP approach: 
+1. Point to PATTERN across situations ("Notice this appears with partner, boss, me, your mother...")
+2. Show COST ("This keeps you lonely, anxious, stuck")
+3. Frame as PRISON not identity ("This pattern imprisons you, it's not who you are")
+4. Explore PAYOFF ("What does this pattern give you? What would you risk if you changed?")
+
+Longer work usually needed. Can't dismantle character-level defenses in single session.`,
+                        concepts: [
+                            {
+                                title: 'Ego-Syntonic vs Ego-Dystonic',
+                                text: 'EGO-DYSTONIC defense: Client experiences it as problem. "I know I shouldn\'t avoid but I can\'t help it." Easier to work with - client wants change. EGO-SYNTONIC: "This is just who I am, I\'ve always been this way." No dissonance. Harder - must CREATE awareness it\'s problem first.'
+                            },
+                            {
+                                title: 'Why Character Defenses Persist',
+                                text: 'They\'re IDENTITY protective. If "I\'m stoic" is your identity, feeling vulnerable = losing self. If "I\'m caretaker" is your identity, receiving care = existential threat. Defense isn\'t just avoiding feeling - it\'s maintaining sense of WHO YOU ARE. Dismantling requires building NEW identity, not just dropping defense.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says "I\'m just a detached person, I don\'t do emotions. That\'s who I am." They present no distress about this. How do you intervene?',
+                                answers: [
+                                    { text: 'Accept it - if they\'re comfortable, don\'t challenge', correct: false, feedback: 'They came to therapy for reason! Symptoms exist even if defense is ego-syntonic. Must explore cost to create motivation.' },
+                                    { text: 'Point to cost: "And what\'s the price of this detachment? What does it prevent in your relationships? What brought you to therapy if this works so well?"', correct: true, feedback: 'EXCELLENT! Challenge ego-syntonic defense by highlighting COST: 1) "You say you\'re detached person. What does this cost you in relationships? Can people get close to you?", 2) "If this works well, why seek therapy? What\'s the problem?", 3) "So \'detached\' keeps you safe from what? What would you risk if you let people in?" Create DISSONANCE - "If this is just who I am and it\'s fine, why am I lonely/anxious/in therapy?" When cost becomes visible, defense becomes ego-DYSTONIC (problem) instead of ego-syntonic (identity). THEN can work with it. Also explore: "When did you become \'detached person\'? What was happening in your life?" Often discover: abuse/loss → child shut down emotionally → froze into identity. It\'s adaptation, not nature.' },
+                                    { text: 'Tell them they\'re wrong about themselves', correct: false, feedback: 'Invalidating. Don\'t tell them who they are. Help them DISCOVER the cost and origin of the defense pattern.' },
+                                    { text: 'Give up - character defenses can\'t change', correct: false, feedback: 'They CAN change but require longer, more patient work. Don\'t give up - adjust expectations and approach.' }
+                                ]
+                            },
+                            {
+                                question: 'Client is chronic caretaker - compulsively helps others, never receives. Sees this as virtue: "I\'m a giving person." What\'s the ISTDP understanding?',
+                                answers: [
+                                    { text: 'They\'re genuinely generous, affirm this', correct: false, feedback: 'COMPULSIVE helping is defense, not genuine generosity! Lack of receiving is problem. Must explore.' },
+                                    { text: 'Caretaking is CHARACTER DEFENSE against vulnerability of needing/receiving - maintains illusion of self-sufficiency, avoids feeling own needs', correct: true, feedback: 'EXACTLY! Compulsive caretaking defends against: 1) VULNERABILITY - if I help, I\'m strong; if I need, I\'m weak, 2) NEEDINESS - own needs feel shameful/dangerous (learned in childhood), 3) ATTACHMENT PAIN - if I don\'t need, can\'t be disappointed/abandoned. Intervention: "You give constantly. What happens when someone tries to give to YOU?" (Usually: discomfort, deflection, "I don\'t need anything.") "So receiving feels dangerous. What would it mean about you if you needed help?" Often: "I\'d be burden, weak, too much." THIS is the wound. Helping others = defending against owning needs that were rejected in past. Must work with: shame about needs, fear of depending, grief about not having needs met as child. Help them receive from YOU first (in transference) as practice.' },
+                                    { text: 'Caretaking is fine, focus on other issues', correct: false, feedback: 'Compulsive caretaking IS the issue! Creates: burnout, resentment, lonely relationships (no reciprocity), symptom formation. Must be addressed.' },
+                                    { text: 'Tell them to stop helping people', correct: false, feedback: 'Can\'t just stop - need to address underlying defense. WHY compulsive helping? What does it defend against? Must work at that level.' }
+                                ]
+                            },
+                            {
+                                question: 'What makes character resistance particularly challenging in time-limited ISTDP?',
+                                answers: [
+                                    { text: 'It\'s not challenging, same as any defense', correct: false, feedback: 'Character defenses ARE more challenging - deeply embedded, ego-syntonic, often requiring longer work.' },
+                                    { text: 'Character defenses are identity-level, ego-syntonic, require building new sense of self - may need longer treatment than brief ISTDP model', correct: true, feedback: 'IMPORTANT LIMITATION! ISTDP excels with: discrete traumas, neurotic-level defenses, motivated clients. But CHARACTER-level pathology (personality disorders, deeply embedded ego-syntonic defenses) often needs: 1) LONGER treatment (months to years, not weeks), 2) More relational focus (using therapeutic relationship to build new ways of being), 3) Patience with slow change (identity doesn\'t shift quickly), 4) Realistic goals (might improve functioning significantly without complete restructuring). Abbass and others acknowledge: not all clients fit brief model. Some need extended ISTDP. Knowing when client needs longer work vs pushing brief format = clinical wisdom. Character resistance suggests: assess carefully, consider if brief work sufficient or need long-term approach.' },
+                                    { text: 'Just apply more pressure to character defenses', correct: false, feedback: 'More pressure on character-level defense often = increased rigidity or therapeutic rupture. Need different approach - patient, relational, long-term.' },
+                                    { text: 'Character can\'t change so don\'t try', correct: false, feedback: 'Character CAN change! But requires appropriate timeframe and approach. Not hopeless, just needs realistic expectations.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'istdp-mastery',
+                title: 'Integration & Mastery',
+                icon: '🎯',
+                level: 3,
+                xp: 50,
+                prereq: 'character-resistance',
+                lessons: [
+                    {
+                        title: 'The Art of ISTDP',
+                        teaching: `MASTERY in ISTDP means holding multiple tasks simultaneously:
+- Track TWO triangles (conflict + person) at once
+- Monitor anxiety pathway continuously  
+- Identify and challenge defenses in moment
+- Assess capacity and titrate pressure accordingly
+- Stay emotionally present while being technical
+- Build alliance while creating productive discomfort
+- Know when to push, when to back off, when to sit in silence
+
+This is BOTH art AND science. Science = the technique, clear model, specific interventions. Art = timing, attunement, reading subtle signals, therapeutic use of self.
+
+Most important: BELIEVING in client's capacity. ISTDP stance: "You CAN bear this. You're stronger than you know. Let's face it together." This belief is transmitted and becomes client's belief in themselves.
+
+Contraindications: Active psychosis, severe dissociative disorder (DID), acute substance intoxication, significant suicide risk. These clients need different approach or stabilization first.`,
+                        concepts: [
+                            {
+                                title: 'When ISTDP Works Best',
+                                text: 'Ideal: Motivated client, neurotic-level defenses, discrete trauma, good capacity (striated muscle), strong enough ego, willing to feel. ISTDP can produce rapid, dramatic change with these clients. Single session breakthroughs possible when: assessment accurate, timing right, client ready.'
+                            },
+                            {
+                                title: 'Ongoing Learning',
+                                text: 'ISTDP mastery requires: Formal training (workshops with Abbass, Frederickson, others), Video review of own sessions, Regular supervision/consultation, Study of cases, Understanding neurobiology, Personal therapy to work through own defenses. This isn\'t modality to learn from books alone - need experiential training and supervision.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'What\'s the most important skill for ISTDP therapist?',
+                                answers: [
+                                    { text: 'Memorizing all the techniques', correct: false, feedback: 'Techniques matter but aren\'t sufficient. Can apply technique robotically and fail. Need something deeper.' },
+                                    { text: 'Capacity to bear client\'s intense affect without defending - staying present, regulated, and believing in their strength', correct: true, feedback: 'THIS IS IT! Can\'t help client bear what you can\'t bear yourself. If client\'s rage triggers YOUR anxiety → you\'ll unconsciously defend (back off, rescue, intellectualize). If you can\'t tolerate their pain → you\'ll avoid it. ISTDP requires: 1) YOUR nervous system staying regulated as theirs activates, 2) Comfort with intense affect (rage, grief, despair), 3) Not needing to rescue or fix - trusting process, 4) Belief: "You can survive this feeling and will be stronger for it." This is transmitted nonverbally. Client feels: "My therapist isn\'t afraid of my feelings. Maybe I don\'t have to be either." This is why personal therapy crucial for ISTDP therapists - must work through own defenses against affect, build own capacity to bear intense emotion without defending.' },
+                                    { text: 'Being confrontational and aggressive', correct: false, feedback: 'No! ISTDP is firm but compassionate, not aggressive. Aggression breaks alliance and retraumatizes. High warmth + high challenge, not hostility.' },
+                                    { text: 'Making client cry in every session', correct: false, feedback: 'Tears aren\'t goal! UNLOCKING (accessing unconscious feeling) is goal - sometimes involves tears, sometimes rage, sometimes quiet realization. Not about performance of emotion.' }
+                                ]
+                            },
+                            {
+                                question: 'Client presents with: active suicidal plan, recent psychotic episode, severe dissociation (DID). Should you use ISTDP?',
+                                answers: [
+                                    { text: 'Yes, ISTDP works for everyone', correct: false, feedback: 'Dangerous! ISTDP has contraindications. Not appropriate for all presentations.' },
+                                    { text: 'NO - these are contraindications. Need: Safety/stabilization first, possibly different modality, may never be appropriate for ISTDP', correct: true, feedback: 'CRITICAL SAFETY! ISTDP contraindicated for: 1) ACTIVE PSYCHOSIS - can\'t reality test, pressure could worsen, 2) ACUTE SUICIDE RISK - need crisis intervention, safety planning, not affect intensification, 3) SEVERE DISSOCIATION (DID) - fragile structure, affect work could fragment further. Need: trauma-informed stabilization (van der Kolk approaches), DBT for crisis/emotion regulation, antipsychotic medication if needed, parts work (IFS) for DID. MAYBE later, after significant stabilization, adapted ISTDP could be considered. But not initially. Knowing limits is crucial! ISTDP is powerful but not appropriate for all. Applying it to fragile client = harm. This is why thorough assessment essential.' },
+                                    { text: 'Just use less pressure', correct: false, feedback: 'Not about pressure amount - these presentations need fundamentally different approach. ISTDP structure itself (activating unconscious affect) may be destabilizing for these clients.' },
+                                    { text: 'ISTDP will cure the psychosis', correct: false, feedback: 'Absolutely not! Psychosis needs medical/psychiatric intervention first. ISTDP doesn\'t treat active psychotic processes.' }
+                                ]
+                            },
+                            {
+                                question: 'After years of practice, what should ISTDP therapist continue doing?',
+                                answers: [
+                                    { text: 'Nothing - they know it all', correct: false, feedback: 'Hubris! ISTDP is complex, always more to learn. Best practitioners stay students.' },
+                                    { text: 'Ongoing supervision/consultation, video review, training, personal therapy - continuous learning and self-examination', correct: true, feedback: 'YES! Even experts need: 1) SUPERVISION - blind spots, stuck cases, consultation, 2) VIDEO REVIEW - see what you missed in moment, refine technique, 3) CONTINUING TRAINING - field evolves, new research, advanced skills, 4) PERSONAL THERAPY - work through own blocks, defenses that limit work with clients. ISTDP community emphasizes: this is lifelong learning, not one-time training. Abbass, Frederickson still consult with each other! Humility, curiosity, commitment to growth = marks of master therapist. Your unworked defenses limit what you can access in clients. Your own avoidance patterns show up in clinical work. Ongoing self-work isn\'t optional - it\'s ethical responsibility.' },
+                                    { text: 'Only see easy, neurotic clients', correct: false, feedback: 'Growth comes from challenge! Working with range of presentations (with appropriate support) develops mastery.' },
+                                    { text: 'Switch to easier modality', correct: false, feedback: 'ISTDP is challenging but profoundly rewarding when done well. With proper training and support, it\'s sustainable long-term practice.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        function initSkillTree() {
+            const container = document.getElementById('skill-tree');
+            container.innerHTML = '';
+            
+            skillTree.forEach(skill => {
+                const isCompleted = gameState.completedSkills.includes(skill.id);
+                const isUnlocked = !skill.prereq || gameState.completedSkills.includes(skill.prereq);
+                const progress = gameState.skillProgress[skill.id] || 0;
+                const totalLessons = skill.lessons.length;
+                
+                const node = document.createElement('div');
+                node.className = `skill-node ${isCompleted ? 'completed' : ''} ${isUnlocked ? 'unlocked' : 'locked'}`;
+                
+                // Find prerequisite skill name
+                let prereqName = '';
+                if (!isUnlocked && skill.prereq) {
+                    const prereqSkill = skillTree.find(s => s.id === skill.prereq);
+                    prereqName = prereqSkill ? prereqSkill.title : '';
+                }
+                
+                node.innerHTML = `
+                    ${!isUnlocked ? '<div class="skill-lock">🔒</div>' : ''}
+                    <div class="skill-icon">${skill.icon}</div>
+                    <div class="skill-title">${skill.title}</div>
+                    ${isCompleted ? '<div style="margin-top:8px; color:#ff0;">✓ MASTERED</div>' : ''}
+                    ${!isUnlocked && prereqName ? `<div class="skill-prereq">Complete: ${prereqName}</div>` : ''}
+                `;
+                
+                // Make unlocked nodes keyboard accessible
+                if (isUnlocked && !isCompleted) {
+                    node.setAttribute('tabindex', '0');
+                    node.setAttribute('role', 'button');
+                    node.setAttribute('aria-label', `Start ${skill.title} skill`);
+                    node.onclick = () => startSkill(skill);
+                    node.onkeypress = (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            startSkill(skill);
+                        }
+                    };
+                }
+                
+                container.appendChild(node);
+            });
+            
+            updateHeader();
+            updatePathDisplay();
+        }
+        
+        function updatePathDisplay() {
+            const level = gameState.level;
+            let path = 'FOUNDATIONS';
+            if (level >= 3) path = 'ADVANCED';
+            else if (level >= 2) path = 'INTERMEDIATE';
+            
+            document.getElementById('current-path').textContent = path;
+        }
+        
+        function updateHeader() {
+            const xpPercent = (gameState.xp / gameState.xpToNextLevel) * 100;
+            document.getElementById('xp-bar').style.width = xpPercent + '%';
+            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
+            document.getElementById('level-display').textContent = gameState.level;
+            
+            const totalSkills = skillTree.length;
+            const completedCount = gameState.completedSkills.length;
+            const masteryPercent = Math.round((completedCount / totalSkills) * 100);
+            document.getElementById('mastery-display').textContent = masteryPercent + '%';
+            document.getElementById('streak-display').textContent = gameState.streak + '🔥';
+        }
+        
+        function startSkill(skill) {
+            gameState.currentLesson = skill;
+            gameState.currentQuestion = 0;
+            gameState.correctAnswers = 0;
+            showLesson(skill.lessons[0]);
+        }
+        
+        function showLesson(lesson) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            
+            const concepts = lesson.concepts.map(c => `
+                <div class="key-concept">
+                    <div class="concept-title">${c.title}</div>
+                    <div class="concept-text">${c.text}</div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-title">${lesson.title}</div>
+                    <div class="lesson-subtitle">${gameState.currentLesson.title}</div>
+                </div>
+                
+                <div class="teaching-section">
+                    <div class="teaching-text">${lesson.teaching}</div>
+                    ${concepts}
+                </div>
+                
+                <button class="continue-btn" onclick="startQuestions()">START QUESTIONS →</button>
+                <button class="back-btn" onclick="closeModal()">✕ BACK</button>
+                <div style="clear:both;"></div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function startQuestions() {
+            const lesson = gameState.currentLesson.lessons[0];
+            showQuestion(lesson.questions[gameState.currentQuestion]);
+        }
+        
+        function showQuestion(question) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            
+            window.currentQuestion = question;
+            
+            const answerButtons = question.answers.map((ans, idx) => `
+                <button class="answer-btn" onclick="checkAnswer(${idx})">${ans.text}</button>
+            `).join('');
+            
+            const progress = `Question ${gameState.currentQuestion + 1} of ${gameState.currentLesson.lessons[0].questions.length}`;
+            const totalQuestions = gameState.currentLesson.lessons[0].questions.length;
+            const scoreDisplay = gameState.currentQuestion > 0 
+                ? `<div class="score-tracker">SCORE: <span class="score-value">${gameState.correctAnswers}/${gameState.currentQuestion}</span> correct so far</div>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-title">${gameState.currentLesson.title}</div>
+                    <div class="lesson-subtitle">${progress}</div>
+                </div>
+                
+                ${scoreDisplay}
+                
+                <div class="question-section">
+                    <div class="question-text">${question.question}</div>
+                    <div class="answers" id="answers">
+                        ${answerButtons}
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+                
+                <div id="continue-container"></div>
+                <button class="back-btn" onclick="closeModal()">✕ BACK</button>
+                <div style="clear:both;"></div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function checkAnswer(idx) {
+            const question = window.currentQuestion;
+            const answer = question.answers[idx];
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            
+            const clickedBtn = buttons[idx];
+            const feedback = document.getElementById('feedback');
+            
+            if (answer.correct) {
+                clickedBtn.classList.add('correct');
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ CORRECT! ' + answer.feedback;
+                gameState.correctAnswers++;
+            } else {
+                clickedBtn.classList.add('incorrect');
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ ' + answer.feedback;
+            }
+            
+            const continueContainer = document.getElementById('continue-container');
+            continueContainer.innerHTML = '<button class="continue-btn" onclick="nextQuestion()">CONTINUE →</button>';
+        }
+        
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            const lesson = gameState.currentLesson.lessons[0];
+            
+            if (gameState.currentQuestion < lesson.questions.length) {
+                showQuestion(lesson.questions[gameState.currentQuestion]);
+            } else {
+                completeSkill();
+            }
+        }
+        
+        function completeSkill() {
+            const skill = gameState.currentLesson;
+            const xpEarned = skill.xp;
+            const questionsTotal = skill.lessons[0].questions.length;
+            const score = Math.round((gameState.correctAnswers / questionsTotal) * 100);
+            
+            gameState.xp += xpEarned;
+            gameState.totalXp += xpEarned;
+            
+            while (gameState.xp >= gameState.xpToNextLevel) {
+                gameState.xp -= gameState.xpToNextLevel;
+                gameState.level++;
+                gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+            }
+            
+            if (!gameState.skillProgress[skill.id]) {
+                gameState.skillProgress[skill.id] = 0;
+            }
+            gameState.skillProgress[skill.id]++;
+            
+            if (!gameState.completedSkills.includes(skill.id)) {
+                gameState.completedSkills.push(skill.id);
+                gameState.streak++;
+            }
+            
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            
+            // Find next available skill
+            const currentIndex = skillTree.findIndex(s => s.id === skill.id);
+            const nextSkill = skillTree.slice(currentIndex + 1).find(s => {
+                if (!s.prereq) return true;
+                return gameState.completedSkills.includes(s.prereq);
+            });
+            
+            const nextSkillButton = nextSkill && !gameState.completedSkills.includes(nextSkill.id)
+                ? `<button class="next-skill-btn" onclick="startNextSkill('${nextSkill.id}')">→ NEXT: ${nextSkill.title}</button>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="completion-screen">
+                    <div class="completion-icon">${skill.icon}</div>
+                    <div class="completion-title">SKILL MASTERED!</div>
+                    <div class="xp-earned">+${xpEarned} XP EARNED</div>
+                    <div class="teaching-text">
+                        Score: ${score}% (${gameState.correctAnswers}/${questionsTotal} correct)<br><br>
+                        You've completed "${skill.title}"<br><br>
+                        Keep building your ISTDP mastery!
+                    </div>
+                    ${nextSkillButton}
+                    <button class="continue-btn" onclick="closeModalAndRefresh()">BACK TO SKILL TREE →</button>
+                </div>
+            `;
+            
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            
+            saveProgress();
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        function closeModalAndRefresh() {
+            closeModal();
+            initSkillTree();
+        }
+        
+        function saveProgress() {
+            localStorage.setItem('stdpAcademy', JSON.stringify(gameState));
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('stdpAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                initSkillTree();
+                alert('✓ Progress loaded!');
+            } else {
+                alert('No saved progress found.');
+            }
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('stdpAcademy');
+                location.reload();
+            }
+        }
+        
+        function startNextSkill(skillId) {
+            const skill = skillTree.find(s => s.id === skillId);
+            if (skill) {
+                closeModal();
+                setTimeout(() => startSkill(skill), 300);
+            }
+        }
+        
+        initSkillTree();
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('modal');
+            const isModalOpen = modal.classList.contains('active');
+            
+            // ESC to close modal
+            if (e.key === 'Escape' && isModalOpen) {
+                closeModal();
+            }
+            
+            // H to go home (when modal is closed)
+            if (e.key === 'h' && !isModalOpen) {
+                window.location.href = 'learning-library-hub.html';
+            }
+            
+            // S to save progress (when modal is closed)
+            if (e.key === 's' && !isModalOpen) {
+                e.preventDefault();
+                saveProgress();
+                alert('💾 Progress saved!');
+            }
+        });
+        
+        // Make answer buttons keyboard accessible
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('answer-btn')) {
+                e.target.focus();
+            }
+        });
+        
+        console.log('%c⚡ STDP ACADEMY LOADED', 'color: #f00; font-size: 16px; font-weight: bold;');
+        console.log('%c⌨️  Keyboard Shortcuts:', 'color: #ff0; font-size: 12px;');
+        console.log('  • ESC - Close modal');
+        console.log('  • H - Return to home');
+        console.log('  • S - Save progress');
+        console.log('  • TAB - Navigate skills');
+        console.log('  • ENTER - Start selected skill');
+    </script>
+</body>
+</html>

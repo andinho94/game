@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPASSIONATE INQUIRY ACADEMY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            color: #0cf;
+            overflow-x: hidden;
+        }
+        
+        .game-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background: #222;
+            border: 8px solid #0cf;
+            box-shadow: 0 0 40px rgba(0, 204, 255, 0.5);
+            position: relative;
+        }
+        
+        .crt-effect {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 1000;
+        }
+        
+        .screen {
+            background: #000;
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 16px;
+            color: #0cf;
+            text-shadow: 2px 2px #0ff;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 8px;
+            color: #0ff;
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            background: #111;
+            border: 4px solid #0cf;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .xp-bar-container {
+            background: #333;
+            border: 2px solid #0cf;
+            height: 20px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, #0cf 0%, #0ff 100%);
+            height: 100%;
+            transition: width 0.5s;
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8px;
+            color: #fff;
+            text-shadow: 1px 1px #000;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            font-size: 8px;
+        }
+        
+        .stat-item {
+            color: #0cf;
+        }
+        
+        .stat-value {
+            color: #0ff;
+        }
+        
+        .level-indicator {
+            background: #000;
+            border: 2px solid #0ff;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .level-text {
+            font-size: 8px;
+            color: #0cf;
+        }
+        
+        #current-path {
+            color: #0ff;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .button-group .nav-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 7px;
+        }
+        
+        .home-btn {
+            background: #002020;
+        }
+        
+        .skill-tree {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .skill-node {
+            background: #001a1a;
+            border: 4px solid #333;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        .skill-node.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .skill-node.unlocked {
+            border-color: #0cf;
+        }
+        
+        .skill-node.unlocked:hover {
+            background: #003333;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+        }
+        
+        .skill-node.completed {
+            border-color: #0ff;
+            background: #002020;
+        }
+        
+        .skill-icon {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .skill-title {
+            font-size: 8px;
+            color: #0cf;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .skill-progress {
+            font-size: 7px;
+            color: #0ff;
+            text-align: center;
+        }
+        
+        .skill-lock {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 16px;
+        }
+        
+        .skill-prereq {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6px;
+            color: #0cf;
+            text-align: center;
+            width: 90%;
+        }
+        
+        .skill-node.locked .skill-prereq {
+            color: #0cf;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        .modal-content {
+            background: #000;
+            border: 8px solid #0cf;
+            padding: 20px;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+        
+        .lesson-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .lesson-title {
+            font-size: 14px;
+            color: #0cf;
+            margin-bottom: 10px;
+        }
+        
+        .lesson-subtitle {
+            font-size: 8px;
+            color: #0ff;
+        }
+        
+        .teaching-section {
+            background: #001a1a;
+            border: 2px solid #0cf;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .teaching-text {
+            font-size: 9px;
+            line-height: 1.8;
+            color: #0cf;
+            margin-bottom: 15px;
+        }
+        
+        .key-concept {
+            background: #000;
+            border-left: 4px solid #0ff;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        
+        .concept-title {
+            color: #0ff;
+            font-size: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .concept-text {
+            color: #0cf;
+            font-size: 8px;
+            line-height: 1.6;
+        }
+        
+        .question-section {
+            background: #000;
+            border: 4px solid #0cf;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 10px;
+            color: #0ff;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .answer-btn {
+            background: #003333;
+            border: 4px solid #0cf;
+            color: #0cf;
+            padding: 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        
+        .answer-btn:hover:not(.disabled) {
+            background: #004d4d;
+            border-color: #0ff;
+            transform: translateX(5px);
+        }
+        
+        .answer-btn.correct {
+            background: #003300;
+            border-color: #0f0;
+            color: #0f0;
+        }
+        
+        .answer-btn.incorrect {
+            background: #330000;
+            border-color: #f00;
+            color: #f00;
+        }
+        
+        .answer-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .feedback {
+            display: none;
+            background: #001a1a;
+            border: 2px solid #0cf;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 8px;
+            line-height: 1.6;
+            color: #0ff;
+        }
+        
+        .feedback.show {
+            display: block;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background: #003333;
+            border: 4px solid #0cf;
+            color: #0cf;
+            padding: 12px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:hover {
+            background: #004d4d;
+            border-color: #0ff;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 600px) {
+            .skill-tree {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="crt-effect"></div>
+            
+            <div class="screen">
+                <h1 class="title">💙 COMPASSIONATE INQUIRY 💙</h1>
+                <div class="subtitle">GABOR MATÉ METHOD</div>
+                
+                <div class="progress-header">
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xp-bar"></div>
+                        <div class="xp-text" id="xp-text">0 / 100 XP</div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-item">LEVEL: <span class="stat-value" id="level-display">1</span></div>
+                        <div class="stat-item">MASTERY: <span class="stat-value" id="mastery-display">0%</span></div>
+                        <div class="stat-item">STREAK: <span class="stat-value" id="streak-display">0🔥</span></div>
+                    </div>
+                </div>
+
+                <div class="level-indicator">
+                    <div class="level-text">CURRENT PATH: <span id="current-path">FOUNDATIONS</span></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="nav-btn home-btn" onclick="window.location.href='learning-library-hub.html'">🏠 HOME</button>
+                    <button class="nav-btn" onclick="saveProgress()">💾 SAVE</button>
+                    <button class="nav-btn" onclick="loadProgress()">📁 LOAD</button>
+                    <button class="nav-btn" onclick="resetProgress()">🔄 RESET</button>
+                </div>
+                
+                <div style="text-align: center; font-size: 6px; color: #666; margin-bottom: 15px;">
+                    ⌨️ SHORTCUTS: ESC=close • H=home • S=save • TAB=navigate
+                </div>
+                
+                <div class="skill-tree" id="skill-tree"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="lesson-modal">
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+
+    <script>
+        // Game State
+        const SKILLS_DATA = [
+            // LEVEL 1: FOUNDATIONS
+            {
+                id: 'curious-presence',
+                title: 'Curious Presence',
+                icon: '🔍',
+                level: 1,
+                xp: 20,
+                prereq: null,
+                lessons: [
+                    {
+                        title: 'The Foundation of CI',
+                        teaching: `Compassionate Inquiry begins with CURIOUS PRESENCE - a state of genuine openness without agenda, judgment, or need to fix.
+
+Not curiosity ABOUT someone (treating them as object to study) but curiosity WITH someone (inviting them into inquiry alongside you).
+
+The stance: "I don't know what's happening for you. I'm genuinely curious. Let's explore together." This dismantles expert/patient hierarchy and creates collaborative space for discovery.
+
+Key distinction: Curiosity vs. interrogation. Curiosity = open exploration. Interrogation = seeking specific answers to prove a theory.`,
+                        concepts: [
+                            {
+                                title: 'What Makes Presence "Curious"',
+                                text: 'Genuine not-knowing. Even if you suspect what\'s beneath, you inquire from openness: "What are you aware of in your body right now?" not "You must be feeling angry." Client discovers their own truth rather than confirming yours. This honors their authority over their experience.'
+                            },
+                            {
+                                title: 'Presence Over Technique',
+                                text: 'CI is not a technique but a WAY OF BEING. Questions matter less than the presence you bring. Same question ("What do you notice?") can be mechanical technique or genuine inquiry depending on therapist\'s state. Client feels the difference instantly.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says: "I\'m just stressed about work." From CI perspective, what\'s your response?',
+                                answers: [
+                                    { text: 'Accept this explanation and move on', correct: false, feedback: '"Just stressed" is surface explanation, not lived experience. CI doesn\'t accept first answer but invites deeper inquiry.' },
+                                    { text: 'Get curious: "When you say stressed, what do you notice in your body right now? Where do you feel it?"', correct: true, feedback: 'PERFECT CI! Moving from mental explanation to EMBODIED EXPERIENCE. "Stressed" is concept. CI asks: what\'s the felt reality beneath? Questions like: "What do you notice in your body?" "Where do you feel this stress?" "If it had a shape/color/texture, what would it be?" This grounds inquiry in present-moment somatic awareness, not abstract thinking. Client might discover: "Actually my jaw is clenched and there\'s pressure in my chest" → now you\'re working with reality, not concept.' },
+                                    { text: 'Suggest coping strategies for work stress', correct: false, feedback: 'This bypasses inquiry! CI doesn\'t solve problems, it explores underlying experience. "Stress" may be covering grief, rage, helplessness.' },
+                                    { text: 'Challenge: "You don\'t seem stressed to me"', correct: false, feedback: 'This dismisses client\'s experience. CI starts where client is, even with surface explanations, then invites deeper.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the difference between curious presence and therapeutic neutrality?',
+                                answers: [
+                                    { text: 'They\'re the same thing', correct: false, feedback: 'Different! Neutrality can be distant, detached. Curious presence is warm, engaged, deeply interested while remaining unattached to outcome.' },
+                                    { text: 'Curious presence is warm, engaged, INTERESTED while unattached to specific outcome - neutrality can be cold/detached', correct: true, feedback: 'YES! Traditional neutrality: "I have no feelings about this, I\'m blank slate." Curious presence: "I\'m deeply interested in your experience, I care about you AND I have no agenda about what you should discover or feel." Combines: warmth (I\'m with you), genuine interest (I want to know), AND non-attachment (your discovery, not mine). This creates safety: client feels met as person while free to explore without pressure to satisfy therapist\'s expectations.' },
+                                    { text: 'Neutrality is better - curiosity is intrusive', correct: false, feedback: 'Genuine curiosity isn\'t intrusive - it invites. Interrogation is intrusive. Client always free to decline inquiry.' },
+                                    { text: 'Curiosity means you don\'t care about the client', correct: false, feedback: 'Opposite! Curious presence requires deep care. You care enough to not impose your theories but discover THEIR truth.' }
+                                ]
+                            },
+                            {
+                                question: 'Client gives long intellectual explanation of their problem. CI practitioner should:',
+                                answers: [
+                                    { text: 'Listen to entire explanation and discuss it intellectually', correct: false, feedback: 'This stays in client\'s defense (intellectualization). CI interrupts gently to return to body/feeling.' },
+                                    { text: 'Gently interrupt: "I notice you\'re explaining. What are you aware of in your body as you talk about this?"', correct: true, feedback: 'EXACTLY! Intellectualization is defense against feeling. CI recognizes this without judgment: "You\'re in your head - what about your body? Your heart?" Not aggressive interruption but gentle redirection: "I hear the thoughts. I\'m curious about what you\'re feeling." This teaches client: we\'re interested in EXPERIENCE not explanation, present-moment reality not story about it. Over time, client learns to drop into body themselves: "I\'m explaining again, aren\'t I? Let me feel this instead..."' },
+                                    { text: 'Say "Stop thinking so much"', correct: false, feedback: 'Too confrontational! CI is gentle. "What do you notice in your body?" invites, not commands.' },
+                                    { text: 'Analyze their explanation psychologically', correct: false, feedback: 'More intellectualizing! CI moves AWAY from analysis toward direct experience.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'body-awareness',
+                title: 'Body Awareness',
+                icon: '🫀',
+                level: 1,
+                xp: 25,
+                prereq: 'curious-presence',
+                lessons: [
+                    {
+                        title: 'Body as Gateway',
+                        teaching: `In CI, the BODY is primary source of truth. Mind lies, rationalizes, defends. Body tells truth.
+
+When client talks about experience, we track: facial expressions, breathing, posture, gestures, tension patterns, voice quality. Body reveals what words conceal.
+
+Core CI intervention: "What do you notice in your body right now?" This redirects from story/explanation to present-moment somatic awareness.
+
+Body holds: emotions (anger = tension, sadness = heaviness), trauma memories (stored somatically), authentic truth (body knows even when mind doesn't).`,
+                        concepts: [
+                            {
+                                title: 'Why Body Over Mind',
+                                text: 'Mind developed to survive via adaptation - learned to please parents, deny truth, create acceptable narratives. Body can\'t lie. Jaw clenches when person says "I\'m fine." Tears come when they insist "It doesn\'t bother me." CI trusts body over words.'
+                            },
+                            {
+                                title: 'Somatic Markers',
+                                text: 'Learn to track: breathing (shallow when anxious, held when avoiding), facial micro-expressions (fleeting true emotion before mask), voice (pitch rises with anxiety, constricts with held tears), gestures (pushing away, reaching, protecting), posture (collapse, rigidity, openness). These reveal real-time emotional process.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says "I\'m fine with my mother" while their jaw visibly clenches. What do you notice?',
+                                answers: [
+                                    { text: 'Believe their words - they said they\'re fine', correct: false, feedback: 'Words are conscious, often defended. Body reveals unconscious truth. The clench tells different story.' },
+                                    { text: 'Point to body: "You say you\'re fine, and I notice your jaw just clenched. What are you aware of there?"', correct: true, feedback: 'PERFECT CI INTERVENTION! You\'re: 1) Acknowledging words (respecting client), 2) Pointing to body (introducing somatic data), 3) Inviting curiosity (what do YOU notice?). This creates: recognition of split between words/body, opportunity to explore the truth beneath "fine", somatic doorway to genuine feeling. Client might say: "Oh... yeah, my jaw is tight. Huh." → now exploring reality not defense. Body holds anger/fear/grief that "I\'m fine" conceals.' },
+                                    { text: 'Interpret: "Your jaw is clenched because you\'re angry at your mother"', correct: false, feedback: 'Don\'t interpret! INVITE CLIENT to discover. "What are you aware of?" not "Here\'s what it means." They find their truth.' },
+                                    { text: 'Ignore the jaw clench, it\'s meaningless', correct: false, feedback: 'Body signals are DATA! Jaw clench is significant. Ignoring it misses therapeutic opportunity to access unconscious material.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the purpose of repeatedly asking "What do you notice in your body?"',
+                                answers: [
+                                    { text: 'It\'s just a technique to fill time', correct: false, feedback: 'Not filler! It\'s core intervention that shifts awareness from thinking to feeling, from story to present reality.' },
+                                    { text: 'Trains client to shift from mental story to present-moment somatic awareness where authentic feelings live', correct: true, feedback: 'YES! This question is RETRAINING. Most clients live in head: thoughts, explanations, stories ABOUT experience. But healing happens in FEELING, which lives in body. "What do you notice?" teaches: drop from head to body, shift from past/future to NOW, move from concept to sensation. Over time, client internalizes this: "When upset, I check my body instead of spinning in thoughts." This is learning to INHABIT experience rather than think ABOUT it. Foundation of healing.' },
+                                    { text: 'To avoid talking about difficult topics', correct: false, feedback: 'Opposite! Body awareness LEADS TO difficult feelings. It\'s the pathway in, not avoidance.' },
+                                    { text: 'Because Maté likes bodies', correct: false, feedback: 'It\'s theoretical! Body is where trauma/emotion lives. Not personal preference but clinical understanding.' }
+                                ]
+                            },
+                            {
+                                question: 'Client becomes tearful but says "I don\'t know why I\'m crying." CI response:',
+                                answers: [
+                                    { text: 'Give them tissue and change subject', correct: false, feedback: 'This rescues them from feeling. CI STAYS WITH the emotion, doesn\'t rush to comfort or divert.' },
+                                    { text: '"You don\'t need to know why. Can you just be with the tears? What do you notice as they come?"', correct: true, feedback: 'BEAUTIFUL CI! You\'re: 1) Removing pressure to understand/explain (tears don\'t need justification), 2) Inviting presence with emotion (just BE with it), 3) Deepening somatic awareness (what do you notice?). This teaches: Feelings are valid without explanation, Being WITH emotion is enough (don\'t need to fix/understand/stop it), Body knows even when mind doesn\'t. Client might notice: "There\'s tightness in my throat" or "Heaviness in my chest." Following these leads to what tears are about. Understanding comes THROUGH feeling, not before it.' },
+                                    { text: 'Stop the session - they\'re too emotional', correct: false, feedback: 'Emotion isn\'t emergency! CI has capacity to sit with intense feeling. This is the work, not problem to avoid.' },
+                                    { text: 'Analyze why they\'re crying', correct: false, feedback: 'Stay experiential! "Can you be with the tears?" not "Let\'s figure out why." Meaning emerges from being with, not analyzing.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'belief-exploration',
+                title: 'Exploring Beliefs',
+                icon: '💭',
+                level: 1,
+                xp: 30,
+                prereq: 'body-awareness',
+                lessons: [
+                    {
+                        title: 'Uncovering Core Beliefs',
+                        teaching: `Beneath symptoms/behaviors lie BELIEFS formed in childhood to make sense of painful experiences. These beliefs persist unconsciously into adulthood.
+
+Examples: "I'm unlovable," "I must be perfect to be safe," "My needs don't matter," "Showing emotion is weakness."
+
+CI explores these through questions like: "What belief about yourself is present when you feel this way?" or "What did you learn about yourself in that moment?"
+
+Not challenging beliefs directly but WITNESSING them compassionately, helping client see how childhood adaptations became adult prison.`,
+                        concepts: [
+                            {
+                                title: 'Beliefs vs. Truth',
+                                text: 'Beliefs are INTERPRETATIONS child made to survive, not facts. "I\'m unlovable" meant "My parent couldn\'t love me because they were too hurt/addicted/narcissistic." Child made it about self (I\'m the problem) because that gave illusion of control. CI helps adult see: belief was adaptation, not truth.'
+                            },
+                            {
+                                title: 'How Beliefs Form',
+                                text: 'Painful experience → Child asks "Why did this happen?" → Creates belief that explains it AND preserves attachment to parent. Better to believe "I\'m bad" than "My parent is incapable of love." Belief protects child from unbearable truth of parental failure.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says: "I know intellectually I\'m not worthless, but I feel worthless." What does CI recognize?',
+                                answers: [
+                                    { text: 'They need more cognitive therapy to change the thought', correct: false, feedback: 'Cognition alone won\'t shift core belief rooted in childhood experience. Need to address emotional/somatic holding.' },
+                                    { text: 'Core belief lives in body/emotion, not intellect - must be met experientially, not just cognitively challenged', correct: true, feedback: 'EXACTLY! "I know but I feel" reveals: intellectual understanding hasn\'t touched emotional truth. Belief formed in childhood through painful EXPERIENCE (being treated as worthless) and lives in body as felt sense. CI approach: "When you feel worthless, what happens in your body? Where do you feel it?" → "What does that feeling remind you of? When did you first feel this way?" → "What did you learn about yourself in that moment?" Accessing somatic/emotional memory where belief lives, not just thinking differently about it. Healing comes through: feeling the original pain, seeing how child made it mean something about self, grieving what happened, updating belief based on adult understanding.' },
+                                    { text: 'They\'re not trying hard enough to think positively', correct: false, feedback: 'Not about effort! Positive thinking doesn\'t access childhood wounds where beliefs formed. Need experiential work.' },
+                                    { text: 'Just tell them they have worth', correct: false, feedback: 'External validation won\'t shift internal belief. Must be discovered through their own inquiry into origin/nature of belief.' }
+                                ]
+                            },
+                            {
+                                question: 'How does CI help client see beliefs without creating shame?',
+                                answers: [
+                                    { text: 'By framing beliefs as childhood adaptations that made sense then, not character flaws', correct: true, feedback: 'YES! Core move: "This belief (I\'m worthless/unlovable/too much) isn\'t truth about you - it\'s what you had to believe to survive what happened to you." Reframes from: "What\'s wrong with me that I believe this?" to "This belief was brilliant survival strategy for child in impossible situation." Creates compassion: child wasn\'t defective, was adapting. Belief honored as once-necessary, now limiting. This removes shame: not your fault you formed belief, makes sense given circumstances. From this compassionate understanding, belief can shift. Shame keeps beliefs locked in place. Compassion creates space for change.' },
+                                    { text: 'By not discussing beliefs at all', correct: false, feedback: 'Beliefs are central to CI! But discussed without judgment, with understanding of their protective origin.' },
+                                    { text: 'By blaming parents instead', correct: false, feedback: 'Not about blame! About understanding. Parent was likely hurt too. CI seeks compassion for everyone including child-self.' },
+                                    { text: 'Beliefs don\'t cause shame', correct: false, feedback: 'Clients often deeply ashamed of their "irrational" beliefs. CI removes shame by showing beliefs made perfect sense.' }
+                                ]
+                            },
+                            {
+                                question: 'Client has belief "I must be perfect or I\'m worthless." What\'s CI exploration?',
+                                answers: [
+                                    { text: 'Challenge it: "That\'s black and white thinking"', correct: false, feedback: 'Cognitive challenge won\'t reach emotional root. Need to explore where/why belief formed.' },
+                                    { text: '"When did you first learn you had to be perfect? What happened when you weren\'t perfect as a child?"', correct: true, feedback: 'PERFECT CI INQUIRY! Tracking belief to its origin: When did this start? What was happening? What did you experience when you made mistakes/weren\'t perfect? Might uncover: parent who only gave love/attention for achievement, rage/rejection when child was imperfect, child\'s terror of parental withdrawal. Belief "I must be perfect" meant: "If I\'m perfect, I\'m safe/loved. If I\'m not, I\'m abandoned." Made sense for survival! But now imprisons adult. Seeing origin creates: compassion for child who needed this belief, recognition it no longer serves, space to update based on adult reality. Can\'t think your way out - must FEEL the childhood terror that created belief.' },
+                                    { text: 'Teach them it\'s okay to make mistakes', correct: false, feedback: 'Lessons don\'t heal core wounds. Must access emotional experience that created belief, not just learn new ideas.' },
+                                    { text: 'Ignore the belief and focus on behavior change', correct: false, feedback: 'Behavior sustained by belief. Until belief shifts through understanding its origin, behavior change is surface/temporary.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 2: INTERMEDIATE
+            {
+                id: 'tracking-process',
+                title: 'Tracking Process',
+                icon: '🎯',
+                level: 2,
+                xp: 35,
+                prereq: 'belief-exploration',
+                lessons: [
+                    {
+                        title: 'Following the Thread',
+                        teaching: `CI doesn't follow content (what client talks about) but PROCESS (what's happening right now in their body, emotion, relationship to you).
+
+Process = present-moment unfolding. Client talks about mother (content) while tears come (process). CI tracks tears: "What's happening for you right now as tears come?"
+
+This keeps inquiry ALIVE and PRESENT rather than getting lost in story about past. Past matters, but we access it through present-moment experience.
+
+Key: When client goes into head/story, return to body/feeling. When emotion emerges, stay with it. When defense appears, notice it. Follow the aliveness, not the narrative.`,
+                        concepts: [
+                            {
+                                title: 'Process vs Content',
+                                text: 'Content = what happened, topics discussed, stories told. Process = what\'s happening NOW (breathing shifts, voice breaks, defensive deflection, emotion rising). Client lost in content is disconnected from feeling. CI: "I hear the story. What\'s happening in you as you tell it?" Brings them present.'
+                            },
+                            {
+                                title: 'Trusting the Process',
+                                text: 'You don\'t need to direct where session goes. Trust that following moment-to-moment aliveness will lead where it needs. Client mentions mother → tears come → explore tears → discover grief → grief reveals belief → belief tracks to childhood moment → healing happens. You didn\'t plan this, you FOLLOWED.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client tells long story about conflict with boss while you notice their fists clenching. What do you track?',
+                                answers: [
+                                    { text: 'The story content - ask questions about the boss', correct: false, feedback: 'Story is content (past event). Clenching fists is PROCESS (present-moment happening). CI tracks process.' },
+                                    { text: 'The fists: "I notice your fists are clenched. What\'s happening in your hands right now?"', correct: true, feedback: 'YES! You\'re tracking PROCESS not content. The story about boss is secondary to what\'s happening in client\'s body NOW. Pointing to fists: brings awareness to somatic experience, interrupts narrative trance, accesses present-moment feeling (might be anger, fear, helplessness). Client might say: "Oh... I didn\'t realize. They\'re so tight." → "What\'s the feeling in that tightness?" Might discover rage they didn\'t know they were holding. THIS is where healing happens - in present embodied experience, not in story about past. Story is vehicle to access feeling. Process is the medicine.' },
+                                    { text: 'Nothing - just listen to the story', correct: false, feedback: 'Passive listening misses the therapeutic moment. CI is ACTIVE tracking of present-moment process.' },
+                                    { text: 'Tell them to relax their fists', correct: false, feedback: 'Don\'t change the process! EXPLORE it. Fists have information. "Relax" is rescuing them from what needs to be felt.' }
+                                ]
+                            },
+                            {
+                                question: 'Why does CI interrupt client\'s storytelling to ask about present moment?',
+                                answers: [
+                                    { text: 'Because therapist isn\'t interested in their story', correct: false, feedback: 'We ARE interested, but story is means to access feeling, not the endpoint. Healing happens in feeling, not story.' },
+                                    { text: 'Story-telling can be dissociative defense - returning to present body/feeling moves from narrative to experience', correct: true, feedback: 'EXACTLY! Telling story ABOUT experience keeps you safe from FEELING experience. It\'s intellectualization: "This happened, then that, then..." but not "This is what I FELT." CI recognizes: endless storytelling = defense, going in circles = avoiding something, animated talking = covering feeling. Intervention: "I hear what happened. What are you feeling as you tell me this?" or "Can we pause the story? I\'m curious what\'s happening in your body right now." This isn\'t dismissive - it\'s refocusing on what matters: client\'s internal experience NOW. Story has value as portal to feeling, but client needs help dropping from story into experience beneath it.' },
+                                    { text: 'To confuse the client', correct: false, feedback: 'Not to confuse but to GROUND. Present-moment awareness is clarifying, not confusing. It\'s concrete: "What do you notice?"' },
+                                    { text: 'The past doesn\'t matter in CI', correct: false, feedback: 'Past matters deeply! But accessed through present-moment door. Feel in present → tracks to past → healing happens.' }
+                                ]
+                            },
+                            {
+                                question: 'Client starts crying then immediately apologizes and tries to stop. How do you track process?',
+                                answers: [
+                                    { text: 'Accept the apology and move on', correct: false, feedback: 'Apology and stopping are DEFENSIVE PROCESS - avoiding the tears. This is exactly what to track!' },
+                                    { text: '"You don\'t need to apologize. What happens inside when the tears come? What makes you want to stop them?"', correct: true, feedback: 'TRACKING THE DEFENSE! Apology/stopping is learned response: "Tears are bad/shameful/burdensome." CI: 1) Removes shame ("Don\'t need to apologize"), 2) Invites staying with emotion ("What happens when tears come?"), 3) Explores the defense itself ("What makes you want to stop?"). Might discover: learned tears made parent angry, internalized "crying is weakness," belief "I\'m too much." Exploring defense reveals childhood conditioning. Then can choose: "Do you want to keep stopping tears (old pattern) or try staying with them (new)?" Process awareness creates choice. This moment - tears emerging, defense arising - is GOLD. Don\'t bypass it.' },
+                                    { text: 'Tell them crying is good for them', correct: false, feedback: 'Don\'t lecture! Explore their experience: "What makes you want to stop?" Better than telling them what they should do.' },
+                                    { text: 'Give them tissue and wait silently', correct: false, feedback: 'Tissue is fine but silence misses opportunity. The apology/stopping IS the process to track - reveals their relationship with emotion.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'authentic-self',
+                title: 'Reconnecting to Authentic Self',
+                icon: '✨',
+                level: 2,
+                xp: 40,
+                prereq: 'tracking-process',
+                lessons: [
+                    {
+                        title: 'The Lost Self',
+                        teaching: `Maté's central thesis: We disconnect from authentic self to maintain attachment to parents. Child can't be who they truly are if that threatens parental connection.
+
+Result: adapted self (what you had to become to survive) vs. authentic self (who you actually are). Most people live entirely in adapted self, unaware there's another possibility.
+
+CI creates conditions for AUTHENTIC SELF to emerge: safety, acceptance, curiosity about true feelings/needs/desires separate from what you learned to perform.
+
+Recognition: "This reaction I'm having - is it genuinely mine or is it programmed response I learned?" Huge question. Beginning of differentiation.`,
+                        concepts: [
+                            {
+                                title: 'What is Authentic Self?',
+                                text: 'Not fixed identity but ALIVENESS: spontaneous feelings, genuine desires, natural responses, body wisdom, creative impulses, boundary clarity. Young children are authentic until adaptation begins. Recovery = returning to this natural state while retaining adult capacities.'
+                            },
+                            {
+                                title: 'Price of Adaptation',
+                                text: 'Chronic disconnection from authentic self creates: depression (living falsely), anxiety (effort to maintain persona), addiction (soothing the pain of inauthenticity), somatic illness (body\'s protest), relationship difficulties (can\'t be intimate while performing), creative blocks (authentic self is source of creativity).'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says: "I don\'t know what I want. I\'m good at giving others what they want but have no idea what would make me happy." What does this reveal?',
+                                answers: [
+                                    { text: 'They need to try new hobbies', correct: false, feedback: 'Surface solution! The issue is deeper - disconnection from authentic desires, not lack of options to try.' },
+                                    { text: 'Complete disconnection from authentic self - learned to attune to others\' needs, suppress own desires to maintain attachment', correct: true, feedback: 'CLASSIC! This person embodied: tuning to what others want/need (attunement to parent for survival), suppressing own desires (they weren\'t welcome/safe), role as caretaker (their job was meeting needs, not having them). Now as adult: expert at reading others, skillful at pleasing, LOST regarding own desires. CI inquiry: "When you were young, what happened when you expressed what you wanted?" Might discover: parent dismissed needs, punished desire, made everything about their needs. Child learned: my wants don\'t matter, safety comes from meeting others\' needs. Recovery: "What do you notice in your body when I ask what you want?" (might feel fear, emptiness, panic), "What would it be like to matter to yourself the way others matter to you?" Slowly reconnecting to authentic desires.' },
+                                    { text: 'They\'re just indecisive', correct: false, feedback: 'Not indecisiveness! Profound disconnection from self. Indecisive people know the options and struggle to choose. This person doesn\'t even know what they want.' },
+                                    { text: 'Tell them what would make them happy', correct: false, feedback: 'Can\'t be given from outside! Must discover through turning attention inward, learning to attune to self, asking "What do I want?" until authentic desires emerge.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the relationship between authenticity and boundaries?',
+                                answers: [
+                                    { text: 'No relationship - separate concepts', correct: false, feedback: 'Intimately connected! Can\'t have healthy boundaries without access to authentic self that knows its limits/needs.' },
+                                    { text: 'Authentic self knows its needs/limits naturally - boundaries flow from this self-knowing. Adapted self has poor boundaries (doesn\'t know its needs)', correct: true, feedback: 'YES! Boundaries require: knowing what you want/don\'t want (authentic self knows), feeling your feelings (anger signals violation), trusting your perceptions (not gaslit), valuing your needs (not sacrificed for others). Person disconnected from authentic self: doesn\'t know when to say no (not in touch with limits), feels guilty setting boundaries (learned needs don\'t matter), confused about what they want (lost self-attunement). Recovery: reconnecting to authentic self naturally clarifies boundaries. Body says "No" when it\'s too much. Feelings signal when something\'s wrong. Desires indicate what to move toward. Authentic self has innate boundary wisdom - just needs to be accessed.' },
+                                    { text: 'Boundaries prevent authenticity', correct: false, feedback: 'Opposite! Boundaries PROTECT authentic self. Without them, must constantly adapt to others, can\'t be genuine.' },
+                                    { text: 'Only selfish people have boundaries', correct: false, feedback: 'Internalized message from childhood! "Having needs = selfish" is what forces disconnection from authentic self in first place.' }
+                                ]
+                            },
+                            {
+                                question: 'How does CI help client distinguish authentic response from conditioned response?',
+                                answers: [
+                                    { text: 'It doesn\'t - all responses are authentic', correct: false, feedback: 'Not true! Many responses are conditioned: learned to please, automatic compliance, defensive reactions. CI helps distinguish.' },
+                                    { text: 'By slowing down, bringing awareness to body: "Is this genuinely what you want or what you learned you\'re supposed to want?"', correct: true, feedback: 'PERFECT! CI creates PAUSE between stimulus and response, space to inquire: "Is this me or my conditioning?" Intervention: Client automatically agrees to something → "I notice you said yes immediately. Can we pause? What\'s happening in your body? Is this a genuine yes or automatic compliance?" Helps client discover: authentic yes feels clear/expansive in body, conditioned yes feels heavy/constricted, genuine no has clarity, automatic yes has anxiety. Over time, client learns: check body before responding, notice quality of feeling (genuine vs obligatory), choose consciously rather than react automatically. This is reclaiming agency, becoming author of own life rather than running programmed responses.' },
+                                    { text: 'Tell them which responses are conditioned', correct: false, feedback: 'They must discover! You pointing it out doesn\'t create self-awareness. They need to learn to distinguish themselves.' },
+                                    { text: 'Authentic vs conditioned doesn\'t matter', correct: false, feedback: 'Central to healing! Living from conditioning = suffering. Living from authenticity = aliveness. Distinguishing between them is crucial.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'trauma-pacing',
+                title: 'Trauma-Informed Pacing',
+                icon: '🌊',
+                level: 2,
+                xp: 35,
+                prereq: 'authentic-self',
+                lessons: [
+                    {
+                        title: 'Titration & Window of Tolerance',
+                        teaching: `CI is gentle, not forceful. Work happens at edge of client's capacity, not beyond it. This is TITRATION - small doses that can be metabolized.
+
+WINDOW OF TOLERANCE: zone where client can feel without overwhelm (hyper-arousal) or shutdown (hypo-arousal). CI keeps client IN window while gradually expanding capacity.
+
+Too much, too fast = re-traumatization (flooding, overwhelm, shutdown). Too little = no activation, no healing. Right amount = client feels intensely BUT remains present, doesn't dissociate.
+
+Pacing requires: tracking arousal levels constantly, knowing when to slow/back off, building capacity before deeper work, trusting organic unfolding.`,
+                        concepts: [
+                            {
+                                title: 'Signs of Overwhelm',
+                                text: 'Hyper-arousal: panic, hyperventilation, agitation, can\'t focus. Hypo-arousal: glazed eyes, monotone voice, "I don\'t feel anything," dissociation. When these appear, intervention is: SLOW DOWN, resource (return to safety/body), back off activation, restore regulation before continuing.'
+                            },
+                            {
+                                title: 'Building Capacity',
+                                text: 'Window expands through: small doses of activation (feeling a little, integrating it), somatic resourcing (learning to self-regulate), relational safety (trustworthy therapist), success experiences (I felt intensely and survived). Rushing this creates collapse. Respecting pace creates solid growth.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client begins trembling, breathing rapidly, eyes darting. They say "I can\'t do this." What\'s happening and how do you respond?',
+                                answers: [
+                                    { text: 'Push through - this is resistance they need to overcome', correct: false, feedback: 'DANGEROUS! This is overwhelm, not resistance. Pushing through = re-traumatization. Must regulate first.' },
+                                    { text: 'Client is outside window of tolerance (hyper-aroused). Slow down, help them resource: "Look around the room. Tell me 5 things you see. Feel your feet on floor."', correct: true, feedback: 'EXACTLY! Signs of hyperarousal: rapid breathing, trembling, dissociative panic, "I can\'t." Intervention: PAUSE the emotional work, bring to present/body/safety, use grounding techniques: name objects in room (engages prefrontal cortex), feel body contact with chair/floor (somatic anchoring), notice you\'re here now not in past (orientation). Once regulated, can reflect: "You got overwhelmed. That\'s okay. We went too fast. What do you need to feel safe?" Respect the limit, rebuild safety, continue more slowly. This teaches: overwhelming feelings are manageable with regulation, therapist won\'t push past capacity, it\'s safe to signal when it\'s too much.' },
+                                    { text: 'End the session - they can\'t handle therapy', correct: false, feedback: 'Going too fast doesn\'t mean they can\'t do therapy! Means you need to pace better. Slow down, resource, continue gently.' },
+                                    { text: 'Ignore the distress and keep going', correct: false, feedback: 'Ignoring overwhelm = replicating childhood abandonment in distress. Attuned response is: see the overwhelm, help them regulate, respect their limits.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the difference between productive activation and re-traumatization?',
+                                answers: [
+                                    { text: 'There is no difference', correct: false, feedback: 'Huge difference! One heals, one harms. Must be able to distinguish to work safely.' },
+                                    { text: 'Productive activation: client feels intensely but stays present, can reflect on experience. Re-traumatization: overwhelm, dissociation, unmanageable activation', correct: true, feedback: 'CRITICAL DISTINCTION! Productive (in window): Client cries, shakes, feels rage BUT: maintains eye contact, can describe experience, stays in room/present, returns to baseline after, feels relief/"that was hard but good." Re-traumatization (out of window): Dissociation, can\'t speak/describe, looks glazed/far away, panic/hyperventilation, collapse, feels worse after, fragmentation. Your job: track arousal constantly, stay at productive edge not beyond. If client goes out of window: STOP activation work, return to regulation, slower next time. Goal isn\'t maximum feeling but INTEGRATED feeling - can feel, stay present, metabolize experience.' },
+                                    { text: 'Any strong emotion is re-traumatization', correct: false, feedback: 'No! Strong emotion within window is healing. It\'s overwhelm BEYOND capacity that re-traumatizes. Intensity isn\'t the issue, dysregulation is.' },
+                                    { text: 'Re-traumatization builds resilience', correct: false, feedback: 'NEVER! Overwhelming client doesn\'t build capacity, it erodes trust and creates instability. Titrated exposure builds capacity.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says "I don\'t want to go there" when you invite exploring painful topic. CI response:',
+                                answers: [
+                                    { text: 'Respect it: "Okay, we don\'t have to. What feels safer to explore right now?"', correct: true, feedback: 'YES! Honoring client\'s "no" is ESSENTIAL. They know their capacity. Forcing exploration = violation, recreates childhood of not being heard. Trust that: if they\'re saying no, there\'s good reason (not ready, need more safety, overwhelm approaching), pushing creates resistance and harm, respecting "no" builds trust and safety. Alternative: "I hear you don\'t want to go there. Can you tell me what you\'re aware of that makes you want to avoid it?" This explores the EDGE without crossing it. Client might say: "I\'m scared I\'ll fall apart" → work with the fear itself rather than pushing into the topic. Pace is everything. Healing can\'t be forced.' },
+                                    { text: 'Insist: "This is important, we need to explore it"', correct: false, feedback: 'Violating! Client gets to decide what/when they explore. Your job is invite, not force. Insisting = therapeutic harm.' },
+                                    { text: 'Tell them they\'re being resistant', correct: false, feedback: 'Pathologizing their boundary! "I don\'t want to go there" might be healthy self-protection, not resistance. Respect it.' },
+                                    { text: 'End therapy if they won\'t explore painful topics', correct: false, feedback: 'Coercive! Therapy requires safety to explore at client\'s pace. Ultimatums destroy therapeutic relationship.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 3: ADVANCED
+            {
+                id: 'therapist-presence',
+                title: 'Therapist\'s Presence',
+                icon: '🧘',
+                level: 3,
+                xp: 45,
+                prereq: 'trauma-pacing',
+                lessons: [
+                    {
+                        title: 'Being the Instrument',
+                        teaching: `In CI, therapist's OWN presence is the primary tool. Not what you do but WHO YOU ARE in the room.
+
+This requires: being regulated yourself (can't help client regulate if you're dysregulated), awareness of your own triggers/wounds (so they don't interfere), capacity to stay present with intense emotion (without rescuing, fixing, or withdrawing), embodiment (in your own body, not just your head).
+
+Maté emphasizes: therapist must have done their own healing work. Can't take client where you haven't gone yourself. Your unprocessed trauma will block their healing.
+
+The work is BEING WITH client in their pain, not doing something to fix it. Your regulated, compassionate presence is medicine.`,
+                        concepts: [
+                            {
+                                title: 'Therapist as Tuning Fork',
+                                text: 'Your nervous system affects client\'s nervous system. If you\'re anxious, they can\'t settle. If you\'re grounded, you help regulate them. This is co-regulation. Not technique but neurobiological reality. Your state matters as much as your questions.'
+                            },
+                            {
+                                title: 'When Therapist Needs Healing',
+                                text: 'Signs you need more work: triggered by client\'s material (your stuff interfering), need to fix/rescue (can\'t tolerate their pain), defending certain patterns (your defenses activated), fatigue/burnout (not resourced enough). Ongoing supervision/therapy for therapist isn\'t luxury, it\'s necessity.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client shares abuse story similar to your own unprocessed trauma. You notice yourself tensing, wanting to change subject. What\'s happening?',
+                                answers: [
+                                    { text: 'Normal response - just push through', correct: false, feedback: 'Don\'t push through your own trigger! Will interfere with presence. Need to address it.' },
+                                    { text: 'Your own unhealed trauma is activated - this limits capacity to be present. Need to take to supervision/therapy, may need to refer client', correct: true, feedback: 'HONEST SELF-ASSESSMENT! You\'re: triggered (your nervous system activated by their material), defending (wanting to change subject = your avoidance of your own pain), limited (can\'t be fully present when managing your own distress). Ethical response: 1) Notice what\'s happening (awareness), 2) Don\'t pretend you\'re unaffected (authenticity), 3) Address it: "I need to reflect on whether I can work with this material effectively" (transparency), 4) Take to supervision/own therapy (get help), 5) Consider referral if you can\'t be present (client deserves therapist who can be with their experience). Not failure to have limits! Failure would be working beyond capacity, letting your trauma interfere with their healing.' },
+                                    { text: 'Ignore your tension - focus on client', correct: false, feedback: 'Can\'t ignore! Your tension WILL affect your presence, your questions, your capacity to stay with their pain. Address it.' },
+                                    { text: 'Tell client about your trauma to bond', correct: false, feedback: 'Not appropriate! Your disclosure serves your needs not theirs. And sharing while still triggered = burdening client with your unprocessed pain.' }
+                                ]
+                            },
+                            {
+                                question: 'What does "being with" client\'s pain mean versus "doing something about" their pain?',
+                                answers: [
+                                    { text: 'They\'re the same thing', correct: false, feedback: 'Fundamentally different! One is presence, one is fixing. Most therapists default to fixing because being with is harder.' },
+                                    { text: '"Being with" = staying present, regulated, open while they feel their pain. "Doing something" = rescuing, advising, fixing to reduce YOUR discomfort with their pain', correct: true, feedback: 'KEY DISTINCTION! Being with: Client cries, you stay present, breathe, maintain eye contact, tolerate their pain without rushing to stop it. Your presence says: "I can handle your pain. You don\'t have to protect me from it. Feel what you need to feel." Doing something: Client cries, you offer tissue, change subject, give advice, reassure ("It\'ll be okay") - anything to STOP the crying because their pain distresses YOU. This is: rescuing (protecting them from feeling), protecting self (can\'t tolerate witnessing pain), replicating childhood (someone couldn\'t be with their pain then either). Healing happens in BEING WITH. Client needs: "My pain is bearable. Someone can witness it without falling apart or making me stop." This is huge gift - just presence, no fixing.' },
+                                    { text: 'Being with means doing nothing and not caring', correct: false, feedback: 'Being with is ACTIVE presence, deeply caring! It\'s harder than fixing because you tolerate the discomfort of not rescuing.' },
+                                    { text: 'Clients need you to fix their pain, not just be with it', correct: false, feedback: 'They need PRESENCE more than fixing. Being truly seen in pain is healing. Fixing bypasses the feeling that needs to be felt.' }
+                                ]
+                            },
+                            {
+                                question: 'How does therapist\'s own regulation affect client\'s capacity to feel?',
+                                answers: [
+                                    { text: 'It doesn\'t - client regulation is independent', correct: false, feedback: 'Nervous systems affect each other! This is co-regulation. Your state directly impacts client\'s capacity.' },
+                                    { text: 'If therapist is regulated/grounded, client\'s nervous system can borrow that stability to feel more deeply than they could alone', correct: true, feedback: 'CO-REGULATION! Client can go deeper into feeling when: your presence is grounded (you\'re in your body, breathing, settled), you\'re not anxious about their distress (calm nervous system), you can tolerate intensity (not trying to shut it down). Your regulation = implicit message: "This intensity is safe. I can hold it. You won\'t overwhelm me." Lets client release control, feel fully, knowing you\'re stable anchor. VS dysregulated therapist: anxious about client\'s pain, wants to fix/stop it, can\'t stay present → client must stay controlled, can\'t fully feel, has to manage therapist\'s anxiety. This is why YOUR healing work matters - can\'t offer regulation you don\'t have. Your nervous system is therapeutic tool.' },
+                                    { text: 'Therapist should match client\'s dysregulation to show empathy', correct: false, feedback: 'No! Matching dysregulation = two people drowning. You need to stay regulated so you can help client regulate. Empathy doesn\'t require losing your ground.' },
+                                    { text: 'Regulation isn\'t important in CI', correct: false, feedback: 'It\'s CENTRAL! CI is fundamentally about nervous system healing. Therapist regulation is foundation of this work.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'integration-practice',
+                title: 'Integration in Practice',
+                icon: '🔗',
+                level: 3,
+                xp: 40,
+                prereq: 'therapist-presence',
+                lessons: [
+                    {
+                        title: 'Bringing It All Together',
+                        teaching: `CI isn't separate techniques but integrated way of being. In real session, you're simultaneously:
+
+• Maintaining curious presence (openness, non-judgment)
+• Tracking body (somatic cues, micro-expressions) 
+• Following process (what's alive right now)
+• Exploring beliefs (what client learned about self)
+• Pacing appropriately (window of tolerance)
+• Being regulated instrument (your own grounding)
+
+This becomes fluid, natural. Not thinking "Now I'll track body, now I'll explore belief" but BEING in inquiry state where all elements flow together.
+
+Real mastery: You disappear. Not "doing CI" but BEING with another human in compassionate exploration of their truth.`,
+                        concepts: [
+                            {
+                                title: 'From Technique to Being',
+                                text: 'Early: mechanical ("I should ask about body now"). Intermediate: smoother but still technique-focused. Advanced: integrated - you\'re just PRESENT and inquiry flows naturally. Questions emerge from genuine curiosity not from following protocol. This is art not science.'
+                            },
+                            {
+                                title: 'CI with Different Modalities',
+                                text: 'CI integrates with: EMDR (use CI presence/body awareness during processing), IFS (compassionate inquiry into parts), psychodynamic (exploring transference with CI curiosity), somatic (already body-based, CI adds relational inquiry). It\'s approach that enhances whatever modality you practice.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client describes intense anger at partner. What CI response integrates multiple elements?',
+                                answers: [
+                                    { text: 'Just ask about their thoughts on the situation', correct: false, feedback: 'This stays cognitive, misses somatic/emotional/belief levels. Not integrating CI principles.' },
+                                    { text: '"What do you notice in your body as you talk about this anger? [body] Where do you feel it? [somatic] What does this anger remind you of? [process] When did you first feel anger like this? [history] What did you learn about expressing anger? [belief]"', correct: true, feedback: 'BEAUTIFUL INTEGRATION! You\'re: 1) Grounding in body ("What do you notice?"), 2) Tracking process (anger as it\'s happening), 3) Following emotional thread (where does it lead?), 4) Connecting to history (origin of pattern), 5) Exploring belief ("What did you learn?"), 6) Staying curious (not directing, discovering), 7) Pacing (questions allow gradual deepening). This flows naturally - not rigid technique but organic inquiry following the aliveness. Client might discover: anger in body (clenched jaw, heat), reminds them of childhood (father\'s rage), learned anger is dangerous (had to suppress it), belief formed ("My anger will destroy relationships"), now can\'t express anger to partner (repeating childhood pattern). All from compassionate inquiry starting with body awareness.' },
+                                    { text: 'Tell them their anger is valid', correct: false, feedback: 'Validation is nice but not inquiry! CI explores the anger - what\'s beneath it, where it lives, what it means - not just validates it.' },
+                                    { text: 'Teach anger management strategies', correct: false, feedback: 'Skips the inquiry! CI isn\'t about managing symptoms but understanding their roots and meanings. Strategies come after understanding.' }
+                                ]
+                            },
+                            {
+                                question: 'How do you know when CI inquiry has gone deep enough in a session?',
+                                answers: [
+                                    { text: 'When you\'ve asked all the right questions', correct: false, feedback: 'Not about asking questions! About reaching truth, release, or meaningful realization. Quality not quantity.' },
+                                    { text: 'When client experiences: felt shift in body, emotional release, meaningful insight connecting past/present, or sense of settling/completion', correct: true, feedback: 'YES - markers of depth: FELT SHIFT: "Something released in my chest," body softens, breathing deepens. EMOTIONAL RELEASE: tears that feel clean/relieving (not overwhelm), appropriate anger expressed, grief felt/honored. INSIGHT: "Oh... this is what I\'ve been doing my whole life," connections between childhood and now, belief recognized. SETTLING: "I feel different," sense of completion, readiness to stop. Don\'t need all of these but at least one indicates: touched something real, metabolized some experience, moved from story to truth. VS staying surface: still in head, no body shift, talking ABOUT rather than FEELING, no new awareness. When deep enough: honor it, don\'t keep pushing. Session isn\'t about drilling deeper indefinitely but reaching what\'s ready to be felt today.' },
+                                    { text: 'After exactly 50 minutes', correct: false, feedback: 'Time is arbitrary! Depth is about quality of inquiry and what\'s been touched/released/understood, not clock.' },
+                                    { text: 'When client is exhausted', correct: false, feedback: 'Exhaustion might mean went too deep (overwhelm) or not deep enough (circling without landing). Neither is goal. Depth with integration = often energizing.' }
+                                ]
+                            },
+                            {
+                                question: 'Client has insights during session but returns next week unchanged. What does CI recognize?',
+                                answers: [
+                                    { text: 'Insights are useless - only behavior change matters', correct: false, feedback: 'Insights matter but insufficient alone. Need embodied/felt experience AND insight for lasting change.' },
+                                    { text: 'Intellectual insight without embodied feeling/release doesn\'t create change - need to FEEL not just understand', correct: true, feedback: 'CRUCIAL UNDERSTANDING! Intellectual insight: "I see that I learned to people-please from my mother" = understanding in HEAD. Doesn\'t change anything. Embodied insight: feeling the terror of mother\'s rejection when you had needs + recognizing pattern + grieving what was lost + choosing differently from adult self = TRANSFORMATION. Difference: knowledge vs experience, thinking vs feeling, explaining vs living. CI ensures: insights emerge from felt experience (not just clever thinking), body shifts when truth is touched (release, tears, settling), new awareness includes emotional/somatic components. Client saying "I get it now" but body/behavior unchanged = stayed in head. Real knowing includes whole self - body, emotion, cognition integrated. This is why CI keeps returning to body/feeling.' },
+                                    { text: 'Client isn\'t trying hard enough', correct: false, feedback: 'Not about effort! About depth of processing. Intellectual insights don\'t require body/feeling integration. That\'s the missing piece.' },
+                                    { text: 'Some people can\'t change', correct: false, feedback: 'Everyone can change but requires embodied work not just intellectual understanding. Haven\'t found right depth yet.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'advanced-application',
+                title: 'Advanced Application',
+                icon: '🎓',
+                level: 3,
+                xp: 50,
+                prereq: 'integration-practice',
+                lessons: [
+                    {
+                        title: 'CI in Complex Cases',
+                        teaching: `Advanced CI work with: severe trauma, personality disorders, addiction, chronic illness, intergenerational trauma requires additional considerations.
+
+SEVERE TRAUMA: Extra attention to pacing, window of tolerance, stabilization before deep work. May need concurrent somatic therapy, psychiatry. CI brings compassion but doesn't replace trauma treatment.
+
+ADDICTION: CI explores what pain addiction soothes. Not about getting sober first (abstinence-only) but understanding wound beneath compulsion. Harm reduction compatible with CI inquiry.
+
+COMPLEX RELATIONAL TRAUMA: Longer timeline, more repair of attachment wounds, patience with defensive patterns. CI's non-judgmental curiosity particularly powerful here.
+
+Core principle remains: curious, compassionate inquiry into experience. Complexity requires more skill, slower pace, additional support systems.`,
+                        concepts: [
+                            {
+                                title: 'When CI Isn\'t Enough',
+                                text: 'CI is powerful but not complete treatment for: acute psychosis (need stabilization first), active suicidality (need safety protocol), severe dissociative disorders (need specialized trauma treatment), crisis states. CI works best integrated with other supports, not as standalone for severe presentations.'
+                            },
+                            {
+                                title: 'Cultural Humility',
+                                text: 'CI must be culturally adapted. Western focus on individual/feelings may conflict with: collectivist values, cultural norms about emotion expression, spiritual frameworks, family structures. Inquiry includes: "What does your culture/family say about this?" "How do your cultural values fit with what you\'re experiencing?" Don\'t impose Western psychological frame.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client with active addiction says: "I know I should stop using but I can\'t." CI inquiry:',
+                                answers: [
+                                    { text: 'Insist they get sober before continuing therapy', correct: false, feedback: 'Abstinence-first approach conflicts with CI/harm reduction. Can work with active addiction compassionately.' },
+                                    { text: '"What does the substance do for you? What pain is it soothing? What would you have to feel if you stopped using?"', correct: true, feedback: 'COMPASSIONATE ADDICTION INQUIRY! Not: "You must stop" (shaming), "Why can\'t you control it?" (blaming). Instead: What function does it serve? (curiosity), What pain beneath? (compassion), What would sobriety require feeling? (understanding). Might discover: substance numbs childhood trauma, using prevents feeling grief/rage/terror, stopping means facing what was survived by not feeling. This is Maté\'s core teaching: addiction isn\'t the problem, it\'s the SOLUTION to unbearable pain. Real question: can we address the pain so solution (using) isn\'t needed? Approach: harm reduction while exploring wound, building capacity to feel, addressing trauma. May need: concurrent addiction support, medical monitoring, long timeline. CI doesn\'t treat addiction alone but explores its meaning/function compassionately.' },
+                                    { text: 'Focus only on stopping the behavior, not the feelings', correct: false, feedback: 'Behavior focus misses the wound! Addiction persists because it serves function. Must address what it\'s solving.' },
+                                    { text: 'Tell them addiction is their choice', correct: false, feedback: 'Simplistic! Addiction is adaptation to unbearable circumstances, often rooted in childhood trauma. Not simple "choice."' }
+                                ]
+                            },
+                            {
+                                question: 'Client from collectivist culture feels guilty about individual therapy, says "focusing on myself feels selfish." How does CI respond with cultural humility?',
+                                answers: [
+                                    { text: 'Tell them Western psychology is correct and they need to individuate', correct: false, feedback: 'Cultural imperialism! Imposing Western values (individualism) without respecting their cultural framework.' },
+                                    { text: '"Tell me about what your culture teaches about self-focus. How do you hold both your cultural values and your need for healing?"', correct: true, feedback: 'CULTURALLY HUMBLE CI! You\'re: 1) Curious about THEIR cultural framework (not imposing yours), 2) Honoring potential conflict (their values vs therapy model), 3) Exploring integration (how to heal while respecting culture), 4) Not assuming Western psychology is universal truth. Might discover: culture values family/community over individual, "selfish" means betraying collective, healing can be framed as "becoming healthier member of community" not "individual self-actualization." Work WITH cultural values: "How can attending to your pain help you serve family better?" "What would ancestors say about healing yourself?" Find culturally congruent path rather than forcing Western therapeutic model. CI adapts to client\'s worldview, doesn\'t demand they adopt yours.' },
+                                    { text: 'Ignore their cultural concerns - focus on individual healing', correct: false, feedback: 'Dismissive! Cultural values are central to identity. Can\'t ignore them. Must integrate healing with cultural framework.' },
+                                    { text: 'Agree therapy is selfish and they should stop', correct: false, feedback: 'Colludes with guilt! Can hold both: respecting cultural values AND recognizing healing benefits everyone including community.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s the relationship between CI and diagnosis/treatment planning?',
+                                answers: [
+                                    { text: 'CI replaces diagnosis - don\'t need it', correct: false, feedback: 'Diagnosis has place (communication, treatment planning, insurance). CI doesn\'t reject it but doesn\'t center it.' },
+                                    { text: 'CI views diagnosis as description of suffering patterns, not identity/pathology. Informs treatment but inquiry focuses on lived experience not label', correct: true, feedback: 'BALANCED APPROACH! Diagnosis useful for: communicating with other providers, understanding patterns (depression, PTSD, etc.), treatment planning, insurance requirements. CI perspective: diagnosis describes SYMPTOMS (what observable), but inquiry explores EXPERIENCE (what it feels like), diagnosis may capture pattern but misses unique meaning, labels can pathologize what\'s actually adaptation/survival. In session: less "You have PTSD, here\'s treatment protocol," more "You\'re experiencing this suffering [may fit PTSD criteria]. What\'s that like for you? What does your body/heart need?" Use diagnosis pragmatically, don\'t let it replace curiosity about THIS person\'s unique experience. They\'re not "a borderline," they\'re a person who learned these protective patterns because...' },
+                                    { text: 'Diagnosis is everything - determine treatment solely from DSM', correct: false, feedback: 'Reductive! Diagnosis is starting point not endpoint. Individual experience varies hugely within any diagnostic category.' },
+                                    { text: 'Never mention diagnosis - it\'s harmful', correct: false, feedback: 'Can be useful when held lightly. Some clients find diagnosis validating: "There\'s a name for this, I\'m not alone." Just don\'t reify it.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            totalXp: 0,
+            streak: 0,
+            completedSkills: [],
+            skillProgress: {},
+            currentSkill: null,
+            currentLessonIndex: 0,
+            currentQuestionIndex: 0,
+            answeredQuestions: [],
+            correctAnswers: 0
+        };
+
+        // Load saved state
+        function loadState() {
+            const saved = localStorage.getItem('compassionateInquiryAcademy');
+            if (saved) {
+                const loadedState = JSON.parse(saved);
+                // Merge with defaults to ensure all fields exist
+                gameState = {
+                    level: loadedState.level || 1,
+                    xp: loadedState.xp || 0,
+                    xpToNextLevel: loadedState.xpToNextLevel || 100,
+                    totalXp: loadedState.totalXp || 0,
+                    streak: loadedState.streak || 0,
+                    completedSkills: loadedState.completedSkills || [],
+                    skillProgress: loadedState.skillProgress || {},
+                    currentSkill: loadedState.currentSkill || null,
+                    currentLessonIndex: loadedState.currentLessonIndex || 0,
+                    currentQuestionIndex: loadedState.currentQuestionIndex || 0,
+                    answeredQuestions: loadedState.answeredQuestions || [],
+                    correctAnswers: loadedState.correctAnswers || 0
+                };
+            }
+            updateUI();
+        }
+
+        // Save state
+        function saveState() {
+            localStorage.setItem('compassionateInquiryAcademy', JSON.stringify(gameState));
+        }
+
+        // Update UI
+        function updateUI() {
+            updateHeader();
+            updatePathDisplay();
+            renderSkillTree();
+        }
+        
+        function updateHeader() {
+            const xpPercent = (gameState.xp / gameState.xpToNextLevel) * 100;
+            document.getElementById('xp-bar').style.width = xpPercent + '%';
+            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
+            document.getElementById('level-display').textContent = gameState.level;
+            
+            const totalSkills = SKILLS_DATA.length;
+            const completedCount = gameState.completedSkills.length;
+            const masteryPercent = Math.round((completedCount / totalSkills) * 100);
+            document.getElementById('mastery-display').textContent = masteryPercent + '%';
+            document.getElementById('streak-display').textContent = gameState.streak + '🔥';
+        }
+        
+        function updatePathDisplay() {
+            const level = gameState.level;
+            let path = 'FOUNDATIONS';
+            if (level >= 3) path = 'ADVANCED';
+            else if (level >= 2) path = 'INTERMEDIATE';
+            
+            document.getElementById('current-path').textContent = path;
+        }
+
+        // Render skill tree
+        function renderSkillTree() {
+            const container = document.getElementById('skill-tree');
+            container.innerHTML = '';
+            
+            SKILLS_DATA.forEach(skill => {
+                const isCompleted = gameState.completedSkills.includes(skill.id);
+                const isUnlocked = !skill.prereq || gameState.completedSkills.includes(skill.prereq);
+                
+                // Find prerequisite skill name
+                let prereqName = '';
+                if (!isUnlocked && skill.prereq) {
+                    const prereqSkill = SKILLS_DATA.find(s => s.id === skill.prereq);
+                    prereqName = prereqSkill ? prereqSkill.title : '';
+                }
+                
+                const node = document.createElement('div');
+                node.className = 'skill-node';
+                
+                if (isCompleted) {
+                    node.classList.add('completed');
+                } else if (isUnlocked) {
+                    node.classList.add('unlocked');
+                } else {
+                    node.classList.add('locked');
+                }
+                
+                node.innerHTML = `
+                    ${!isUnlocked ? '<div class="skill-lock">🔒</div>' : ''}
+                    <div class="skill-icon">${skill.icon}</div>
+                    <div class="skill-title">${skill.title}</div>
+                    ${isCompleted ? '<div style="margin-top:8px; color:#0ff;">✓ MASTERED</div>' : ''}
+                    ${!isUnlocked && prereqName ? `<div class="skill-prereq">Complete: ${prereqName}</div>` : ''}
+                `;
+                
+                if (isUnlocked && !isCompleted) {
+                    node.style.cursor = 'pointer';
+                    node.onclick = () => startSkill(skill);
+                    node.setAttribute('tabindex', '0');
+                    node.setAttribute('role', 'button');
+                    node.setAttribute('aria-label', `Start ${skill.title} skill`);
+                    node.onkeypress = (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            startSkill(skill);
+                        }
+                    };
+                }
+                
+                container.appendChild(node);
+            });
+        }
+
+        // Start skill
+        function startSkill(skill) {
+            gameState.currentSkill = skill.id;
+            gameState.currentLessonIndex = 0;
+            gameState.currentQuestionIndex = 0;
+            showLesson();
+        }
+
+        // Show lesson
+        function showLesson() {
+            const skill = SKILLS_DATA.find(s => s.id === gameState.currentSkill);
+            const lesson = skill.lessons[gameState.currentLessonIndex];
+            
+            const modal = document.getElementById('lesson-modal');
+            const content = document.getElementById('modal-content');
+            
+            let html = `
+                <div class="lesson-header">
+                    <div class="lesson-title">${skill.title}</div>
+                    <div class="lesson-subtitle">${lesson.title}</div>
+                </div>
+                
+                <div class="teaching-section">
+                    <div class="teaching-text">${lesson.teaching.split('\n').join('<br><br>')}</div>
+                </div>
+            `;
+            
+            // Add concepts
+            lesson.concepts.forEach(concept => {
+                html += `
+                    <div class="key-concept">
+                        <div class="concept-title">${concept.title}</div>
+                        <div class="concept-text">${concept.text}</div>
+                    </div>
+                `;
+            });
+            
+            // Add current question
+            if (gameState.currentQuestionIndex < lesson.questions.length) {
+                const question = lesson.questions[gameState.currentQuestionIndex];
+                const questionId = `${skill.id}-${gameState.currentLessonIndex}-${gameState.currentQuestionIndex}`;
+                const isAnswered = gameState.answeredQuestions.includes(questionId);
+                
+                html += `
+                    <div class="question-section">
+                        <div class="question-text">QUESTION ${gameState.currentQuestionIndex + 1}/${lesson.questions.length}:<br><br>${question.question}</div>
+                        <div class="answers" id="answers-container"></div>
+                        <div class="feedback" id="feedback"></div>
+                    </div>
+                `;
+            }
+            
+            // Navigation buttons
+            html += `
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="closeLesson()">← BACK TO TREE</button>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
+            
+            // Render answers if question present
+            if (gameState.currentQuestionIndex < lesson.questions.length) {
+                renderAnswers(lesson.questions[gameState.currentQuestionIndex], skill.id);
+            } else {
+                // Lesson complete
+                completeLesson(skill);
+            }
+        }
+
+        // Render answers
+        function renderAnswers(question, skillId) {
+            const container = document.getElementById('answers-container');
+            const questionId = `${skillId}-${gameState.currentLessonIndex}-${gameState.currentQuestionIndex}`;
+            const isAnswered = gameState.answeredQuestions.includes(questionId);
+            
+            container.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer.text;
+                
+                if (isAnswered) {
+                    btn.classList.add('disabled');
+                    if (answer.correct) {
+                        btn.classList.add('correct');
+                    }
+                } else {
+                    btn.onclick = () => selectAnswer(answer, questionId);
+                }
+                
+                container.appendChild(btn);
+            });
+        }
+
+        // Select answer
+        function selectAnswer(answer, questionId) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = answer.feedback;
+            feedback.classList.add('show');
+            
+            // Mark as answered
+            if (!gameState.answeredQuestions.includes(questionId)) {
+                gameState.answeredQuestions.push(questionId);
+                saveState();
+            }
+            
+            // Disable all buttons and highlight
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => {
+                btn.classList.add('disabled');
+                if (btn.textContent === answer.text) {
+                    btn.classList.add(answer.correct ? 'correct' : 'incorrect');
+                }
+            });
+            
+            // Show next button
+            setTimeout(() => {
+                const skill = SKILLS_DATA.find(s => s.id === gameState.currentSkill);
+                const lesson = skill.lessons[gameState.currentLessonIndex];
+                
+                if (gameState.currentQuestionIndex < lesson.questions.length - 1) {
+                    feedback.innerHTML += '<br><br><button class="nav-btn" onclick="nextQuestion()">NEXT QUESTION →</button>';
+                } else {
+                    feedback.innerHTML += '<br><br><button class="nav-btn" onclick="completeLesson()">COMPLETE LESSON →</button>';
+                }
+            }, 500);
+        }
+
+        // Next question
+        function nextQuestion() {
+            gameState.currentQuestionIndex++;
+            saveState();
+            showLesson();
+        }
+
+        // Complete lesson
+        function completeLesson() {
+            const skill = SKILLS_DATA.find(s => s.id === gameState.currentSkill);
+            
+            // Award XP if not already completed
+            if (!gameState.completedSkills.includes(skill.id)) {
+                const xpEarned = skill.xp;
+                gameState.xp += xpEarned;
+                gameState.totalXp += xpEarned;
+                
+                // Level up check
+                while (gameState.xp >= gameState.xpToNextLevel) {
+                    gameState.xp -= gameState.xpToNextLevel;
+                    gameState.level++;
+                    gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+                }
+                
+                // Update skill progress
+                if (!gameState.skillProgress[skill.id]) {
+                    gameState.skillProgress[skill.id] = 0;
+                }
+                gameState.skillProgress[skill.id]++;
+                
+                // Mark as completed and update streak
+                gameState.completedSkills.push(skill.id);
+                gameState.streak++;
+                
+                saveState();
+                
+                // Find next available skill
+                const currentIndex = SKILLS_DATA.findIndex(s => s.id === skill.id);
+                const nextSkill = SKILLS_DATA.slice(currentIndex + 1).find(s => {
+                    if (!s.prereq) return true;
+                    return gameState.completedSkills.includes(s.prereq);
+                });
+                
+                const nextSkillButton = nextSkill && !gameState.completedSkills.includes(nextSkill.id)
+                    ? `<button class="nav-btn" onclick="startNextSkill('${nextSkill.id}')">→ NEXT: ${nextSkill.title}</button>`
+                    : '';
+                
+                // Show completion message
+                const content = document.getElementById('modal-content');
+                content.innerHTML = `
+                    <div class="lesson-header">
+                        <div class="lesson-title">✨ SKILL MASTERED! ✨</div>
+                        <div class="lesson-subtitle">${skill.title}</div>
+                    </div>
+                    <div class="teaching-section">
+                        <div class="teaching-text" style="text-align: center;">
+                            <div style="font-size: 48px; margin: 20px 0;">${skill.icon}</div>
+                            <div style="font-size: 16px; color: #0ff; margin: 20px 0;">+${xpEarned} XP EARNED!</div>
+                            <div style="font-size: 10px;">You've completed all questions in ${skill.title}.</div>
+                            <div style="font-size: 8px; margin-top: 20px; color: #0cf;">
+                                Level: ${gameState.level}<br>
+                                Mastery: ${Math.round((gameState.completedSkills.length / SKILLS_DATA.length) * 100)}%<br>
+                                Streak: ${gameState.streak}🔥
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nav-buttons">
+                        ${nextSkillButton}
+                        <button class="nav-btn" onclick="closeLesson()">→ CONTINUE LEARNING</button>
+                    </div>
+                `;
+            } else {
+                closeLesson();
+            }
+        }
+        
+        function startNextSkill(skillId) {
+            const skill = SKILLS_DATA.find(s => s.id === skillId);
+            if (skill) {
+                closeLesson();
+                setTimeout(() => startSkill(skill), 100);
+            }
+        }
+
+        // Close lesson
+        function closeLesson() {
+            document.getElementById('lesson-modal').classList.remove('active');
+            gameState.currentSkill = null;
+            saveState();
+            updateUI();
+        }
+
+        // Save/Load/Reset functions
+        function saveProgress() {
+            localStorage.setItem('compassionateInquiryAcademy', JSON.stringify(gameState));
+            alert('✓ Progress saved!');
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('compassionateInquiryAcademy');
+            if (saved) {
+                const loadedState = JSON.parse(saved);
+                // Merge with defaults to ensure all fields exist
+                gameState = {
+                    level: loadedState.level || 1,
+                    xp: loadedState.xp || 0,
+                    xpToNextLevel: loadedState.xpToNextLevel || 100,
+                    totalXp: loadedState.totalXp || 0,
+                    streak: loadedState.streak || 0,
+                    completedSkills: loadedState.completedSkills || [],
+                    skillProgress: loadedState.skillProgress || {},
+                    currentSkill: loadedState.currentSkill || null,
+                    currentLessonIndex: loadedState.currentLessonIndex || 0,
+                    currentQuestionIndex: loadedState.currentQuestionIndex || 0,
+                    answeredQuestions: loadedState.answeredQuestions || [],
+                    correctAnswers: loadedState.correctAnswers || 0
+                };
+                updateUI();
+                alert('✓ Progress loaded!');
+            } else {
+                alert('No saved progress found.');
+            }
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('compassionateInquiryAcademy');
+                location.reload();
+            }
+        }
+
+        // Initialize
+        loadState();
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // ESC to close modal
+            if (e.key === 'Escape') {
+                closeLesson();
+            }
+            
+            // H for home
+            if (e.key === 'h' || e.key === 'H') {
+                if (!document.getElementById('lesson-modal').classList.contains('active')) {
+                    window.location.href = 'learning-library-hub.html';
+                }
+            }
+            
+            // S for save
+            if (e.key === 's' || e.key === 'S') {
+                if (!document.getElementById('lesson-modal').classList.contains('active')) {
+                    e.preventDefault();
+                    saveProgress();
+                }
+            }
+        });
+        
+        console.log('%c💙 COMPASSIONATE INQUIRY LOADED', 'color: #0cf; font-size: 16px; font-weight: bold;');
+        console.log('%c⌨️  Keyboard Shortcuts:', 'color: #0ff; font-size: 12px;');
+        console.log('  • Press ESC to close lessons');
+        console.log('  • Press H for home');
+        console.log('  • Press S to save');
+        console.log('  • Use TAB to navigate');
+    </script>
+</body>
+</html>
