@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>PSYCHODYNAMIC ACADEMY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --primary: #0f0;
+            --secondary: #0ff;
+            --accent: #ff0;
+            --danger: #f00;
+            --bg-dark: #000;
+            --bg-card: #0a0a0a;
+            --bg-elevated: #111;
+            --border-subtle: #222;
+            --text-muted: #666;
+            
+            /* Mobile-first spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 24px;
+            --space-2xl: 32px;
+            
+            /* Touch-friendly sizing */
+            --touch-target: 44px;
+            --border-width: 3px;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            
+            /* Safe areas for notched phones */
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--bg-dark);
+            color: var(--primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-bottom: calc(70px + var(--safe-bottom));
+        }
+        
+        /* Subtle scanline effect - less intense for mobile */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.08) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Header - sticky with blur */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-top: calc(var(--space-md) + var(--safe-top));
+            border-bottom: var(--border-width) solid var(--primary);
+        }
+        
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 11px;
+            color: var(--secondary);
+            text-shadow: 2px 2px var(--danger), 0 0 20px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: var(--space-sm);
+            letter-spacing: 1px;
+        }
+        
+        /* XP Progress Bar */
+        .xp-section {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .xp-bar-outer {
+            background: var(--border-subtle);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-sm);
+            height: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .xp-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7px;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            white-space: nowrap;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xs);
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+        }
+        
+        .stat-label {
+            font-size: 5px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-size: 9px;
+            color: var(--accent);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: var(--space-md);
+            padding-left: calc(var(--space-md) + var(--safe-left));
+            padding-right: calc(var(--space-md) + var(--safe-right));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Path Indicator */
+        .path-indicator {
+            text-align: center;
+            font-size: 7px;
+            color: var(--text-muted);
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-sm);
+        }
+        
+        .path-name {
+            color: var(--accent);
+            font-size: 8px;
+        }
+        
+        /* Skill Cards Grid */
+        .skill-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .skill-card {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+        }
+        
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--border-subtle);
+            transition: background 0.2s;
+        }
+        
+        .skill-card.unlocked {
+            border-color: var(--primary);
+        }
+        
+        .skill-card.unlocked::before {
+            background: var(--primary);
+        }
+        
+        .skill-card.unlocked:active {
+            transform: scale(0.98);
+            background: #001a00;
+        }
+        
+        .skill-card.completed {
+            border-color: var(--accent);
+            background: rgba(255, 255, 0, 0.03);
+        }
+        
+        .skill-card.completed::before {
+            background: var(--accent);
+        }
+        
+        .skill-card.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .skill-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .skill-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .skill-title {
+            font-size: 8px;
+            color: var(--primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.4;
+        }
+        
+        .skill-card.completed .skill-title {
+            color: var(--accent);
+        }
+        
+        .skill-meta {
+            display: flex;
+            gap: var(--space-sm);
+            font-size: 6px;
+            color: var(--text-muted);
+        }
+        
+        .skill-xp {
+            color: var(--secondary);
+        }
+        
+        .skill-status {
+            margin-left: auto;
+            font-size: 16px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: var(--border-width) solid var(--primary);
+            padding: var(--space-sm);
+            padding-bottom: calc(var(--space-sm) + var(--safe-bottom));
+            z-index: 100;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 6px;
+            padding: var(--space-sm);
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: var(--radius-sm);
+        }
+        
+        .nav-btn:active {
+            background: rgba(0, 255, 0, 0.1);
+            transform: scale(0.95);
+        }
+        
+        .nav-btn .icon {
+            font-size: 20px;
+        }
+        
+        .nav-btn.home-btn {
+            color: var(--secondary);
+        }
+        
+        /* Modal - Full Screen on Mobile */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-dark);
+            z-index: 1000;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+        
+        .modal-overlay.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            min-height: 100%;
+            padding: var(--space-lg);
+            padding-top: calc(var(--space-lg) + var(--safe-top));
+            padding-bottom: calc(100px + var(--safe-bottom));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Lesson Header */
+        .lesson-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+        
+        .lesson-icon {
+            font-size: 40px;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .lesson-title {
+            font-size: 10px;
+            color: var(--secondary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.5;
+        }
+        
+        .lesson-subtitle {
+            font-size: 7px;
+            color: var(--accent);
+        }
+        
+        /* Teaching Section */
+        .teaching-section {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .teaching-text {
+            font-size: 9px;
+            line-height: 2;
+            color: var(--primary);
+            white-space: pre-wrap;
+        }
+        
+        /* Key Concepts */
+        .concepts-section {
+            margin-top: var(--space-xl);
+        }
+        
+        .concept-card {
+            background: var(--bg-dark);
+            border-left: 4px solid var(--accent);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        
+        .concept-title {
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .concept-text {
+            font-size: 8px;
+            line-height: 1.8;
+            color: var(--primary);
+            opacity: 0.9;
+        }
+        
+        /* Question Section */
+        .question-section {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .question-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: var(--space-xs);
+        }
+        
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-subtle);
+            border: 1px solid var(--text-muted);
+        }
+        
+        .progress-dot.current {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            box-shadow: 0 0 8px var(--secondary);
+        }
+        
+        .progress-dot.correct {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .progress-dot.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .score-display {
+            font-size: 7px;
+            color: var(--secondary);
+        }
+        
+        .score-value {
+            color: var(--accent);
+        }
+        
+        .question-text {
+            font-size: 10px;
+            line-height: 1.8;
+            color: var(--secondary);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--secondary);
+        }
+        
+        /* Answer Buttons */
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .answer-btn {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 8px;
+            line-height: 1.7;
+            padding: var(--space-lg);
+            text-align: left;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .answer-btn:active:not(.disabled) {
+            transform: scale(0.98);
+            background: #001a00;
+        }
+        
+        .answer-btn.selected {
+            border-color: var(--secondary);
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        .answer-btn.correct {
+            border-color: var(--primary);
+            background: rgba(0, 255, 0, 0.1);
+            animation: correctPulse 0.4s ease;
+        }
+        
+        .answer-btn.incorrect {
+            border-color: var(--danger);
+            background: rgba(255, 0, 0, 0.1);
+            animation: shake 0.4s ease;
+        }
+        
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        
+        /* Feedback */
+        .feedback-box {
+            margin-top: var(--space-lg);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            line-height: 1.8;
+            display: none;
+        }
+        
+        .feedback-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .feedback-box.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .feedback-box.incorrect {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        /* Modal Footer */
+        .modal-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-bottom: calc(var(--space-md) + var(--safe-bottom));
+            display: flex;
+            gap: var(--space-md);
+            z-index: 1001;
+        }
+        
+        .btn {
+            flex: 1;
+            font-family: inherit;
+            font-size: 8px;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: var(--touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .btn:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: #002200;
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-primary:active {
+            background: #003300;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+        
+        .btn-accent {
+            background: rgba(255, 255, 0, 0.1);
+            border: var(--border-width) solid var(--accent);
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Completion Screen */
+        .completion-screen {
+            text-align: center;
+            padding: var(--space-2xl) 0;
+        }
+        
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-lg);
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .completion-title {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        .completion-xp {
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats p {
+            font-size: 9px;
+            line-height: 2;
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* Empty state for when all skills completed */
+        .all-complete {
+            text-align: center;
+            padding: var(--space-2xl);
+            color: var(--accent);
+        }
+        
+        .all-complete-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .all-complete-text {
+            font-size: 9px;
+            line-height: 2;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            color: var(--primary);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Level badge in header */
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid var(--accent);
+            padding: 2px var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 7px;
+            color: var(--accent);
+        }
+        
+        /* Desktop enhancements */
+        @media (min-width: 768px) {
+            :root {
+                --space-md: 16px;
+                --space-lg: 20px;
+                --space-xl: 32px;
+            }
+            
+            .title {
+                font-size: 14px;
+            }
+            
+            .skill-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .skill-card:hover:not(.locked) {
+                transform: translateY(-2px);
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            }
+            
+            .teaching-text,
+            .question-text {
+                font-size: 10px;
+            }
+            
+            .answer-btn {
+                font-size: 9px;
+            }
+            
+            .answer-btn:hover:not(.disabled) {
+                background: #001a00;
+                border-color: var(--secondary);
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="title">⚡ PSYCHODYNAMIC ACADEMY ⚡</h1>
+            
+            <div class="xp-section">
+                <div class="xp-bar-outer">
+                    <div class="xp-bar-fill" id="xp-bar"></div>
+                    <div class="xp-text" id="xp-text">0 / 100 XP</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="level-display">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MASTERY</div>
+                    <div class="stat-value" id="mastery-display">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">STREAK</div>
+                    <div class="stat-value" id="streak-display">0🔥</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="path-indicator">
+            CURRENT PATH: <span class="path-name" id="current-path">FOUNDATIONS</span>
+        </div>
+        
+        <div class="skill-grid" id="skill-grid">
+            <!-- Skills populated by JS -->
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-buttons">
+            <button class="nav-btn home-btn" onclick="goHome()" aria-label="Go to Learning Hub">
+                <span class="icon">🏠</span>
+                <span>HOME</span>
+            </button>
+            <button class="nav-btn" onclick="saveProgress()" aria-label="Save progress">
+                <span class="icon">💾</span>
+                <span>SAVE</span>
+            </button>
+            <button class="nav-btn" onclick="loadProgress()" aria-label="Load progress">
+                <span class="icon">📁</span>
+                <span>LOAD</span>
+            </button>
+            <button class="nav-btn" onclick="resetProgress()" aria-label="Reset progress">
+                <span class="icon">🔄</span>
+                <span>RESET</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content" id="modal-content">
+            <!-- Content populated by JS -->
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // Game State
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            totalXp: 0,
+            streak: 0,
+            completedSkills: [],
+            skillProgress: {},
+            currentLesson: null,
+            currentQuestion: 0,
+            correctAnswers: 0,
+            questionResults: [] // Track each question result for progress dots
+        };
+        
+        // Skill Tree Data
+        const skillTree = [
+            {
+                id: 'unconscious-intro',
+                title: 'The Unconscious',
+                icon: '🧠',
+                level: 1,
+                xp: 20,
+                prereq: null,
+                lessons: [{
+                    title: 'What is the Unconscious?',
+                    teaching: `The UNCONSCIOUS is the foundation of psychodynamic theory. Freud's revolutionary insight: most mental life happens OUTSIDE conscious awareness.
+
+Think of mind like an iceberg. Tiny tip above water = consciousness (what you're aware of right now). Massive bulk below = unconscious (memories, desires, conflicts, fears you don't know you have).
+
+The unconscious isn't just "forgotten" - it's ACTIVELY KEPT from awareness because it's threatening, shameful, or painful. Yet it DRIVES behavior.`,
+                    concepts: [
+                        { title: 'Three Levels of Mind', text: 'CONSCIOUS: What you\'re aware of now. PRECONSCIOUS: Can be accessed with effort. UNCONSCIOUS: Cannot be directly accessed - only visible through dreams, slips, symptoms, therapy.' },
+                        { title: 'Dynamic Unconscious', text: 'Not passive storage - ACTIVE forces pushing against awareness. Desires, conflicts, traumatic memories exert pressure and leak out in disguised forms.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'A client keeps "forgetting" therapy appointments. They say they want help but miss sessions. What\'s likely happening?',
+                            answers: [
+                                { text: 'They have bad time management skills', correct: false, feedback: 'Too surface-level. Psychodynamic thinking looks DEEPER - what unconscious conflict might "forgetting" express?' },
+                                { text: 'Unconscious resistance - part of them fears what therapy might uncover', correct: true, feedback: 'Exactly! Forgetting is rarely just forgetting. It can be unconscious DEFENSE against threatening material.' },
+                                { text: 'They don\'t actually need therapy', correct: false, feedback: 'This dismisses their stated need. Behavior often contradicts conscious wishes because the unconscious has a different agenda.' },
+                                { text: 'They need medication, not talk therapy', correct: false, feedback: 'This bypasses the psychological meaning. What is the symptom (forgetting) COMMUNICATING?' }
+                            ]
+                        },
+                        {
+                            question: 'Why can\'t people just "decide" to access their unconscious directly?',
+                            answers: [
+                                { text: 'Defense mechanisms keep threatening material out of awareness', correct: true, feedback: 'YES! Defenses exist precisely to PREVENT direct access. If it could be easily accessed, it wouldn\'t be unconscious.' },
+                                { text: 'People are lazy or unmotivated', correct: false, feedback: 'This misses the DYNAMIC aspect. It\'s not willpower - the unconscious is actively BARRED from awareness.' },
+                                { text: 'The unconscious doesn\'t actually exist', correct: false, feedback: 'Clinical phenomena (slips, dreams, symptoms) strongly suggest processes outside awareness.' },
+                                { text: 'Only therapists can access the unconscious', correct: false, feedback: 'Anyone can access unconscious material through dreams, free association, slips. But DEFENSES make this difficult.' }
+                            ]
+                        },
+                        {
+                            question: 'Client says: "I dreamed I was late to my wedding, but I wasn\'t upset." What might this reveal?',
+                            answers: [
+                                { text: 'Nothing - dreams are random and meaningless', correct: false, feedback: 'Psychodynamic view: dreams are the "royal road to the unconscious" - they express disguised wishes and conflicts.' },
+                                { text: 'Possible unconscious ambivalence about commitment', correct: true, feedback: 'Strong interpretation! Being late (avoiding) + not upset = unconscious comfort with NOT committing. Dreams often express what consciousness denies.' },
+                                { text: 'They definitely should not get married', correct: false, feedback: 'Dreams inform, they don\'t dictate. Use as exploration point, not directive.' },
+                                { text: 'They just need better time management', correct: false, feedback: 'This ignores symbolic meaning. Manifest content often symbolizes latent content.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'defense-mechanisms',
+                title: 'Defense Mechanisms',
+                icon: '🛡️',
+                level: 1,
+                xp: 25,
+                prereq: 'unconscious-intro',
+                lessons: [{
+                    title: 'How the Mind Protects Itself',
+                    teaching: `DEFENSE MECHANISMS are unconscious psychological strategies that protect ego from anxiety, guilt, shame, and other threatening feelings.
+
+Key insight: Defenses are NORMAL and necessary. Without them, we'd be overwhelmed by every painful reality. They become problematic when: overused, rigid, prevent growth, or cause more suffering than they prevent.
+
+Defenses operate UNCONSCIOUSLY - client isn't aware they're doing it. Your job: recognize patterns, understand function, gently help client become aware.`,
+                    concepts: [
+                        { title: 'Common Defenses', text: 'DENIAL: "It didn\'t happen." PROJECTION: Seeing your feelings in others. RATIONALIZATION: Making excuses. DISPLACEMENT: Redirecting feelings to safer target. SUBLIMATION: Channeling into productive activity.' },
+                        { title: 'Defense Hierarchy', text: 'Primitive (denial, splitting) vs Mature (humor, sublimation). Less mature = more distortion. Therapy helps people move up the hierarchy.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Partner says hurtful thing. You feel angry but say "I\'m not upset at all, I understand their perspective." You then snap at a coworker. What defenses?',
+                            answers: [
+                                { text: 'Denial (of anger) and displacement (redirecting to coworker)', correct: true, feedback: 'EXACTLY! First you deny the anger ("I\'m not upset"), then displace it onto a safer target (coworker who has nothing to do with it).' },
+                                { text: 'Just good emotional regulation', correct: false, feedback: 'Snapping at coworker shows emotion wasn\'t regulated - it was displaced. Defense isn\'t same as regulation.' },
+                                { text: 'Projection onto the coworker', correct: false, feedback: 'Projection would be seeing YOUR anger in the coworker. This is displacement - redirecting emotion to different target.' },
+                                { text: 'Healthy boundary-setting', correct: false, feedback: 'Healthy would be addressing anger directly with partner, not suppressing it and dumping on innocent coworker.' }
+                            ]
+                        },
+                        {
+                            question: 'Client who feels inadequate constantly criticizes others. What defense and what function?',
+                            answers: [
+                                { text: 'Projection - puts inadequacy in others to keep it out of self', correct: true, feedback: 'PERFECT! By seeing inadequacy OUTSIDE self (in others), client doesn\'t have to confront it INSIDE self. Classic projection.' },
+                                { text: 'They\'re just critical by nature', correct: false, feedback: 'Psychodynamic lens always asks: what PSYCHOLOGICAL FUNCTION does behavior serve? Why THIS symptom?' },
+                                { text: 'Reaction formation - being opposite of how they feel', correct: false, feedback: 'Reaction formation would be excessive self-praise. Criticizing others is closer to projection - putting bad stuff outside.' },
+                                { text: 'Sublimation - channeling feelings productively', correct: false, feedback: 'Criticism isn\'t productive channeling. Sublimation would be using those feelings in art, work, etc.' }
+                            ]
+                        },
+                        {
+                            question: 'You point out client\'s pattern of sabotaging relationships. They laugh and say "That\'s ridiculous, my relationships are fine." What defense?',
+                            answers: [
+                                { text: 'Humor as deflection combined with denial', correct: true, feedback: 'YES! Laughing deflects the emotional weight of the observation. "Ridiculous" + "fine" = denial of the pattern. Double defense!' },
+                                { text: 'They\'re just confident', correct: false, feedback: 'Confident people can consider feedback. Dismissive laughter + denial suggests protection against threatening information.' },
+                                { text: 'You\'re wrong about the pattern', correct: false, feedback: 'Even if wrong, the DEFENSIVE reaction (laugh + dismiss) is the clinical data. Why couldn\'t they consider it calmly?' },
+                                { text: 'Healthy disagreement', correct: false, feedback: 'The laugh gives it away. Healthy disagreement is thoughtful. This is defensive dismissal.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'transference',
+                title: 'Transference',
+                icon: '🔄',
+                level: 1,
+                xp: 30,
+                prereq: 'defense-mechanisms',
+                lessons: [{
+                    title: 'The Past in the Present',
+                    teaching: `TRANSFERENCE: Client unconsciously transfers feelings, expectations, and relationship patterns from past (usually early relationships) onto therapist.
+
+This is GOLD for therapy. The past literally shows up in the room. Instead of client TELLING you about patterns, they SHOW you by enacting them with you.
+
+Key insight: Transference isn't error or distortion - it's DATA. It reveals the client's internal working models of relationships.`,
+                    concepts: [
+                        { title: 'Types of Transference', text: 'POSITIVE: Idealization, warmth, attraction. NEGATIVE: Hostility, distrust, criticism. EROTIC: Romantic/sexual feelings. All are useful data!' },
+                        { title: 'Using Transference', text: 'Notice it. Don\'t react personally. Wonder aloud: "I notice you seem frustrated with me. Does this remind you of other relationships?" Connect present to past.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client becomes angry when you reschedule once, accusing you of "never being reliable." You\'ve been consistently reliable. What\'s happening?',
+                            answers: [
+                                { text: 'You need to apologize more', correct: false, feedback: 'You rescheduled ONCE. "Never reliable" is disproportionate. This suggests transference - past experience coloring present.' },
+                                { text: 'Transference - past experiences of unreliable caregivers are being projected onto you', correct: true, feedback: 'EXACTLY! One reschedule = "never reliable" is a clue. Their history (maybe parents who repeatedly failed them) shapes perception of you.' },
+                                { text: 'They\'re just sensitive about time', correct: false, feedback: 'WHY are they sensitive? Psychodynamic view: sensitivities come from somewhere. This intensity suggests historical wound.' },
+                                { text: 'You should never reschedule clients', correct: false, feedback: 'Life happens. The clinical question is: why does normal event trigger such intense reaction? That\'s the transference.' }
+                            ]
+                        },
+                        {
+                            question: 'Client constantly asks "Am I doing therapy right? Are you disappointed in me?" despite doing well. What\'s the likely transference?',
+                            answers: [
+                                { text: 'They\'re just anxious people', correct: false, feedback: 'But anxious about WHAT specifically? Repeatedly asking about disappointment suggests specific relational template.' },
+                                { text: 'Critical parent transference - expecting judgment and trying to prevent it', correct: true, feedback: 'PERFECT! The specific fear (disappointment) + the strategy (seek reassurance) suggests history with critical, hard-to-please parent. They\'re treating you like that parent.' },
+                                { text: 'They need more structure', correct: false, feedback: 'Structure might help symptom but misses meaning. WHY do they fear disappointment so much?' },
+                                { text: 'You\'re being too vague in your feedback', correct: false, feedback: 'Even clear positive feedback may not help - they may not be able to take it in. The template ("I disappoint") overrides reality.' }
+                            ]
+                        },
+                        {
+                            question: 'You feel unusually drawn to "rescue" a client. Other clients don\'t evoke this. What should you consider?',
+                            answers: [
+                                { text: 'This client just needs more help than others', correct: false, feedback: 'Maybe, but WHY do you feel compelled to RESCUE specifically? That\'s YOUR reaction to examine.' },
+                                { text: 'Client may unconsciously invite rescue, and this resonates with my own patterns', correct: true, feedback: 'YES! This is likely both: Client may unconsciously present as helpless (their pattern) AND you may have rescuer tendencies (your pattern). Transference meets countertransference.' },
+                                { text: 'You\'re just a caring therapist', correct: false, feedback: 'All clients deserve care. But RESCUE fantasy with ONE client is specific. Examine it.' },
+                                { text: 'The client is manipulating you', correct: false, feedback: 'Too blaming. Even if client has pattern of evoking rescue, it\'s likely unconscious, not manipulation. And YOUR response is yours to own.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'countertransference',
+                title: 'Countertransference',
+                icon: '↩️',
+                level: 2,
+                xp: 30,
+                prereq: 'transference',
+                lessons: [{
+                    title: 'Your Reactions as Data',
+                    teaching: `COUNTERTRANSFERENCE: Therapist's emotional reactions to client. Originally seen as problem to eliminate. Now understood as VALUABLE DATA.
+
+Two types:
+1. OBJECTIVE CT: Normal reaction any therapist would have to this client. Tells you about CLIENT.
+2. SUBJECTIVE CT: Your unique reaction based on YOUR history. Tells you about YOU (and maybe the therapy relationship).
+
+Key skill: Notice your feelings, wonder about their source, use them clinically without acting on them.`,
+                    concepts: [
+                        { title: 'Using Countertransference', text: 'Ask: Is this feeling DATA about the client (they make everyone feel this) or about ME (my personal stuff)? Usually both. Either way, USE IT clinically - don\'t just react.' },
+                        { title: 'Dangers', text: 'ENACTMENT: Unconsciously acting out the countertransference. DISCLOSURE: Sharing too much of your reaction. OVER-IDENTIFICATION: Losing therapeutic stance. Get supervision!' }
+                    ],
+                    questions: [
+                        {
+                            question: 'With one client, you consistently feel bored and disconnected. Other clients don\'t bore you. What might this tell you?',
+                            answers: [
+                                { text: 'You\'re just tired that day', correct: false, feedback: 'Pattern is with ONE client, not random. That\'s data about the therapeutic dyad.' },
+                                { text: 'Client may keep emotional distance, preventing connection - boredom may be HOW they make others feel', correct: true, feedback: 'EXCELLENT! Your boredom is objective countertransference - DATA about client\'s relational style. Others in their life probably feel disconnected too. Use this!' },
+                                { text: 'They\'re just a boring person', correct: false, feedback: 'Judgmental, not clinical. Ask: what is client DOING (perhaps unconsciously) that creates this feeling in me? That\'s the therapeutic question.' },
+                                { text: 'You should refer them out', correct: false, feedback: 'Your boredom IS the therapy material! Understanding it could unlock client\'s relational patterns. Don\'t run from useful data.' }
+                            ]
+                        },
+                        {
+                            question: 'You\'re working extra hard for one client - staying late, thinking about them constantly. What\'s happening?',
+                            answers: [
+                                { text: 'You care deeply and are a dedicated therapist', correct: false, feedback: 'Maybe partly true, but over-functioning suggests countertransference. This intensity is worth examining.' },
+                                { text: 'Rescue fantasy - client may evoke this, or it touches YOUR need to be needed', correct: true, feedback: 'YES! Over-functioning is classic countertransference. Does client evoke rescue (their pattern)? Does this touch MY savior complex (my pattern)? Probably both.' },
+                                { text: 'This is normal and fine', correct: false, feedback: 'Boundary blurring and over-investment are RED FLAGS. "Normal" care doesn\'t involve staying late and constant preoccupation.' },
+                                { text: 'The client is manipulating you', correct: false, feedback: 'Blaming client misses YOUR role. Even if client has patterns, your response is yours to manage.' }
+                            ]
+                        },
+                        {
+                            question: 'Best way to handle strong countertransference?',
+                            answers: [
+                                { text: 'Ignore it and stay professional', correct: false, feedback: 'Ignoring increases risk of ENACTMENT. You can\'t suppress away countertransference.' },
+                                { text: 'Tell the client how they make you feel', correct: false, feedback: 'RARELY appropriate! Process in supervision/therapy, not with client.' },
+                                { text: 'Reflect on it privately, understand its source, then use consciously', correct: true, feedback: 'PERFECT! Process privately, understand (is this about me or them?), then use awareness therapeutically.' },
+                                { text: 'Refer the client to someone else', correct: false, feedback: 'Sometimes necessary, but countertransference happens with EVERY client. Running means missing its clinical value.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'resistance',
+                title: 'Resistance',
+                icon: '🚧',
+                level: 2,
+                xp: 30,
+                prereq: 'countertransference',
+                lessons: [{
+                    title: 'When Clients Push Back',
+                    teaching: `RESISTANCE: Client's (mostly unconscious) opposition to therapeutic process. Shows up as: missed sessions, changing topics, intellectualizing, silence, "yes-but-ing," forgetting insights.
+
+CRUCIAL UNDERSTANDING: Resistance isn't defiance or lack of motivation. It's PROTECTION. Part of client wants to change, part is terrified of what change means.
+
+Resistance signals you're getting close to something important. WELCOME it. "The resistance is the work."`,
+                    concepts: [
+                        { title: 'Forms of Resistance', text: 'AVOIDANCE (changing subject, lateness). INTELLECTUALIZATION (analyzing feelings vs feeling). COMPLIANCE (being "good patient" to avoid real work). HOPELESSNESS ("nothing will help"). TRANSFERENCE RESISTANCE (attachment prevents change).' },
+                        { title: 'Working with Resistance', text: 'Don\'t fight or shame it. GET CURIOUS: "I notice we keep moving away from this topic. What might be hard about staying with it?" Honor the protection.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client intellectualizes every emotion: "I think I feel sad because evolutionarily..." rather than FEELING sadness. What\'s the resistance protecting against?',
+                            answers: [
+                                { text: 'They\'re just very smart and analytical', correct: false, feedback: 'Intelligence is real, but using it to AVOID feeling is defense/resistance. Ask WHY now, WHY this way?' },
+                                { text: 'Overwhelming affect - staying in head protects from flood of feeling', correct: true, feedback: 'YES! Intellectualization keeps feelings at distance. Thinking ABOUT emotion is safer than EXPERIENCING it. Build tolerance slowly.' },
+                                { text: 'They don\'t actually have emotions', correct: false, feedback: 'Everyone has emotions. Some are just more defended. The intellectualizing proves there\'s something TO defend against.' },
+                                { text: 'You\'re not smart enough to understand them', correct: false, feedback: 'This might be YOUR countertransference (feeling inadequate). Their intellectualizing isn\'t about your intelligence.' }
+                            ]
+                        },
+                        {
+                            question: 'Client says "I feel so much better! I don\'t think I need therapy anymore" after two sessions. What\'s likely happening?',
+                            answers: [
+                                { text: 'They genuinely are cured', correct: false, feedback: 'After two sessions? Unlikely. Psychodynamic work takes time. Sudden "cure" is usually resistance.' },
+                                { text: 'Flight into health - resistance against going deeper', correct: true, feedback: 'EXACTLY! "Flight into health" is classic resistance. Anxiety about deeper work triggers "I\'m fine now!" Explore: "What might be scary about continuing?"' },
+                                { text: 'You\'re such a good therapist they healed instantly', correct: false, feedback: 'This would be YOUR countertransference (narcissistic wish). Be suspicious of miraculous quick fixes.' },
+                                { text: 'They found a better therapist', correct: false, feedback: 'Maybe, but more likely resistance. Explore before accepting at face value.' }
+                            ]
+                        },
+                        {
+                            question: 'How do you address resistance without shaming?',
+                            answers: [
+                                { text: '"You\'re clearly resisting. Why won\'t you engage?"', correct: false, feedback: 'Confrontational and shaming. Will increase resistance, not reduce it.' },
+                                { text: 'Ignore it and hope they come around', correct: false, feedback: 'Resistance doesn\'t disappear if ignored. It\'s the CORE of the work.' },
+                                { text: 'Name it gently and get curious: "Part of you seems hesitant. Can we explore that?"', correct: true, feedback: 'PERFECT! Non-judgmental, curious, honors that resistance serves PURPOSE. You\'re allies investigating together.' },
+                                { text: 'Give up and refer them out', correct: false, feedback: 'Resistance is NORMAL in therapy. If you can\'t work with it, you can\'t do psychodynamic work.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'dreamwork',
+                title: 'Dream Analysis',
+                icon: '🌙',
+                level: 2,
+                xp: 35,
+                prereq: 'resistance',
+                lessons: [{
+                    title: 'Royal Road to the Unconscious',
+                    teaching: `Dreams are the "royal road to the unconscious" (Freud). During sleep, defenses lower, allowing unconscious material to surface - though still in disguised form.
+
+MANIFEST CONTENT: What the dream literally shows (being chased, flying, etc.)
+LATENT CONTENT: The underlying meaning, wishes, conflicts
+
+Key: Don't interpret FOR client. Help them associate TO the dream. Their meanings matter more than dream dictionaries.`,
+                    concepts: [
+                        { title: 'Dream Elements', text: 'CONDENSATION: Multiple meanings compressed into one image. DISPLACEMENT: Emotional charge shifted to "safer" element. SYMBOLIZATION: Abstract concepts made concrete. SECONDARY REVISION: Mind trying to make dream logical upon waking.' },
+                        { title: 'Working with Dreams', text: 'Ask: "What comes to mind about X element?" "How did you feel in the dream?" "Does any part remind you of current life?" Follow client\'s associations, not your interpretations.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client dreams of being in childhood home, but all the furniture is wrong. What\'s a good first intervention?',
+                            answers: [
+                                { text: 'Tell them it means they\'re conflicted about their past', correct: false, feedback: 'Never interpret immediately! Follow client\'s associations first. Your meaning may be completely wrong for them.' },
+                                { text: 'Ask what associations arise about the home and wrong furniture', correct: true, feedback: 'PERFECT! "What comes to mind about your childhood home? About the furniture being wrong?" Follow THEIR associations - they lead to THEIR unconscious.' },
+                                { text: 'Ignore the dream - focus on current issues', correct: false, feedback: 'Dreams ARE current issues in disguise. They reveal what\'s active in the unconscious RIGHT NOW.' },
+                                { text: 'Look up furniture symbolism in a dream dictionary', correct: false, feedback: 'Generic symbols miss individual meaning. For this client, "wrong furniture" might mean something unique to their history.' }
+                            ]
+                        },
+                        {
+                            question: 'Client reports recurring dream of missing a train. They always wake anxious. What questions help explore?',
+                            answers: [
+                                { text: '"Do you have anxiety about transportation?"', correct: false, feedback: 'Too literal. Dreams are symbolic. The train probably represents something else - opportunity, life phase, connection.' },
+                                { text: '"What\'s the feeling of missing something? Where does that show up in life? What opportunities feel like they\'re leaving without you?"', correct: true, feedback: 'EXCELLENT! Moving from dream feeling to life connection. "Missing" the train could represent missed opportunities, fear of being left behind, anxiety about life passing by.' },
+                                { text: '"Trains represent sexual desire - are you frustrated sexually?"', correct: false, feedback: 'Classic Freudian cliché, but interpretations should come from CLIENT, not theory. Follow their associations.' },
+                                { text: '"You should set alarms to not miss real trains"', correct: false, feedback: 'Completely misses the symbolic nature of dreams! The dream isn\'t about actual trains.' }
+                            ]
+                        },
+                        {
+                            question: 'Why do people often forget dreams upon waking?',
+                            answers: [
+                                { text: 'Dreams aren\'t stored in memory properly', correct: false, feedback: 'Psychodynamic view: forgetting has MEANING. It\'s not just memory mechanics.' },
+                                { text: 'Defenses kick back in - the unconscious material is re-repressed as ego regains control', correct: true, feedback: 'YES! Upon waking, defenses reactivate. What slipped through during sleep gets pushed back down. This is why writing dreams immediately helps.' },
+                                { text: 'Dreams are meaningless brain noise', correct: false, feedback: 'The forgetting itself suggests meaning - why would the mind work to forget random noise?' },
+                                { text: 'People just don\'t care about dreams', correct: false, feedback: 'Many people TRY to remember and still can\'t. This active forgetting (repression) is psychodynamically significant.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'working-alliance',
+                title: 'Working Alliance',
+                icon: '🤝',
+                level: 3,
+                xp: 35,
+                prereq: 'dreamwork',
+                lessons: [{
+                    title: 'The Foundation of Change',
+                    teaching: `The WORKING ALLIANCE is the collaborative relationship between therapist and client. Research shows it's the single best predictor of therapy outcome - more than technique!
+
+Three components (Bordin):
+1. BOND: Mutual liking, trust, respect
+2. GOALS: Agreement on what we're working toward
+3. TASKS: Agreement on how we'll get there
+
+Alliance isn't "being nice" - it's creating conditions where difficult work becomes possible.`,
+                    concepts: [
+                        { title: 'Alliance Ruptures', text: 'Inevitable. Client may feel misunderstood, judged, pushed too fast. KEY: Repair ruptures - this IS the therapeutic work. Meta-communication: "Something shifted between us. Can we talk about it?"' },
+                        { title: 'Building Alliance', text: 'Validate experience. Go at client\'s pace. Be genuinely curious. Admit mistakes. Be consistent and reliable. Show you remember details. Alliance = safety + collaboration.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client seems withdrawn today, giving short answers. Sessions were warm before. What do you do?',
+                            answers: [
+                                { text: 'Push through with the agenda - they\'re probably just tired', correct: false, feedback: 'This ignores possible rupture. The shift IS the agenda now.' },
+                                { text: 'Address it directly: "I notice something feels different today. Can we explore that?"', correct: true, feedback: 'EXACTLY! Name what you observe, invite exploration. Ruptures ignored become ruptures deepened. Addressing them strengthens alliance.' },
+                                { text: 'Wait for them to bring it up', correct: false, feedback: 'They may not be aware or may not feel safe to raise it. Therapist often needs to initiate repair.' },
+                                { text: 'Assume it\'s transference and interpret it', correct: false, feedback: 'Maybe eventually, but first CHECK IN. Don\'t assume - curiosity before interpretation.' }
+                            ]
+                        },
+                        {
+                            question: 'You make an interpretation and client says "That\'s not right at all." How do you respond?',
+                            answers: [
+                                { text: 'Explain why you\'re actually correct', correct: false, feedback: 'This invalidates client\'s experience. Even if your interpretation is accurate, pushing it damages alliance.' },
+                                { text: 'Back off, apologize, and ask what feels more accurate to them', correct: true, feedback: 'PERFECT! Alliance matters more than being right. "I hear that doesn\'t fit. Help me understand better?" This models collaborative exploration.' },
+                                { text: 'They\'re in denial - note their resistance', correct: false, feedback: 'Maybe, but also maybe you\'re wrong! Client knows themselves better than you do. Stay curious, not certain.' },
+                                { text: 'Stay silent and let them figure it out', correct: false, feedback: 'Silence here might feel like sulking or punishment. Active repair is needed.' }
+                            ]
+                        },
+                        {
+                            question: 'Why is the working alliance more predictive of outcomes than specific techniques?',
+                            answers: [
+                                { text: 'Techniques don\'t actually work', correct: false, feedback: 'Techniques help! But they require a foundation. Alliance is the soil in which techniques grow.' },
+                                { text: 'Change requires safety, trust, and felt understanding - alliance provides the conditions where new experience becomes possible', correct: true, feedback: 'YES! New experiences (insights, risks, vulnerability) require safety. Alliance creates the container. Without it, techniques feel mechanical or threatening.' },
+                                { text: 'Clients just need a friend', correct: false, feedback: 'Therapy isn\'t friendship. Alliance is professional - includes boundaries, roles, purpose. It\'s healing relationship, not casual one.' },
+                                { text: 'Research is wrong', correct: false, feedback: 'Decades of research consistently show alliance as top predictor. The finding is robust across orientations.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'interpretation',
+                title: 'Interpretation',
+                icon: '💡',
+                level: 3,
+                xp: 40,
+                prereq: 'working-alliance',
+                lessons: [{
+                    title: 'The Art of Insight',
+                    teaching: `INTERPRETATION: Offering a hypothesis about unconscious meaning. The goal: bring unconscious into conscious, expand self-understanding.
+
+Good interpretation is:
+- TENTATIVE: "I wonder if..." not "You are..."
+- TIMELY: Client is almost there themselves
+- TOLERABLE: Won't overwhelm defenses
+- TIED TO EVIDENCE: Based on session material
+
+Interpretation isn't lecture - it's collaborative wondering.`,
+                    concepts: [
+                        { title: 'Levels of Interpretation', text: 'SURFACE: "You seem sad." DEFENSIVE: "You\'re using humor to avoid sadness." TRANSFERENCE: "You\'re sad like you were with your mother." DEEP: "Your fundamental belief is you\'re unlovable." Move gradually deeper.' },
+                        { title: 'Testing Interpretations', text: 'Right interpretation: Client says "Yes!" or gets emotional, or new memories emerge, or associations deepen. Wrong interpretation: Flat "okay," defensiveness increases, client pulls away. Follow the evidence.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client mentions father several times today, though topic is work stress. When might you offer this observation?',
+                            answers: [
+                                { text: 'Immediately - they need to see the connection', correct: false, feedback: 'Too fast. Let pattern develop. Premature interpretation often gets rejected.' },
+                                { text: 'Wait until client pauses or there\'s a natural break, then wonder aloud tentatively', correct: true, feedback: 'YES! "I notice you\'ve mentioned your father a few times while talking about work. I wonder if there\'s a connection?" Lets client do the work.' },
+                                { text: 'Never - it\'s your projection', correct: false, feedback: 'Repeated mentions are DATA, not projection. Noticing patterns is the work. The question is HOW and WHEN to share.' },
+                                { text: 'Wait until you\'re 100% sure what it means', correct: false, feedback: 'You\'ll never be 100% sure - and you don\'t need to be. You\'re WONDERING together, not pronouncing truth.' }
+                            ]
+                        },
+                        {
+                            question: 'You offer interpretation. Client says "That\'s exactly right" and tears up. What does this suggest?',
+                            answers: [
+                                { text: 'You\'re a genius', correct: false, feedback: 'Maybe a good moment, but don\'t let it go to your head! Stay curious about what opened up.' },
+                                { text: 'The interpretation landed - something unconscious became conscious with emotional impact', correct: true, feedback: 'PERFECT! Tears + recognition = touching something real. New awareness is emotionally charged. This is a mutative moment - follow it gently.' },
+                                { text: 'They\'re just agreeable', correct: false, feedback: 'Tears aren\'t agreement - they\'re genuine emotion. Trust the response.' },
+                                { text: 'Move on to the next topic', correct: false, feedback: 'NO! This is the moment TO STAY WITH. Deepen: "What\'s coming up for you right now?" Don\'t rush past emotion.' }
+                            ]
+                        },
+                        {
+                            question: 'Client consistently deflects interpretations with "I guess" or "Maybe." What\'s happening?',
+                            answers: [
+                                { text: 'Your interpretations are wrong', correct: false, feedback: 'Maybe, but consistent pattern suggests more. "I guess" is neither yes nor no - it\'s avoidance of engagement.' },
+                                { text: 'Resistance to insight - explore what makes it hard to engage with observations about themselves', correct: true, feedback: 'EXACTLY! The deflection IS the material. "I notice you often say \'I guess\' to my observations. What might make it hard to sit with them more fully?"' },
+                                { text: 'They\'re not smart enough for insight', correct: false, feedback: 'Intelligence isn\'t the issue. Fear of what insight might reveal often is. This is defense, not capacity.' },
+                                { text: 'Give up on interpretation with this client', correct: false, feedback: 'Don\'t give up - ADDRESS the pattern. Their deflection tells you about their relationship to self-knowledge.' }
+                            ]
+                        }
+                    ]
+                }]
+            }
+        ];
+        
+        // Initialize UI
+        function initUI() {
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        function updateStats() {
+            const xpPercent = (gameState.xp / gameState.xpToNextLevel) * 100;
+            const mastery = Math.round((gameState.completedSkills.length / skillTree.length) * 100);
+            const currentPath = gameState.level <= 1 ? 'FOUNDATIONS' : gameState.level <= 2 ? 'INTERMEDIATE' : 'ADVANCED';
+            
+            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
+            document.getElementById('level-display').textContent = gameState.level;
+            document.getElementById('mastery-display').textContent = `${mastery}%`;
+            document.getElementById('streak-display').textContent = `${gameState.streak}🔥`;
+            document.getElementById('current-path').textContent = currentPath;
+        }
+        
+        function renderSkillGrid() {
+            const grid = document.getElementById('skill-grid');
+            grid.innerHTML = skillTree.map(skill => {
+                const isCompleted = gameState.completedSkills.includes(skill.id);
+                const isUnlocked = !skill.prereq || gameState.completedSkills.includes(skill.prereq);
+                
+                let status = '🔒';
+                let statusClass = 'locked';
+                
+                if (isCompleted) {
+                    status = '✓';
+                    statusClass = 'completed';
+                } else if (isUnlocked) {
+                    status = '→';
+                    statusClass = 'unlocked';
+                }
+                
+                return `
+                    <div class="skill-card ${statusClass}" 
+                         onclick="${isUnlocked ? `startSkill('${skill.id}')` : ''}"
+                         role="button"
+                         tabindex="${isUnlocked ? '0' : '-1'}"
+                         aria-label="${skill.title}${isCompleted ? ', completed' : isUnlocked ? ', available' : ', locked'}">
+                        <div class="skill-icon">${skill.icon}</div>
+                        <div class="skill-info">
+                            <div class="skill-title">${skill.title}</div>
+                            <div class="skill-meta">
+                                <span class="skill-xp">+${skill.xp} XP</span>
+                                <span>Level ${skill.level}</span>
+                            </div>
+                        </div>
+                        <div class="skill-status">${status}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add keyboard support
+            grid.querySelectorAll('.skill-card.unlocked').forEach(card => {
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+        }
+        
+        function startSkill(skillId) {
+            const skill = skillTree.find(s => s.id === skillId);
+            if (!skill) return;
+            
+            gameState.currentLesson = skill;
+            gameState.currentQuestion = 0;
+            gameState.correctAnswers = 0;
+            gameState.questionResults = [];
+            
+            showLesson(skill);
+        }
+        
+        function showLesson(skill) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            const lesson = skill.lessons[0];
+            
+            const concepts = lesson.concepts.map(c => `
+                <div class="concept-card">
+                    <div class="concept-title">📌 ${c.title}</div>
+                    <div class="concept-text">${c.text}</div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-icon">${skill.icon}</div>
+                    <h2 class="lesson-title">${lesson.title}</h2>
+                    <div class="lesson-subtitle">+${skill.xp} XP on completion</div>
+                </div>
+                
+                <div class="teaching-section">
+                    <div class="teaching-text">${lesson.teaching}</div>
+                </div>
+                
+                <div class="concepts-section">
+                    ${concepts}
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Back</button>
+                    <button class="btn btn-primary" onclick="startQuestions()">Start Quiz →</button>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.top = `-${window.scrollY}px`;
+        }
+        
+        function startQuestions() {
+            showQuestion(0);
+        }
+        
+        function showQuestion(index) {
+            const skill = gameState.currentLesson;
+            const lesson = skill.lessons[0];
+            const question = lesson.questions[index];
+            const content = document.getElementById('modal-content');
+            const total = lesson.questions.length;
+            
+            // Build progress dots
+            const dots = lesson.questions.map((_, i) => {
+                let dotClass = 'progress-dot';
+                if (i === index) dotClass += ' current';
+                else if (i < index) {
+                    dotClass += gameState.questionResults[i] ? ' correct' : ' incorrect';
+                }
+                return `<div class="${dotClass}"></div>`;
+            }).join('');
+            
+            const answers = question.answers.map((a, i) => `
+                <button class="answer-btn" onclick="selectAnswer(${i})" data-index="${i}">
+                    ${a.text}
+                </button>
+            `).join('');
+            
+            const scoreText = index > 0 
+                ? `<span class="score-display">Score: <span class="score-value">${gameState.correctAnswers}/${index}</span></span>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <h2 class="lesson-title">${skill.title}</h2>
+                    <div class="lesson-subtitle">Question ${index + 1} of ${total}</div>
+                </div>
+                
+                <div class="question-section">
+                    <div class="question-progress">
+                        <div class="progress-dots">${dots}</div>
+                        ${scoreText}
+                    </div>
+                    
+                    <div class="question-text">${question.question}</div>
+                    
+                    <div class="answers-list" id="answers-list">
+                        ${answers}
+                    </div>
+                    
+                    <div class="feedback-box" id="feedback"></div>
+                </div>
+                
+                <div class="modal-footer" id="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Exit</button>
+                    <div id="continue-container"></div>
+                </div>
+            `;
+            
+            // Store for answer checking
+            window.currentQuestionData = { question, index, total };
+        }
+        
+        function selectAnswer(answerIndex) {
+            const { question, index, total } = window.currentQuestionData;
+            const answer = question.answers[answerIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            const feedback = document.getElementById('feedback');
+            const continueContainer = document.getElementById('continue-container');
+            
+            // Disable all buttons
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            
+            // Mark selected answer
+            const selectedBtn = buttons[answerIndex];
+            
+            if (answer.correct) {
+                selectedBtn.classList.add('correct');
+                feedback.className = 'feedback-box correct show';
+                feedback.innerHTML = `✓ CORRECT! ${answer.feedback}`;
+                gameState.correctAnswers++;
+                gameState.questionResults.push(true);
+            } else {
+                selectedBtn.classList.add('incorrect');
+                feedback.className = 'feedback-box incorrect show';
+                feedback.innerHTML = `✗ ${answer.feedback}`;
+                gameState.questionResults.push(false);
+            }
+            
+            // Show continue button
+            const isLast = index >= total - 1;
+            continueContainer.innerHTML = `
+                <button class="btn btn-primary" onclick="${isLast ? 'completeSkill()' : 'nextQuestion()'}">
+                    ${isLast ? 'See Results →' : 'Continue →'}
+                </button>
+            `;
+        }
+        
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            showQuestion(gameState.currentQuestion);
+        }
+        
+        function completeSkill() {
+            const skill = gameState.currentLesson;
+            const total = skill.lessons[0].questions.length;
+            const score = Math.round((gameState.correctAnswers / total) * 100);
+            const xpEarned = skill.xp;
+            
+            // Award XP
+            gameState.xp += xpEarned;
+            gameState.totalXp += xpEarned;
+            
+            // Level up check
+            while (gameState.xp >= gameState.xpToNextLevel) {
+                gameState.xp -= gameState.xpToNextLevel;
+                gameState.level++;
+                gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+            }
+            
+            // Mark completed
+            if (!gameState.completedSkills.includes(skill.id)) {
+                gameState.completedSkills.push(skill.id);
+                gameState.streak++;
+            }
+            
+            // Find next skill
+            const currentIndex = skillTree.findIndex(s => s.id === skill.id);
+            const nextSkill = skillTree.slice(currentIndex + 1).find(s => {
+                if (!s.prereq) return true;
+                return gameState.completedSkills.includes(s.prereq);
+            });
+            
+            const content = document.getElementById('modal-content');
+            
+            const nextButton = nextSkill && !gameState.completedSkills.includes(nextSkill.id)
+                ? `<button class="btn btn-accent" onclick="startNextSkill('${nextSkill.id}')">
+                       Next: ${nextSkill.title} →
+                   </button>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="completion-screen">
+                    <div class="completion-icon">${skill.icon}</div>
+                    <h2 class="completion-title">SKILL MASTERED!</h2>
+                    <div class="completion-xp">+${xpEarned} XP EARNED</div>
+                    
+                    <div class="completion-stats">
+                        <p>Score: <span style="color: var(--accent);">${score}%</span> (${gameState.correctAnswers}/${total})</p>
+                        <p>Skill: "${skill.title}"</p>
+                        <p>Keep building your mastery!</p>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModalAndRefresh()">← Skill Tree</button>
+                    ${nextButton}
+                </div>
+            `;
+            
+            // Confetti!
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#0f0', '#0ff', '#ff0']
+                });
+            }
+            
+            saveProgress();
+        }
+        
+        function startNextSkill(skillId) {
+            closeModal();
+            setTimeout(() => startSkill(skillId), 200);
+        }
+        
+        function closeModal() {
+            const scrollY = document.body.style.top;
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.top = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+        
+        function closeModalAndRefresh() {
+            closeModal();
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        // Progress Management
+        function saveProgress() {
+            localStorage.setItem('psychodynamicAcademy', JSON.stringify(gameState));
+            showToast('💾 Progress saved!');
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('psychodynamicAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                updateStats();
+                renderSkillGrid();
+                showToast('✓ Progress loaded!');
+            } else {
+                showToast('No saved progress found');
+            }
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('psychodynamicAcademy');
+                location.reload();
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function goHome() {
+            window.location.href = 'learning-library-hub.html';
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('modal');
+            const isOpen = modal.classList.contains('active');
+            
+            if (e.key === 'Escape' && isOpen) {
+                closeModal();
+            }
+            
+            if (!isOpen) {
+                if (e.key === 'h') goHome();
+                if (e.key === 's') {
+                    e.preventDefault();
+                    saveProgress();
+                }
+            }
+        });
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved progress
+            const saved = localStorage.getItem('psychodynamicAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+            initUI();
+        });
+    </script>
+</body>
+</html>

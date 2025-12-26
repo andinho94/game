@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a001a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>THE BODY KEEPS THE SCORE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --primary: #f0f;
+            --secondary: #0ff;
+            --accent: #ff0;
+            --success: #0f0;
+            --danger: #f00;
+            --bg-dark: #000;
+            --bg-card: #0d0011;
+            --bg-elevated: #1a0022;
+            --border-subtle: #330033;
+            --text-muted: #666;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 24px;
+            --space-2xl: 32px;
+            
+            --touch-target: 44px;
+            --border-width: 3px;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--bg-dark);
+            color: var(--primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-bottom: calc(70px + var(--safe-bottom));
+        }
+        
+        /* Subtle scanline effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.08) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-top: calc(var(--space-md) + var(--safe-top));
+            border-bottom: var(--border-width) solid var(--primary);
+        }
+        
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 10px;
+            color: var(--primary);
+            text-shadow: 2px 2px var(--secondary), 0 0 20px rgba(255, 0, 255, 0.5);
+            text-align: center;
+            margin-bottom: var(--space-sm);
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            font-size: 6px;
+            color: var(--secondary);
+            text-align: center;
+            margin-bottom: var(--space-md);
+            opacity: 0.8;
+        }
+        
+        /* XP Progress Bar */
+        .xp-section {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .xp-bar-outer {
+            background: var(--border-subtle);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-sm);
+            height: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .xp-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7px;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            white-space: nowrap;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xs);
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+        }
+        
+        .stat-label {
+            font-size: 5px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-size: 9px;
+            color: var(--secondary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: var(--space-md);
+            padding-left: calc(var(--space-md) + var(--safe-left));
+            padding-right: calc(var(--space-md) + var(--safe-right));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Path Indicator */
+        .path-indicator {
+            text-align: center;
+            font-size: 7px;
+            color: var(--text-muted);
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-sm);
+        }
+        
+        .path-name {
+            color: var(--secondary);
+            font-size: 8px;
+        }
+        
+        /* Skill Cards */
+        .skill-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .skill-card {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+        }
+        
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--border-subtle);
+            transition: background 0.2s;
+        }
+        
+        .skill-card.unlocked {
+            border-color: var(--primary);
+        }
+        
+        .skill-card.unlocked::before {
+            background: var(--primary);
+        }
+        
+        .skill-card.unlocked:active {
+            transform: scale(0.98);
+            background: var(--bg-elevated);
+        }
+        
+        .skill-card.completed {
+            border-color: var(--secondary);
+            background: rgba(0, 255, 255, 0.03);
+        }
+        
+        .skill-card.completed::before {
+            background: var(--secondary);
+        }
+        
+        .skill-card.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .skill-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .skill-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .skill-title {
+            font-size: 8px;
+            color: var(--primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.4;
+        }
+        
+        .skill-card.completed .skill-title {
+            color: var(--secondary);
+        }
+        
+        .skill-meta {
+            display: flex;
+            gap: var(--space-sm);
+            font-size: 6px;
+            color: var(--text-muted);
+        }
+        
+        .skill-xp {
+            color: var(--secondary);
+        }
+        
+        .skill-status {
+            margin-left: auto;
+            font-size: 16px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: var(--border-width) solid var(--primary);
+            padding: var(--space-sm);
+            padding-bottom: calc(var(--space-sm) + var(--safe-bottom));
+            z-index: 100;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 6px;
+            padding: var(--space-sm);
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: var(--radius-sm);
+        }
+        
+        .nav-btn:active {
+            background: rgba(255, 0, 255, 0.1);
+            transform: scale(0.95);
+        }
+        
+        .nav-btn .icon {
+            font-size: 20px;
+        }
+        
+        .nav-btn.home-btn {
+            color: var(--secondary);
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-dark);
+            z-index: 1000;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+        
+        .modal-overlay.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            min-height: 100%;
+            padding: var(--space-lg);
+            padding-top: calc(var(--space-lg) + var(--safe-top));
+            padding-bottom: calc(100px + var(--safe-bottom));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Lesson Header */
+        .lesson-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+        
+        .lesson-icon {
+            font-size: 40px;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .lesson-title {
+            font-size: 10px;
+            color: var(--primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.5;
+        }
+        
+        .lesson-subtitle {
+            font-size: 7px;
+            color: var(--secondary);
+        }
+        
+        /* Teaching Section */
+        .teaching-section {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .teaching-text {
+            font-size: 9px;
+            line-height: 2;
+            color: var(--primary);
+            white-space: pre-wrap;
+        }
+        
+        /* Key Concepts */
+        .concepts-section {
+            margin-top: var(--space-xl);
+        }
+        
+        .concept-card {
+            background: var(--bg-dark);
+            border-left: 4px solid var(--secondary);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        
+        .concept-title {
+            font-size: 8px;
+            color: var(--secondary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .concept-text {
+            font-size: 8px;
+            line-height: 1.8;
+            color: var(--primary);
+            opacity: 0.9;
+        }
+        
+        /* Question Section */
+        .question-section {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .question-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: var(--space-xs);
+        }
+        
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-subtle);
+            border: 1px solid var(--text-muted);
+        }
+        
+        .progress-dot.current {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+        
+        .progress-dot.correct {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        
+        .progress-dot.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .score-display {
+            font-size: 7px;
+            color: var(--primary);
+        }
+        
+        .score-value {
+            color: var(--secondary);
+        }
+        
+        .question-text {
+            font-size: 10px;
+            line-height: 1.8;
+            color: var(--secondary);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--secondary);
+        }
+        
+        /* Answer Buttons */
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .answer-btn {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 8px;
+            line-height: 1.7;
+            padding: var(--space-lg);
+            text-align: left;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .answer-btn:active:not(.disabled) {
+            transform: scale(0.98);
+            background: var(--bg-elevated);
+        }
+        
+        .answer-btn.correct {
+            border-color: var(--success);
+            background: rgba(0, 255, 0, 0.1);
+            animation: correctPulse 0.4s ease;
+        }
+        
+        .answer-btn.incorrect {
+            border-color: var(--danger);
+            background: rgba(255, 0, 0, 0.1);
+            animation: shake 0.4s ease;
+        }
+        
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        
+        /* Feedback */
+        .feedback-box {
+            margin-top: var(--space-lg);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            line-height: 1.8;
+            display: none;
+        }
+        
+        .feedback-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .feedback-box.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid var(--success);
+            color: var(--success);
+        }
+        
+        .feedback-box.incorrect {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        /* Modal Footer */
+        .modal-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-bottom: calc(var(--space-md) + var(--safe-bottom));
+            display: flex;
+            gap: var(--space-md);
+            z-index: 1001;
+        }
+        
+        .btn {
+            flex: 1;
+            font-family: inherit;
+            font-size: 8px;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: var(--touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .btn:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: rgba(255, 0, 255, 0.1);
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-primary:active {
+            background: rgba(255, 0, 255, 0.2);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+        
+        .btn-accent {
+            background: rgba(0, 255, 255, 0.1);
+            border: var(--border-width) solid var(--secondary);
+            color: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Completion Screen */
+        .completion-screen {
+            text-align: center;
+            padding: var(--space-2xl) 0;
+        }
+        
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-lg);
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .completion-title {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+        
+        .completion-xp {
+            font-size: 12px;
+            color: var(--secondary);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats p {
+            font-size: 9px;
+            line-height: 2;
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            color: var(--primary);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Desktop */
+        @media (min-width: 768px) {
+            :root {
+                --space-md: 16px;
+                --space-lg: 20px;
+                --space-xl: 32px;
+            }
+            
+            .title {
+                font-size: 14px;
+            }
+            
+            .skill-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .skill-card:hover:not(.locked) {
+                transform: translateY(-2px);
+                box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+            }
+            
+            .teaching-text,
+            .question-text {
+                font-size: 10px;
+            }
+            
+            .answer-btn {
+                font-size: 9px;
+            }
+            
+            .answer-btn:hover:not(.disabled) {
+                background: var(--bg-elevated);
+                border-color: var(--secondary);
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1 class="title">💜 THE BODY KEEPS THE SCORE 💜</h1>
+            <p class="subtitle">BESSEL VAN DER KOLK'S TRAUMA FRAMEWORK</p>
+            
+            <div class="xp-section">
+                <div class="xp-bar-outer">
+                    <div class="xp-bar-fill" id="xp-bar"></div>
+                    <div class="xp-text" id="xp-text">0 / 100 XP</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="level-display">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MASTERY</div>
+                    <div class="stat-value" id="mastery-display">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">STREAK</div>
+                    <div class="stat-value" id="streak-display">0🔥</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="path-indicator">
+            CURRENT PATH: <span class="path-name" id="current-path">FOUNDATIONS</span>
+        </div>
+        
+        <div class="skill-grid" id="skill-grid"></div>
+    </main>
+    
+    <nav class="bottom-nav">
+        <div class="nav-buttons">
+            <button class="nav-btn home-btn" onclick="goHome()" aria-label="Go to Learning Hub">
+                <span class="icon">🏠</span>
+                <span>HOME</span>
+            </button>
+            <button class="nav-btn" onclick="saveProgress()" aria-label="Save progress">
+                <span class="icon">💾</span>
+                <span>SAVE</span>
+            </button>
+            <button class="nav-btn" onclick="loadProgress()" aria-label="Load progress">
+                <span class="icon">📁</span>
+                <span>LOAD</span>
+            </button>
+            <button class="nav-btn" onclick="resetProgress()" aria-label="Reset progress">
+                <span class="icon">🔄</span>
+                <span>RESET</span>
+            </button>
+        </div>
+    </nav>
+    
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            totalXp: 0,
+            streak: 0,
+            completedSkills: [],
+            skillProgress: {},
+            currentLesson: null,
+            currentQuestion: 0,
+            correctAnswers: 0,
+            questionResults: []
+        };
+        
+        const skillTree = [
+            {
+                id: 'trauma-in-body',
+                title: 'Trauma Lives in the Body',
+                icon: '🫀',
+                level: 1,
+                xp: 25,
+                prereq: null,
+                lessons: [{
+                    title: 'The Body Keeps the Score',
+                    teaching: `Van der Kolk's core insight: trauma is stored in BODY, not just mind. Traditional therapy focuses on narrative (telling story) and cognition (changing thoughts). But trauma lives in: muscles, organs, nervous system, cells.
+
+The body keeps the score = body remembers trauma even when mind doesn't consciously recall. Symptoms: chronic pain, autoimmune issues, digestive problems, hypervigilance - these are body's way of "keeping score."`,
+                    concepts: [
+                        { title: 'Implicit vs Explicit Memory', text: 'EXPLICIT (narrative): "I remember being hit at age 5." IMPLICIT (body): Heart racing when someone raises their voice, flinching when touched. Trauma often lives in implicit - body remembers when mind doesn\'t.' },
+                        { title: 'Why Words Aren\'t Enough', text: 'Trauma overwhelms language centers. Broca\'s area goes offline during trauma activation. Can\'t "talk yourself out" of body-based response. Need body-based interventions.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client says "I\'ve talked about my abuse for years but still have panic attacks." What does van der Kolk\'s framework suggest?',
+                            answers: [
+                                { text: 'They need to talk about it more', correct: false, feedback: 'More talking often doesn\'t help if trauma is held in body, not narrative.' },
+                                { text: 'Trauma is stored in body/nervous system - need somatic interventions', correct: true, feedback: 'EXACTLY! Panic attacks are IMPLICIT body memory. Need interventions that work with BODY: EMDR, somatic experiencing, yoga, neurofeedback.' },
+                                { text: 'They\'re not trying hard enough', correct: false, feedback: 'Trauma responses are physiological, not conscious choice. Can\'t willpower away nervous system activation.' },
+                                { text: 'Panic attacks are unrelated to trauma', correct: false, feedback: 'Van der Kolk shows clear link: trauma → altered stress response → symptoms like panic.' }
+                            ]
+                        },
+                        {
+                            question: 'What does "the body keeps the score" mean?',
+                            answers: [
+                                { text: 'Your body tracks exercise', correct: false, feedback: 'This is about trauma, not fitness!' },
+                                { text: 'Body stores trauma as physical sensations and automatic responses', correct: true, feedback: 'YES! Veteran has chronic gut pain (body holds terror). Abuse survivor flinches at touch. These are REAL physiological impacts.' },
+                                { text: 'Traumatic memories are always conscious', correct: false, feedback: 'Opposite! Trauma often lives OUTSIDE conscious awareness - in body memory.' },
+                                { text: 'Only physical injuries create symptoms', correct: false, feedback: 'PSYCHOLOGICAL trauma creates PHYSICAL changes. Mind-body are one system.' }
+                            ]
+                        },
+                        {
+                            question: 'Why does traditional talk therapy often fail for trauma?',
+                            answers: [
+                                { text: 'Therapists aren\'t skilled enough', correct: false, feedback: 'Not about skill - about modality limits. Can\'t access subcortical trauma with words alone.' },
+                                { text: 'Trauma is stored in subcortical brain regions that don\'t respond to language', correct: true, feedback: 'EXACTLY! Talking engages cortex but doesn\'t reach where trauma lives. Need EMDR, somatic work, movement.' },
+                                { text: 'Talk therapy is completely useless', correct: false, feedback: 'Talk therapy helps with meaning-making. But it\'s INSUFFICIENT alone - needs body-based work too.' },
+                                { text: 'People with trauma can\'t talk', correct: false, feedback: 'They CAN talk, but talking doesn\'t necessarily access body-held trauma.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'window-tolerance',
+                title: 'Window of Tolerance',
+                icon: '🪟',
+                level: 1,
+                xp: 25,
+                prereq: 'trauma-in-body',
+                lessons: [{
+                    title: 'The Zone of Regulation',
+                    teaching: `WINDOW OF TOLERANCE: zone of arousal where you can think clearly and respond flexibly. Inside window = regulated. Outside = dysregulated.
+
+ABOVE window = HYPERAROUSAL: fight/flight - racing heart, panic, rage, hypervigilance.
+
+BELOW window = HYPOAROUSAL: shutdown/freeze - numb, dissociated, foggy, exhausted.
+
+Trauma NARROWS your window. Small triggers cause big dysregulation.`,
+                    concepts: [
+                        { title: 'Dysregulation Isn\'t Choice', text: 'When outside window, prefrontal cortex is offline. You CAN\'T "calm down" through willpower. Need regulation tools: breathing, movement, grounding.' },
+                        { title: 'Goal Is Widening Window', text: 'Healing = expanding window of tolerance. Through somatic work, mindfulness, building felt safety. Over time, triggers don\'t dysregulate you as much.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client is agitated, can\'t focus, speech pressured. Says "I can\'t calm down!" What\'s happening?',
+                            answers: [
+                                { text: 'They\'re choosing to be difficult', correct: false, feedback: 'This is physiological, not choice. They\'re ABOVE window - nervous system has hijacked.' },
+                                { text: 'Hyperarousal - above window, need regulation tools not talk', correct: true, feedback: 'YES! DON\'T keep processing trauma. DO help regulate: breathing, grounding, movement. FIRST regulate, THEN process.' },
+                                { text: 'They need to try harder to relax', correct: false, feedback: 'Can\'t willpower out of dysregulation! Need physiological strategies.' },
+                                { text: 'Give them medication immediately', correct: false, feedback: 'Immediate need is REGULATION skills. Teaching tools is crucial.' }
+                            ]
+                        },
+                        {
+                            question: 'Client becomes flat, spacey, says "I don\'t feel anything." What state?',
+                            answers: [
+                                { text: 'They\'re lying', correct: false, feedback: 'Dissociation DOES create numbness. They\'re telling their truth.' },
+                                { text: 'Hypoarousal - below window, need gentle activation', correct: true, feedback: 'PERFECT! Signs: numbness, fog, disconnection. DON\'T push harder. DO: gentle activation - orient to present, body awareness, small movements.' },
+                                { text: 'Perfect window of tolerance', correct: false, feedback: 'No - numbness is BELOW window. In window = able to feel AND think.' },
+                                { text: 'Keep pushing them to feel', correct: false, feedback: 'Dangerous! Dissociation protects. Forcing can retraumatize.' }
+                            ]
+                        },
+                        {
+                            question: 'How does trauma narrow the window of tolerance?',
+                            answers: [
+                                { text: 'It doesn\'t', correct: false, feedback: 'Trauma definitively narrows window. Well-established in research.' },
+                                { text: 'Chronic trauma keeps nervous system on high alert - small stressors trigger big responses', correct: true, feedback: 'YES! Baseline shifts hypervigilant. What others handle easily sends traumatized person outside window. Healing widens it back.' },
+                                { text: 'Only severe trauma affects window', correct: false, feedback: 'Even "small" chronic trauma can narrow window. Cumulative impact matters.' },
+                                { text: 'Window is genetic, can\'t change', correct: false, feedback: 'Window CAN expand! Neuroplasticity. Nervous system can learn safety.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'brain-changes',
+                title: 'The Traumatized Brain',
+                icon: '🧠',
+                level: 1,
+                xp: 30,
+                prereq: 'window-tolerance',
+                lessons: [{
+                    title: 'Neuroscience of Trauma',
+                    teaching: `Brain imaging shows HOW trauma changes brain:
+
+AMYGDALA (fear center): HYPERACTIVE - constantly scanning for danger, false alarms. Like smoke detector going off when you cook toast.
+
+PREFRONTAL CORTEX: UNDERACTIVE during activation - can't think clearly. "Thinking brain" goes offline.
+
+HIPPOCAMPUS (memory): Struggles to time-stamp memories as "past." Flashbacks feel PRESENT.
+
+INSULA (body awareness): Overactive (overwhelming sensations) OR underactive (numbness).`,
+                    concepts: [
+                        { title: 'Stuck in Alarm Mode', text: 'Traumatized brain stays in threat-detection. Amygdala screams danger when there isn\'t any. NOT irrational - brain doing job it learned: SURVIVE. But miscalibrated.' },
+                        { title: 'Why Flashbacks Feel Real', text: 'Hippocampus fails to contextualize as PAST. When triggered, you RE-EXPERIENCE it. Brain/body respond as if happening NOW. "It\'s in the past" doesn\'t help.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client has flashback - reliving assault, terrified. You say "You\'re safe now." They don\'t calm down. Why?',
+                            answers: [
+                                { text: 'They\'re not listening', correct: false, feedback: 'They CAN\'T process words. Language centers offline during flashback.' },
+                                { text: 'Hippocampus isn\'t contextualizing as past - brain experiences it as NOW', correct: true, feedback: 'EXACTLY! In flashback: prefrontal offline. Need SUBCORTICAL interventions: orient through SENSES, bilateral stimulation, help body feel safe.' },
+                                { text: 'Flashbacks aren\'t real', correct: false, feedback: 'Very real to nervous system! Physiologically indistinguishable from actual threat.' },
+                                { text: 'Just wait for it to pass', correct: false, feedback: 'Active grounding intervention helps them regulate sooner.' }
+                            ]
+                        },
+                        {
+                            question: 'What does hyperactive amygdala mean for daily life?',
+                            answers: [
+                                { text: 'Anxious for no reason', correct: false, feedback: 'There IS reason - miscalibrated threat detection. Brain learned world is dangerous.' },
+                                { text: 'Constant scanning for danger, overreacting, difficulty relaxing, exhausting hypervigilance', correct: true, feedback: 'YES! Smoke detector too sensitive. Startle easily, can\'t relax, small things feel threatening. Treatment: calm amygdala through safety, regulation, bottom-up approaches.' },
+                                { text: 'Brain changes don\'t affect behavior', correct: false, feedback: 'Brain changes DIRECTLY create symptoms. This IS the biological basis.' },
+                                { text: 'They\'re permanently broken', correct: false, feedback: 'NEUROPLASTICITY! Brain can change with treatment. Not permanent.' }
+                            ]
+                        },
+                        {
+                            question: 'Why does van der Kolk emphasize brain imaging research?',
+                            answers: [
+                                { text: 'To prove trauma survivors are damaged', correct: false, feedback: 'Not "damaged" - CHANGED. Changes are adaptive but create problems. And reversible!' },
+                                { text: 'To show trauma has biological basis, reducing shame - symptoms are real, not weakness', correct: true, feedback: 'EXACTLY! Reduces shame, validates suffering, explains why willpower fails, guides treatment, offers hope (brain CAN heal).' },
+                                { text: 'Brain imaging is irrelevant', correct: false, feedback: 'Very relevant! Understanding which areas affected guides intervention.' },
+                                { text: 'To ignore psychological factors', correct: false, feedback: 'Van der Kolk integrates biological AND psychological. Enriches understanding.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'emdr',
+                title: 'EMDR',
+                icon: '👁️',
+                level: 2,
+                xp: 35,
+                prereq: 'brain-changes',
+                lessons: [{
+                    title: 'Eye Movement Desensitization',
+                    teaching: `EMDR (Eye Movement Desensitization and Reprocessing): Van der Kolk extensively researched this powerful trauma treatment.
+
+Process: While recalling trauma, client follows therapist's moving finger with eyes (bilateral stimulation). Can also use alternating taps or sounds.
+
+Theory: bilateral stimulation helps brain REPROCESS stuck trauma memories - integrating them into narrative memory so they feel "past" not "present."
+
+Research shows: significant PTSD reduction, often faster than traditional therapy.`,
+                    concepts: [
+                        { title: 'Why It Works', text: 'Bilateral stimulation may mimic REM sleep (when we naturally process experiences). Helps connect left brain (language, time) with right brain (emotion, imagery). Trauma becomes integrated rather than fragmented.' },
+                        { title: 'Not Just Eye Movement', text: 'Key is bilateral alternating stimulation. Eyes, taps, sounds all work. Combined with trauma recall and cognitive processing. Structured 8-phase protocol.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client avoids trauma memories because they\'re overwhelming. How might EMDR help?',
+                            answers: [
+                                { text: 'Forces them to relive trauma repeatedly', correct: false, feedback: 'EMDR is controlled and titrated. Not flooding or forcing.' },
+                                { text: 'Bilateral stimulation keeps one foot in present while processing past - reduces overwhelm', correct: true, feedback: 'EXACTLY! Dual attention: part of brain on eye movement (present), part on memory (past). Allows processing without full overwhelm. Window stays open.' },
+                                { text: 'Erases traumatic memories', correct: false, feedback: 'Doesn\'t erase - CHANGES relationship to memory. Becomes past, not present threat.' },
+                                { text: 'Just distraction from pain', correct: false, feedback: 'Not distraction - active neural reprocessing. Brain changes visible on scans.' }
+                            ]
+                        },
+                        {
+                            question: 'What happens neurologically during EMDR?',
+                            answers: [
+                                { text: 'Nothing - it\'s placebo', correct: false, feedback: 'Brain imaging shows real changes. Not placebo.' },
+                                { text: 'Trauma memory becomes linked with sense of present safety, hippocampus properly contextualizes as past', correct: true, feedback: 'YES! Trauma memory gets "updated" with new information: "I survived, it\'s over, I\'m safe now." Hippocampus can time-stamp. Amygdala calms.' },
+                                { text: 'Memory is deleted', correct: false, feedback: 'Memory remains but relationship changes. Less charge, more context.' },
+                                { text: 'Eyes are damaged', correct: false, feedback: 'Eye movement is safe! Can also use taps or sounds instead.' }
+                            ]
+                        },
+                        {
+                            question: 'When is EMDR NOT appropriate?',
+                            answers: [
+                                { text: 'Never - works for everyone', correct: false, feedback: 'No intervention works for everyone. Contraindications exist.' },
+                                { text: 'When client is too dysregulated, dissociative, or lacks resources for stabilization', correct: true, feedback: 'CORRECT! Need baseline stability. If too dissociative, may not stay present enough. If no coping resources, processing could overwhelm. Stabilization phase first!' },
+                                { text: 'For any trauma', correct: false, feedback: 'Works well for many traumas but requires assessment. Some need more stabilization work first.' },
+                                { text: 'Only for combat veterans', correct: false, feedback: 'Effective for all trauma types - assault, accidents, childhood abuse, not just combat.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'yoga-movement',
+                title: 'Yoga & Movement',
+                icon: '🧘',
+                level: 2,
+                xp: 30,
+                prereq: 'emdr',
+                lessons: [{
+                    title: 'Healing Through the Body',
+                    teaching: `Van der Kolk researched YOGA as trauma treatment - pioneering "trauma-sensitive yoga."
+
+Why movement helps: trauma disconnects people from bodies. They feel: numb, out of body, or overwhelmed by sensation. Yoga helps RECLAIM body as safe home.
+
+Key elements: Choice and control (trauma removes these). Noticing body without judgment. Staying present with sensation. Building body awareness gradually.
+
+Research showed yoga significantly reduced PTSD symptoms - sometimes more than medication!`,
+                    concepts: [
+                        { title: 'Trauma-Sensitive Yoga', text: 'Different from regular yoga! Invitational language ("you might try..."), no hands-on adjustments, focus on interoception (feeling inside body), choice emphasized throughout. Never forcing.' },
+                        { title: 'Reclaiming the Body', text: 'Trauma makes body feel like enemy (source of flashbacks, pain). Yoga helps body become ally again - place of strength, sensation, aliveness. Befriending, not fighting body.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Why is yoga effective for trauma when it doesn\'t involve talking about trauma?',
+                            answers: [
+                                { text: 'It\'s just relaxation', correct: false, feedback: 'More than relaxation - actively works with body where trauma is stored.' },
+                                { text: 'Works with body directly - builds interoception, reclaims sense of safety in body, regulates nervous system', correct: true, feedback: 'EXACTLY! Bottom-up intervention. Trauma stored somatically - yoga addresses somatically. Rebuilds body awareness, teaches regulation, creates new relationship with physical self.' },
+                                { text: 'It\'s spiritual healing', correct: false, feedback: 'Trauma-sensitive yoga isn\'t about spirituality - it\'s about body reclamation and nervous system regulation.' },
+                                { text: 'Only works as placebo', correct: false, feedback: 'Research shows specific mechanisms and measurable improvements beyond placebo.' }
+                            ]
+                        },
+                        {
+                            question: 'What makes yoga "trauma-sensitive"?',
+                            answers: [
+                                { text: 'More intense poses', correct: false, feedback: 'Opposite - intensity can be triggering. Trauma-sensitive is gentler, more choice-oriented.' },
+                                { text: 'Invitational language, no touch, focus on choice and interoception, slow pace', correct: true, feedback: 'YES! Key differences: Language of invitation not command. No hands-on adjustments. Constant choice. Focus on FEELING body not performing poses. Predictable, safe environment.' },
+                                { text: 'Same as regular yoga', correct: false, feedback: 'Regular yoga can actually be triggering. Trauma-sensitive is specifically adapted.' },
+                                { text: 'Only for advanced yogis', correct: false, feedback: 'Designed for beginners, especially those disconnected from body. Accessible to all.' }
+                            ]
+                        },
+                        {
+                            question: 'How does movement help with trauma stored in body?',
+                            answers: [
+                                { text: 'Distracts from thoughts', correct: false, feedback: 'Not distraction - INTEGRATION. Working directly with body where trauma lives.' },
+                                { text: 'Completes thwarted fight/flight responses, releases tension patterns, rebuilds body ownership', correct: true, feedback: 'EXACTLY! Trauma freezes body in unfinished survival responses. Movement helps COMPLETE: shake, push, run. Releases held tension. Plus: body becomes YOUR body again.' },
+                                { text: 'Erases traumatic memories', correct: false, feedback: 'Doesn\'t erase - changes relationship to BODY. Body becomes less scary, more inhabitable.' },
+                                { text: 'Only helps physical injuries', correct: false, feedback: 'Psychological trauma HAS physical manifestation! Mind-body are connected.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'neurofeedback',
+                title: 'Neurofeedback',
+                icon: '🎮',
+                level: 3,
+                xp: 45,
+                prereq: 'yoga-movement',
+                lessons: [{
+                    title: 'Training the Brain',
+                    teaching: `NEUROFEEDBACK: shows real-time brain activity (via EEG) and teaches brain to self-regulate.
+
+How it works: Electrodes measure brain waves. Computer displays as game. When brain produces desired pattern (e.g., calm alpha waves), game progresses. Brain learns through reinforcement.
+
+For trauma: calms amygdala, strengthens prefrontal cortex, regulates arousal. No talking required - brain learns directly.
+
+Van der Kolk found: significant PTSD reduction, better regulation, improved sleep. Helpful when talk therapy hasn't worked.`,
+                    concepts: [
+                        { title: 'Brain Training Without Words', text: 'Bypasses language entirely. Literally training brain waves through feedback. For subcortical trauma, this direct approach is powerful. No need to verbally process.' },
+                        { title: 'Limitations', text: 'Helps with regulation but doesn\'t address meaning, relationships, patterns. Best as PART of treatment. Expensive, time-intensive. But for right person, game-changing.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Client tried multiple therapies, still hypervigilant with poor sleep. How might neurofeedback help?',
+                            answers: [
+                                { text: 'They\'re treatment resistant', correct: false, feedback: 'May need different APPROACH. Neurofeedback offers something others don\'t.' },
+                                { text: 'Trains brain to regulate without requiring trauma processing - builds stability when too dysregulated for other work', correct: true, feedback: 'YES! Some are TOO dysregulated for processing. Neurofeedback: works on regulation itself, doesn\'t require talking, calms nervous system directly. Creates foundation for other work.' },
+                                { text: 'They should try harder', correct: false, feedback: 'Not about effort! Nervous system may need direct intervention.' },
+                                { text: 'Neurofeedback is pseudoscience', correct: false, feedback: 'Research shows real effects. Brain changes measurable on scans.' }
+                            ]
+                        },
+                        {
+                            question: 'What\'s the mechanism of change in neurofeedback?',
+                            answers: [
+                                { text: 'Talking about trauma', correct: false, feedback: 'No talking! That\'s the point - non-verbal brain training.' },
+                                { text: 'Operant conditioning - brain receives feedback for desired waves, learns to self-regulate', correct: true, feedback: 'EXACTLY! Brain produces calm waves → game rewards → brain learns "this = good." Over time, brain MORE EASILY produces regulated states. Neuroplasticity through reinforcement.' },
+                                { text: 'Placebo', correct: false, feedback: 'Research shows specific brain changes beyond placebo.' },
+                                { text: 'Magic', correct: false, feedback: 'Neuroscience! Brain learning through feedback is established principle.' }
+                            ]
+                        },
+                        {
+                            question: 'Why is neurofeedback PART of treatment, not replacement?',
+                            answers: [
+                                { text: 'It\'s useless', correct: false, feedback: 'Van der Kolk actively recommends it! But within integrated approach.' },
+                                { text: 'Helps regulation but doesn\'t address meaning, relationships, behaviors - need comprehensive treatment', correct: true, feedback: 'YES! Neurofeedback does: calms amygdala, improves sleep, reduces hypervigilance. Doesn\'t: process memories, change cognitions, repair attachment. WHOLE PERSON needs multiple approaches.' },
+                                { text: 'Insurance won\'t cover it', correct: false, feedback: 'Access barriers exist but don\'t change clinical value.' },
+                                { text: 'Only neurofeedback works', correct: false, feedback: 'Van der Kolk is eclectic - believes in multiple approaches. One tool, not THE answer.' }
+                            ]
+                        }
+                    ]
+                }]
+            },
+            {
+                id: 'attachment-trauma',
+                title: 'Developmental Trauma',
+                icon: '👶',
+                level: 3,
+                xp: 50,
+                prereq: 'neurofeedback',
+                lessons: [{
+                    title: 'Early Wounds Run Deep',
+                    teaching: `Van der Kolk advocates recognizing DEVELOPMENTAL TRAUMA - chronic early childhood trauma from caregivers. Different from single-incident PTSD.
+
+Effects: shapes brain development, attachment patterns, sense of self, emotion regulation capacity. Not just "bad memories" but altered DEVELOPMENT.
+
+More pervasive than acute trauma because it happens DURING brain formation. Child has no template for safety or healthy relationships.
+
+Van der Kolk argues we need a diagnosis: "Developmental Trauma Disorder" (not yet in DSM, but he advocates strongly).`,
+                    concepts: [
+                        { title: 'Why Childhood Matters Most', text: 'Brain is forming. Neural pathways establish. What\'s learned: "relationships = danger," "I\'m worthless," "world is unsafe." These become BIOLOGICAL, not just beliefs. Harder to treat because foundational.' },
+                        { title: 'Beyond PTSD', text: 'PTSD captures acute trauma response. Developmental trauma causes: identity issues, relational patterns, emotion regulation problems, dissociation, shame. Current diagnoses miss this complexity.' }
+                    ],
+                    questions: [
+                        {
+                            question: 'Why is developmental trauma particularly hard to treat?',
+                            answers: [
+                                { text: 'Happened too long ago', correct: false, feedback: 'Time isn\'t the issue - it\'s that trauma shaped developing brain and became structural.' },
+                                { text: 'Occurred during brain development - became wired into neural structure, not just memory', correct: true, feedback: 'EXACTLY! Single trauma leaves memory trace. Developmental trauma shapes HOW BRAIN FORMS. Becomes the water fish swim in - hard to see, pervasive. Requires longer, deeper work.' },
+                                { text: 'Children don\'t really remember', correct: false, feedback: 'Body remembers even without explicit memory! Implicit patterns persist.' },
+                                { text: 'It\'s just personality, not trauma', correct: false, feedback: 'This IS what van der Kolk fights against. "Personality disorders" often ARE developmental trauma responses.' }
+                            ]
+                        },
+                        {
+                            question: 'What distinguishes developmental trauma from single-incident PTSD?',
+                            answers: [
+                                { text: 'Nothing different', correct: false, feedback: 'Very different! Different causes, presentations, and treatment needs.' },
+                                { text: 'Affects identity, relationships, and self-regulation globally - not just trauma memories', correct: true, feedback: 'YES! PTSD: specific triggers, intrusive memories, hyperarousal. Developmental: WHO AM I? CAN I TRUST ANYONE? AM I WORTHY? Pervasive, affects everything. Needs different approach.' },
+                                { text: 'Less severe', correct: false, feedback: 'Often MORE severe and treatment-resistant because foundational.' },
+                                { text: 'Only affects memory', correct: false, feedback: 'Affects personality, relationships, sense of self - far beyond memory.' }
+                            ]
+                        },
+                        {
+                            question: 'Why does van der Kolk advocate for "Developmental Trauma Disorder" diagnosis?',
+                            answers: [
+                                { text: 'To stigmatize more children', correct: false, feedback: 'Opposite - to get proper recognition and treatment rather than misdiagnosis.' },
+                                { text: 'Current diagnoses miss the pattern - kids get multiple labels when one coherent diagnosis would guide treatment', correct: true, feedback: 'EXACTLY! Child with developmental trauma often diagnosed: ADHD + ODD + depression + anxiety + learning disorder. Multiple labels miss the ROOT: trauma. Van der Kolk argues coherent diagnosis would lead to trauma-informed treatment, not scattered symptom management.' },
+                                { text: 'He wants fame', correct: false, feedback: 'This is about improving care for traumatized children, not personal gain.' },
+                                { text: 'All trauma is the same', correct: false, feedback: 'His point is the OPPOSITE - developmental trauma is distinct and needs recognition.' }
+                            ]
+                        }
+                    ]
+                }]
+            }
+        ];
+        
+        function initUI() {
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        function updateStats() {
+            const xpPercent = (gameState.xp / gameState.xpToNextLevel) * 100;
+            const mastery = Math.round((gameState.completedSkills.length / skillTree.length) * 100);
+            const currentPath = gameState.level <= 1 ? 'FOUNDATIONS' : gameState.level <= 2 ? 'INTERMEDIATE' : 'ADVANCED';
+            
+            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
+            document.getElementById('level-display').textContent = gameState.level;
+            document.getElementById('mastery-display').textContent = `${mastery}%`;
+            document.getElementById('streak-display').textContent = `${gameState.streak}🔥`;
+            document.getElementById('current-path').textContent = currentPath;
+        }
+        
+        function renderSkillGrid() {
+            const grid = document.getElementById('skill-grid');
+            grid.innerHTML = skillTree.map(skill => {
+                const isCompleted = gameState.completedSkills.includes(skill.id);
+                const isUnlocked = !skill.prereq || gameState.completedSkills.includes(skill.prereq);
+                
+                let status = '🔒';
+                let statusClass = 'locked';
+                
+                if (isCompleted) {
+                    status = '✓';
+                    statusClass = 'completed';
+                } else if (isUnlocked) {
+                    status = '→';
+                    statusClass = 'unlocked';
+                }
+                
+                return `
+                    <div class="skill-card ${statusClass}" 
+                         onclick="${isUnlocked ? `startSkill('${skill.id}')` : ''}"
+                         role="button"
+                         tabindex="${isUnlocked ? '0' : '-1'}"
+                         aria-label="${skill.title}${isCompleted ? ', completed' : isUnlocked ? ', available' : ', locked'}">
+                        <div class="skill-icon">${skill.icon}</div>
+                        <div class="skill-info">
+                            <div class="skill-title">${skill.title}</div>
+                            <div class="skill-meta">
+                                <span class="skill-xp">+${skill.xp} XP</span>
+                                <span>Level ${skill.level}</span>
+                            </div>
+                        </div>
+                        <div class="skill-status">${status}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            grid.querySelectorAll('.skill-card.unlocked').forEach(card => {
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+        }
+        
+        function startSkill(skillId) {
+            const skill = skillTree.find(s => s.id === skillId);
+            if (!skill) return;
+            
+            gameState.currentLesson = skill;
+            gameState.currentQuestion = 0;
+            gameState.correctAnswers = 0;
+            gameState.questionResults = [];
+            
+            showLesson(skill);
+        }
+        
+        function showLesson(skill) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            const lesson = skill.lessons[0];
+            
+            const concepts = lesson.concepts.map(c => `
+                <div class="concept-card">
+                    <div class="concept-title">📌 ${c.title}</div>
+                    <div class="concept-text">${c.text}</div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-icon">${skill.icon}</div>
+                    <h2 class="lesson-title">${lesson.title}</h2>
+                    <div class="lesson-subtitle">+${skill.xp} XP on completion</div>
+                </div>
+                
+                <div class="teaching-section">
+                    <div class="teaching-text">${lesson.teaching}</div>
+                </div>
+                
+                <div class="concepts-section">
+                    ${concepts}
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Back</button>
+                    <button class="btn btn-primary" onclick="startQuestions()">Start Quiz →</button>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.top = `-${window.scrollY}px`;
+        }
+        
+        function startQuestions() {
+            showQuestion(0);
+        }
+        
+        function showQuestion(index) {
+            const skill = gameState.currentLesson;
+            const lesson = skill.lessons[0];
+            const question = lesson.questions[index];
+            const content = document.getElementById('modal-content');
+            const total = lesson.questions.length;
+            
+            const dots = lesson.questions.map((_, i) => {
+                let dotClass = 'progress-dot';
+                if (i === index) dotClass += ' current';
+                else if (i < index) {
+                    dotClass += gameState.questionResults[i] ? ' correct' : ' incorrect';
+                }
+                return `<div class="${dotClass}"></div>`;
+            }).join('');
+            
+            const answers = question.answers.map((a, i) => `
+                <button class="answer-btn" onclick="selectAnswer(${i})" data-index="${i}">
+                    ${a.text}
+                </button>
+            `).join('');
+            
+            const scoreText = index > 0 
+                ? `<span class="score-display">Score: <span class="score-value">${gameState.correctAnswers}/${index}</span></span>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <h2 class="lesson-title">${skill.title}</h2>
+                    <div class="lesson-subtitle">Question ${index + 1} of ${total}</div>
+                </div>
+                
+                <div class="question-section">
+                    <div class="question-progress">
+                        <div class="progress-dots">${dots}</div>
+                        ${scoreText}
+                    </div>
+                    
+                    <div class="question-text">${question.question}</div>
+                    
+                    <div class="answers-list" id="answers-list">
+                        ${answers}
+                    </div>
+                    
+                    <div class="feedback-box" id="feedback"></div>
+                </div>
+                
+                <div class="modal-footer" id="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Exit</button>
+                    <div id="continue-container"></div>
+                </div>
+            `;
+            
+            window.currentQuestionData = { question, index, total };
+        }
+        
+        function selectAnswer(answerIndex) {
+            const { question, index, total } = window.currentQuestionData;
+            const answer = question.answers[answerIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            const feedback = document.getElementById('feedback');
+            const continueContainer = document.getElementById('continue-container');
+            
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            
+            const selectedBtn = buttons[answerIndex];
+            
+            if (answer.correct) {
+                selectedBtn.classList.add('correct');
+                feedback.className = 'feedback-box correct show';
+                feedback.innerHTML = `✓ CORRECT! ${answer.feedback}`;
+                gameState.correctAnswers++;
+                gameState.questionResults.push(true);
+            } else {
+                selectedBtn.classList.add('incorrect');
+                feedback.className = 'feedback-box incorrect show';
+                feedback.innerHTML = `✗ ${answer.feedback}`;
+                gameState.questionResults.push(false);
+            }
+            
+            const isLast = index >= total - 1;
+            continueContainer.innerHTML = `
+                <button class="btn btn-primary" onclick="${isLast ? 'completeSkill()' : 'nextQuestion()'}">
+                    ${isLast ? 'See Results →' : 'Continue →'}
+                </button>
+            `;
+        }
+        
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            showQuestion(gameState.currentQuestion);
+        }
+        
+        function completeSkill() {
+            const skill = gameState.currentLesson;
+            const total = skill.lessons[0].questions.length;
+            const score = Math.round((gameState.correctAnswers / total) * 100);
+            const xpEarned = skill.xp;
+            
+            gameState.xp += xpEarned;
+            gameState.totalXp += xpEarned;
+            
+            while (gameState.xp >= gameState.xpToNextLevel) {
+                gameState.xp -= gameState.xpToNextLevel;
+                gameState.level++;
+                gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+            }
+            
+            if (!gameState.completedSkills.includes(skill.id)) {
+                gameState.completedSkills.push(skill.id);
+                gameState.streak++;
+            }
+            
+            const currentIndex = skillTree.findIndex(s => s.id === skill.id);
+            const nextSkill = skillTree.slice(currentIndex + 1).find(s => {
+                if (!s.prereq) return true;
+                return gameState.completedSkills.includes(s.prereq);
+            });
+            
+            const content = document.getElementById('modal-content');
+            
+            const nextButton = nextSkill && !gameState.completedSkills.includes(nextSkill.id)
+                ? `<button class="btn btn-accent" onclick="startNextSkill('${nextSkill.id}')">
+                       Next: ${nextSkill.title} →
+                   </button>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="completion-screen">
+                    <div class="completion-icon">${skill.icon}</div>
+                    <h2 class="completion-title">SKILL MASTERED!</h2>
+                    <div class="completion-xp">+${xpEarned} XP EARNED</div>
+                    
+                    <div class="completion-stats">
+                        <p>Score: <span style="color: var(--secondary);">${score}%</span> (${gameState.correctAnswers}/${total})</p>
+                        <p>Skill: "${skill.title}"</p>
+                        <p>The body keeps the score - and so do you!</p>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModalAndRefresh()">← Skill Tree</button>
+                    ${nextButton}
+                </div>
+            `;
+            
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#f0f', '#0ff', '#ff0']
+                });
+            }
+            
+            saveProgress();
+        }
+        
+        function startNextSkill(skillId) {
+            closeModal();
+            setTimeout(() => startSkill(skillId), 200);
+        }
+        
+        function closeModal() {
+            const scrollY = document.body.style.top;
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.top = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+        
+        function closeModalAndRefresh() {
+            closeModal();
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        function saveProgress() {
+            localStorage.setItem('bodyKeepsScoreAcademy', JSON.stringify(gameState));
+            showToast('💾 Progress saved!');
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('bodyKeepsScoreAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                updateStats();
+                renderSkillGrid();
+                showToast('✓ Progress loaded!');
+            } else {
+                showToast('No saved progress found');
+            }
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('bodyKeepsScoreAcademy');
+                location.reload();
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function goHome() {
+            window.location.href = 'learning-library-hub.html';
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('modal');
+            const isOpen = modal.classList.contains('active');
+            
+            if (e.key === 'Escape' && isOpen) closeModal();
+            
+            if (!isOpen) {
+                if (e.key === 'h') goHome();
+                if (e.key === 's') {
+                    e.preventDefault();
+                    saveProgress();
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('bodyKeepsScoreAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+            initUI();
+        });
+    </script>
+</body>
+</html>
