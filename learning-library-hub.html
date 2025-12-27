@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>LEARNING LIBRARY HUB</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            color: #0f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .game-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            background: #222;
+            border: 8px solid #0ff;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+            position: relative;
+        }
+        
+        .crt-effect {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 1000;
+        }
+        
+        .screen {
+            background: #000;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .main-title {
+            text-align: center;
+            font-size: 24px;
+            color: #0ff;
+            text-shadow: 3px 3px #f0f;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 10px;
+            color: #ff0;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .quick-stats {
+            background: #111;
+            border: 4px solid #0ff;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .quick-stat-value {
+            font-size: 20px;
+            color: #0ff;
+            margin-bottom: 5px;
+        }
+
+        .quick-stat-label {
+            font-size: 7px;
+            color: #999;
+        }
+
+        .info-section {
+            background: #111;
+            border: 4px solid #0ff;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-title {
+            color: #0ff;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .info-text {
+            color: #999;
+            font-size: 8px;
+            line-height: 1.8;
+        }
+
+        /* Section styling */
+        .section-header {
+            text-align: center;
+            margin: 40px 0 20px 0;
+            padding: 15px;
+            border-top: 3px solid #0ff;
+            border-bottom: 3px solid #0ff;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #0ff;
+            text-shadow: 2px 2px #f0f;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 8px;
+            color: #f0f;
+            letter-spacing: 1px;
+        }
+
+        /* Carousel Container */
+        .carousel-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .carousel-track-wrapper {
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: grab;
+        }
+
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+
+        .carousel-track.dragging {
+            transition: none;
+        }
+
+        /* Navigation Arrows */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #0ff;
+            color: #0ff;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .carousel-nav:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .carousel-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .carousel-nav:disabled:hover {
+            background: rgba(0, 0, 0, 0.8);
+            color: #0ff;
+            box-shadow: none;
+        }
+
+        .carousel-nav.prev {
+            left: 5px;
+        }
+
+        .carousel-nav.next {
+            right: 5px;
+        }
+
+        /* Dot Indicators */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border: 2px solid #0ff;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .carousel-dot:hover {
+            background: rgba(0, 255, 255, 0.3);
+        }
+
+        .carousel-dot.active {
+            background: #0ff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Swipe hint */
+        .swipe-hint {
+            text-align: center;
+            font-size: 8px;
+            color: #666;
+            margin-top: 10px;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Module Cards */
+        .module-card {
+            flex: 0 0 100%;
+            width: 100%;
+            background: linear-gradient(135deg, #001a1a 0%, #000 100%);
+            border: 4px solid #333;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .module-card:active:not(.coming-soon) {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+
+        .module-card .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .module-card.loading .loading-overlay {
+            opacity: 1;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top-color: #0ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Progress bar inside cards */
+        .module-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #222;
+        }
+
+        .module-progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .psychodynamic .module-progress-fill { background: linear-gradient(90deg, #0f0, #0ff); }
+        .mate .module-progress-fill { background: linear-gradient(90deg, #f90, #ff0); }
+        .vdk .module-progress-fill { background: linear-gradient(90deg, #f0f, #f9f); }
+        .stdp .module-progress-fill { background: linear-gradient(90deg, #f00, #f90); }
+        .ci .module-progress-fill { background: linear-gradient(90deg, #0cf, #0ff); }
+        .miller .module-progress-fill { background: linear-gradient(90deg, #9f0, #cf0); }
+        .berne .module-progress-fill { background: linear-gradient(90deg, #fc0, #fe0); }
+
+        /* Module states */
+        .module-card.completed {
+            border-width: 4px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .module-card.completed::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .module-card.completed .progress-badge {
+            background: linear-gradient(135deg, #4a3f00, #2a2400);
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .module-card.in-progress .progress-badge {
+            animation: progressPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .module-card.new-module .progress-badge {
+            background: #001a1a;
+        }
+        
+        .module-card:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .module-card.completed:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Module color themes - borders stay consistent on hover/active */
+        .module-card.psychodynamic { border-color: #0f0; }
+        .module-card.psychodynamic:hover,
+        .module-card.psychodynamic:active {
+            border-color: #0f0;
+            background: linear-gradient(135deg, #001a00 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3);
+        }
+        
+        .module-card.mate { border-color: #f90; }
+        .module-card.mate:hover,
+        .module-card.mate:active {
+            border-color: #f90;
+            background: linear-gradient(135deg, #1a0a00 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 153, 0, 0.3);
+        }
+        
+        .module-card.vdk { border-color: #f0f; }
+        .module-card.vdk:hover,
+        .module-card.vdk:active {
+            border-color: #f0f;
+            background: linear-gradient(135deg, #1a001a 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+        }
+        
+        .module-card.stdp { border-color: #f00; }
+        .module-card.stdp:hover,
+        .module-card.stdp:active {
+            border-color: #f00;
+            background: linear-gradient(135deg, #1a0000 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
+        }
+
+        .module-card.ci { border-color: #0cf; }
+        .module-card.ci:hover,
+        .module-card.ci:active {
+            border-color: #0cf;
+            background: linear-gradient(135deg, #001a1a 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(0, 204, 255, 0.3);
+        }
+
+        .module-card.miller { border-color: #9f0; }
+        .module-card.miller:hover,
+        .module-card.miller:active {
+            border-color: #9f0;
+            background: linear-gradient(135deg, #0a1a00 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(153, 255, 0, 0.3);
+        }
+        
+        .module-card.berne { border-color: #fc0; }
+        .module-card.berne:hover,
+        .module-card.berne:active {
+            border-color: #fc0;
+            background: linear-gradient(135deg, #1a1500 0%, #000 100%);
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.3);
+        }
+        
+        .module-card.coming-soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        
+        .module-card.coming-soon:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .module-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .module-title {
+            font-size: 11px;
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .psychodynamic .module-title { color: #0f0; }
+        .mate .module-title { color: #f90; }
+        .vdk .module-title { color: #f0f; }
+        .stdp .module-title { color: #f00; }
+        .ci .module-title { color: #0cf; }
+        .miller .module-title { color: #9f0; }
+        .berne .module-title { color: #fc0; }
+        .coming-soon .module-title { color: #666; }
+        
+        .module-author {
+            font-size: 7px;
+            text-align: center;
+            color: #999;
+            margin-bottom: 12px;
+        }
+        
+        .module-description {
+            font-size: 7px;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 12px;
+            flex-grow: 1;
+        }
+        
+        .module-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 12px;
+            margin-bottom: 15px;
+            border-top: 2px solid #333;
+            font-size: 6px;
+        }
+        
+        .stat-item { text-align: center; }
+        .stat-label { color: #666; margin-bottom: 4px; }
+        .stat-value { font-size: 9px; }
+        
+        .psychodynamic .stat-value { color: #0f0; }
+        .mate .stat-value { color: #f90; }
+        .vdk .stat-value { color: #f0f; }
+        .stdp .stat-value { color: #f00; }
+        .ci .stat-value { color: #0cf; }
+        .miller .stat-value { color: #9f0; }
+        .berne .stat-value { color: #fc0; }
+
+        .progress-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #000;
+            padding: 5px 10px;
+            font-size: 6px;
+            border: 2px solid;
+        }
+
+        .psychodynamic .progress-badge { border-color: #0f0; color: #0f0; }
+        .mate .progress-badge { border-color: #f90; color: #f90; }
+        .vdk .progress-badge { border-color: #f0f; color: #f0f; }
+        .stdp .progress-badge { border-color: #f00; color: #f00; }
+        .ci .progress-badge { border-color: #0cf; color: #0cf; }
+        .miller .progress-badge { border-color: #9f0; color: #9f0; }
+        .berne .progress-badge { border-color: #fc0; color: #fc0; }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #333;
+            color: #666;
+            padding: 5px 10px;
+            font-size: 6px;
+            border: 2px solid #666;
+        }
+        
+        .launch-btn {
+            background: #003300;
+            border: 3px solid #0f0;
+            color: #0f0;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .launch-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .launch-btn:hover::before {
+            left: 100%;
+        }
+        
+        .launch-btn:hover {
+            background: #005500;
+            border-color: #0ff;
+            color: #0ff;
+            transform: scale(1.02);
+        }
+
+        .launch-btn:active {
+            transform: scale(0.98);
+        }
+
+        .launch-btn.continue-btn {
+            animation: continuePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes continuePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
+            50% { box-shadow: 0 0 15px 2px rgba(0, 255, 0, 0.2); }
+        }
+
+        .launch-btn.review-btn {
+            background: linear-gradient(135deg, #2a2400, #1a1700);
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .launch-btn.review-btn:hover {
+            background: linear-gradient(135deg, #3a3400, #2a2400);
+            border-color: #ffed4a;
+            color: #ffed4a;
+        }
+
+        /* Button color themes */
+        .mate .launch-btn { background: #331a00; border-color: #f90; color: #f90; }
+        .mate .launch-btn:hover { background: #4d2600; border-color: #ff0; color: #ff0; }
+        
+        .vdk .launch-btn { background: #330033; border-color: #f0f; color: #f0f; }
+        .vdk .launch-btn:hover { background: #4d004d; border-color: #0ff; color: #0ff; }
+        
+        .stdp .launch-btn { background: #330000; border-color: #f00; color: #f00; }
+        .stdp .launch-btn:hover { background: #4d0000; border-color: #ff0; color: #ff0; }
+
+        .ci .launch-btn { background: #001a1a; border-color: #0cf; color: #0cf; }
+        .ci .launch-btn:hover { background: #003333; border-color: #0ff; color: #0ff; }
+
+        .miller .launch-btn { background: #1a2a00; border-color: #9f0; color: #9f0; }
+        .miller .launch-btn:hover { background: #2a3a00; border-color: #cf0; color: #cf0; }
+
+        .berne .launch-btn { background: #1a1500; border-color: #fc0; color: #fc0; }
+        .berne .launch-btn:hover { background: #2a2200; border-color: #fe0; color: #fe0; }
+        
+        .placeholder-btn {
+            background: #1a1a1a;
+            border: 3px dashed #666;
+            color: #666;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            width: 100%;
+            margin-top: auto;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 7px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+        }
+
+        /* ========== MOBILE OPTIMIZATION ========== */
+        @media (max-width: 768px) {
+            .game-wrapper {
+                padding: 10px;
+            }
+            
+            .game-container {
+                border-width: 4px;
+            }
+            
+            .screen {
+                padding: 15px;
+            }
+            
+            .main-title {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+            
+            .subtitle {
+                font-size: 8px;
+                margin-bottom: 20px;
+            }
+
+            .quick-stats {
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .quick-stat {
+                flex: 1 1 40%;
+                min-width: 70px;
+            }
+
+            .quick-stat-value {
+                font-size: 16px;
+            }
+
+            .quick-stat-label {
+                font-size: 6px;
+            }
+
+            .info-section {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .info-title {
+                font-size: 10px;
+            }
+
+            .info-text {
+                font-size: 8px;
+            }
+            
+            .section-header {
+                margin: 25px 0 15px 0;
+                padding: 12px;
+            }
+            
+            .section-title {
+                font-size: 11px;
+            }
+            
+            .section-subtitle {
+                font-size: 7px;
+            }
+
+            .carousel-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .carousel-nav.prev {
+                left: 2px;
+            }
+
+            .carousel-nav.next {
+                right: 2px;
+            }
+
+            .module-card {
+                padding: 20px;
+                min-height: 280px;
+            }
+            
+            .module-icon {
+                font-size: 40px;
+                margin-bottom: 12px;
+            }
+            
+            .module-title {
+                font-size: 10px;
+            }
+            
+            .module-author {
+                font-size: 7px;
+            }
+            
+            .module-description {
+                font-size: 7px;
+            }
+            
+            .module-stats {
+                font-size: 6px;
+            }
+            
+            .stat-value {
+                font-size: 9px;
+            }
+            
+            .launch-btn,
+            .placeholder-btn {
+                font-size: 8px;
+                padding: 10px 12px;
+            }
+
+            .carousel-dots {
+                gap: 8px;
+            }
+
+            .carousel-dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        /* Hide arrows on touch devices, show swipe hint */
+        @media (hover: none) and (pointer: coarse) {
+            .carousel-nav {
+                display: none;
+            }
+
+            .swipe-hint {
+                display: block;
+            }
+
+            .module-card:hover {
+                transform: none;
+            }
+            
+            .launch-btn:hover {
+                transform: none;
+            }
+            
+            .module-card:active {
+                transform: scale(0.98);
+                opacity: 0.9;
+            }
+            
+            .launch-btn:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Show arrows on non-touch devices */
+        @media (hover: hover) and (pointer: fine) {
+            .swipe-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="crt-effect"></div>
+            <div class="screen">
+                <div class="main-title">📚 LEARNING LIBRARY 📚</div>
+                <div class="subtitle">THERAPEUTIC KNOWLEDGE BASE</div>
+                
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-modules">7</div>
+                        <div class="quick-stat-label">MODULES</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-skills">66</div>
+                        <div class="quick-stat-label">SKILLS</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-completed">0</div>
+                        <div class="quick-stat-label">LESSONS</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value" id="total-xp">0</div>
+                        <div class="quick-stat-label">TOTAL XP</div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">⚡ WELCOME TO YOUR LEARNING HUB ⚡</div>
+                    <div class="info-text">
+                        Each module is a comprehensive, progressive learning path. Start from foundations and work your way to mastery. 
+                        Your progress is saved locally - pick up where you left off anytime.<br><br>
+                        <strong>← Swipe or use arrows to browse modules →</strong>
+                    </div>
+                </div>
+
+                <!-- THERAPEUTIC APPROACHES Section -->
+                <div class="section-header">
+                    <div class="section-title">⚡ THERAPEUTIC APPROACHES ⚡</div>
+                    <div class="section-subtitle">Core modalities and treatment methods</div>
+                </div>
+
+                <div class="carousel-container" id="carousel-approaches">
+                    <button class="carousel-nav prev" onclick="moveCarousel('approaches', -1)">◀</button>
+                    <button class="carousel-nav next" onclick="moveCarousel('approaches', 1)">▶</button>
+                    
+                    <div class="carousel-track-wrapper">
+                        <div class="carousel-track" id="track-approaches">
+                            <!-- Psychodynamic Module -->
+                            <div class="module-card psychodynamic new-module" onclick="launchModule('psychodynamic', this)" id="card-psychodynamic">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="psychodynamic-progress">NEW</div>
+                                <div class="module-icon">⚡</div>
+                                <div class="module-title">PSYCHODYNAMIC THERAPY</div>
+                                <div class="module-author">Classical & Contemporary Theory</div>
+                                <div class="module-description">
+                                    Master psychodynamic concepts from foundations to expert level. Learn: unconscious processes, 
+                                    defense mechanisms, transference, resistance, dream work, object relations, interpretation.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">12</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">4</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">36</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-psychodynamic">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-psychodynamic"></div></div>
+                            </div>
+
+                            <!-- STDP Module -->
+                            <div class="module-card stdp new-module" onclick="launchModule('stdp', this)" id="card-stdp">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="stdp-progress">NEW</div>
+                                <div class="module-icon">⏳</div>
+                                <div class="module-title">SHORT-TERM DYNAMIC PSYCHOTHERAPY</div>
+                                <div class="module-author">ISTDP / Davanloo / Abbass</div>
+                                <div class="module-description">
+                                    Master intensive affect-focused work. Learn: triangle of conflict, triangle of person, 
+                                    pressure & challenge, anxiety pathways, defense restructuring, unlocking unconscious.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">9</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">3</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">27</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-stdp">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-stdp"></div></div>
+                            </div>
+
+                            <!-- Compassionate Inquiry Module -->
+                            <div class="module-card ci new-module" onclick="launchModule('ci', this)" id="card-ci">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="ci-progress">NEW</div>
+                                <div class="module-icon">💙</div>
+                                <div class="module-title">COMPASSIONATE INQUIRY</div>
+                                <div class="module-author">Gabor Maté Method</div>
+                                <div class="module-description">
+                                    Master Maté's therapeutic approach. Learn: curious presence, body awareness, belief exploration, 
+                                    tracking process, authentic self reconnection, trauma-informed pacing.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">9</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">3</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">27</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-ci">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-ci"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-dots" id="dots-approaches"></div>
+                    <div class="swipe-hint">← SWIPE TO BROWSE →</div>
+                </div>
+
+                <!-- FOUNDATIONAL TEXTS Section -->
+                <div class="section-header">
+                    <div class="section-title">📖 FOUNDATIONAL TEXTS 📖</div>
+                    <div class="section-subtitle">Essential books on trauma, development & psychology</div>
+                </div>
+
+                <div class="carousel-container" id="carousel-texts">
+                    <button class="carousel-nav prev" onclick="moveCarousel('texts', -1)">◀</button>
+                    <button class="carousel-nav next" onclick="moveCarousel('texts', 1)">▶</button>
+                    
+                    <div class="carousel-track-wrapper">
+                        <div class="carousel-track" id="track-texts">
+                            <!-- Body Keeps Score Module -->
+                            <div class="module-card vdk new-module" onclick="launchModule('vdk', this)" id="card-vdk">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="vdk-progress">NEW</div>
+                                <div class="module-icon">🧠</div>
+                                <div class="module-title">THE BODY KEEPS THE SCORE</div>
+                                <div class="module-author">Bessel van der Kolk</div>
+                                <div class="module-description">
+                                    Understand how trauma reshapes body and brain. Learn: trauma neuroscience, body-based symptoms, 
+                                    dissociation, attachment disruption, somatic approaches, EMDR, yoga, neurofeedback.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">9</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">3</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">27</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-vdk">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-vdk"></div></div>
+                            </div>
+
+                            <!-- Hungry Ghosts Module -->
+                            <div class="module-card mate new-module" onclick="launchModule('mate', this)" id="card-mate">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="mate-progress">NEW</div>
+                                <div class="module-icon">👻</div>
+                                <div class="module-title">IN THE REALM OF HUNGRY GHOSTS</div>
+                                <div class="module-author">Gabor Maté</div>
+                                <div class="module-description">
+                                    Understand addiction through compassion. Learn: attachment roots, brain development, 
+                                    trauma connection, harm reduction, biopsychosocial model, recovery pathways.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">9</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">3</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">27</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-mate">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-mate"></div></div>
+                            </div>
+
+                            <!-- Drama of the Gifted Child Module -->
+                            <div class="module-card miller new-module" onclick="launchModule('miller', this)" id="card-miller">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="miller-progress">NEW</div>
+                                <div class="module-icon">🎭</div>
+                                <div class="module-title">DRAMA OF THE GIFTED CHILD</div>
+                                <div class="module-author">Alice Miller</div>
+                                <div class="module-description">
+                                    Explore childhood emotional wounds. Learn: false self development, narcissistic adaptation, 
+                                    depression origins, grieving process, therapeutic process, societal implications.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">9</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">3</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">27</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-miller">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-miller"></div></div>
+                            </div>
+
+                            <!-- Games People Play Module -->
+                            <div class="module-card berne new-module" onclick="launchModule('berne', this)" id="card-berne">
+                                <div class="loading-overlay"><div class="loading-spinner"></div></div>
+                                <div class="progress-badge" id="berne-progress">NEW</div>
+                                <div class="module-icon">🎲</div>
+                                <div class="module-title">GAMES PEOPLE PLAY</div>
+                                <div class="module-author">Eric Berne</div>
+                                <div class="module-description">
+                                    Master Transactional Analysis. Learn: ego states (Parent/Adult/Child), transactions, 
+                                    strokes, life positions, games, drama triangle, life scripts, achieving autonomy.
+                                </div>
+                                <div class="module-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">SKILLS</div>
+                                        <div class="stat-value">9</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">LEVELS</div>
+                                        <div class="stat-value">3</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">QUESTIONS</div>
+                                        <div class="stat-value">27</div>
+                                    </div>
+                                </div>
+                                <button class="launch-btn" id="btn-berne">→ START</button>
+                                <div class="module-progress-bar"><div class="module-progress-fill" id="bar-berne"></div></div>
+                            </div>
+
+                            <!-- Coming Soon Placeholder -->
+                            <div class="module-card coming-soon">
+                                <div class="coming-soon-badge">COMING SOON</div>
+                                <div class="module-icon">📖</div>
+                                <div class="module-title">MORE BOOKS</div>
+                                <div class="module-author">Expanding Library</div>
+                                <div class="module-description">
+                                    More transformative books coming soon to expand your therapeutic knowledge...
+                                </div>
+                                <button class="placeholder-btn">🔜 SOON</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-dots" id="dots-texts"></div>
+                    <div class="swipe-hint">← SWIPE TO BROWSE →</div>
+                </div>
+
+                <div class="footer">
+                    💾 PROGRESS SAVED LOCALLY • 🎮 LEARN AT YOUR OWN PACE
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Module configuration
+        const moduleConfig = {
+            psychodynamic: { key: 'psychodynamicAcademy', total: 12, url: 'psychodynamic-academy.html' },
+            mate: { key: 'hungryGhostsAcademy', total: 9, url: 'hungry-ghosts-academy.html' },
+            vdk: { key: 'bodyKeepsScoreAcademy', total: 9, url: 'body-keeps-score-academy.html' },
+            stdp: { key: 'stdpAcademy', total: 9, url: 'stdp-academy.html' },
+            ci: { key: 'compassionateInquiryAcademy', total: 9, url: 'compassionate-inquiry-academy.html' },
+            miller: { key: 'giftedChildAcademy', total: 9, url: 'gifted-child-academy.html' },
+            berne: { key: 'gamesPeoplePlayAcademy', total: 9, url: 'games-people-play-academy.html' }
+        };
+
+        // Carousel state
+        const carousels = {
+            approaches: { currentIndex: 0, itemCount: 3 },
+            texts: { currentIndex: 0, itemCount: 5 }
+        };
+
+        // Initialize carousels
+        function initCarousels() {
+            ['approaches', 'texts'].forEach(id => {
+                const track = document.getElementById(`track-${id}`);
+                const dotsContainer = document.getElementById(`dots-${id}`);
+                const cards = track.querySelectorAll('.module-card');
+                
+                carousels[id].itemCount = cards.length;
+                
+                // Create dots
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < cards.length; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = `carousel-dot${i === 0 ? ' active' : ''}`;
+                    dot.onclick = () => goToSlide(id, i);
+                    dotsContainer.appendChild(dot);
+                }
+                
+                // Add touch/swipe support
+                setupSwipe(track, id);
+                
+                // Update nav buttons
+                updateNavButtons(id);
+            });
+        }
+
+        // Move carousel
+        function moveCarousel(id, direction) {
+            const carousel = carousels[id];
+            const newIndex = carousel.currentIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < carousel.itemCount) {
+                goToSlide(id, newIndex);
+            }
+        }
+
+        // Go to specific slide
+        function goToSlide(id, index) {
+            const carousel = carousels[id];
+            const track = document.getElementById(`track-${id}`);
+            const trackWrapper = track.parentElement;
+            
+            carousel.currentIndex = Math.max(0, Math.min(index, carousel.itemCount - 1));
+            
+            // Each card is 100% width, so offset is simply index * 100%
+            const offset = carousel.currentIndex * 100;
+            track.style.transform = `translateX(-${offset}%)`;
+            
+            // Update dots
+            updateDots(id);
+            updateNavButtons(id);
+        }
+
+        // Update dot indicators
+        function updateDots(id) {
+            const dotsContainer = document.getElementById(`dots-${id}`);
+            const dots = dotsContainer.querySelectorAll('.carousel-dot');
+            
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === carousels[id].currentIndex);
+            });
+        }
+
+        // Update navigation buttons
+        function updateNavButtons(id) {
+            const carousel = carousels[id];
+            const container = document.getElementById(`carousel-${id}`);
+            const prevBtn = container.querySelector('.prev');
+            const nextBtn = container.querySelector('.next');
+            
+            prevBtn.disabled = carousel.currentIndex === 0;
+            nextBtn.disabled = carousel.currentIndex >= carousel.itemCount - 1;
+        }
+
+        // Setup swipe/touch support
+        function setupSwipe(track, id) {
+            let startX = 0;
+            let startY = 0;
+            let currentX = 0;
+            let isDragging = false;
+            let direction = null; // 'horizontal' or 'vertical' or null
+
+            const onStart = (e) => {
+                // Don't initiate drag on buttons
+                if (e.target.closest('.launch-btn, .placeholder-btn')) return;
+                
+                isDragging = true;
+                direction = null; // Reset direction detection
+                startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+                startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+                currentX = startX;
+                track.classList.add('dragging');
+            };
+
+            const onMove = (e) => {
+                if (!isDragging) return;
+                
+                const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+                const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+                
+                const diffX = clientX - startX;
+                const diffY = clientY - startY;
+                
+                // Determine direction on first significant movement
+                if (direction === null && (Math.abs(diffX) > 5 || Math.abs(diffY) > 5)) {
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        direction = 'horizontal';
+                    } else {
+                        direction = 'vertical';
+                        isDragging = false;
+                        track.classList.remove('dragging');
+                        return;
+                    }
+                }
+                
+                // Only handle horizontal swipes
+                if (direction !== 'horizontal') return;
+                
+                // Prevent vertical scrolling when swiping horizontally
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                
+                currentX = clientX;
+            };
+
+            const onEnd = (e) => {
+                if (!isDragging && direction !== 'horizontal') {
+                    direction = null;
+                    return;
+                }
+                
+                isDragging = false;
+                track.classList.remove('dragging');
+                
+                const diff = currentX - startX;
+                const threshold = 50;
+                
+                if (direction === 'horizontal' && Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        moveCarousel(id, -1);
+                    } else {
+                        moveCarousel(id, 1);
+                    }
+                } else {
+                    // Snap back to current position
+                    goToSlide(id, carousels[id].currentIndex);
+                }
+                
+                direction = null;
+            };
+
+            // Mouse events
+            track.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            // Touch events - use passive: false for touchmove to allow preventDefault
+            track.addEventListener('touchstart', onStart, { passive: true });
+            track.addEventListener('touchmove', onMove, { passive: false });
+            track.addEventListener('touchend', onEnd);
+
+            // Prevent click after drag
+            track.addEventListener('click', (e) => {
+                if (Math.abs(currentX - startX) > 10) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+        }
+
+        // Update module UI based on progress
+        function updateModuleUI(moduleId, percent) {
+            const card = document.getElementById('card-' + moduleId);
+            const badge = document.getElementById(moduleId + '-progress');
+            const btn = document.getElementById('btn-' + moduleId);
+            const bar = document.getElementById('bar-' + moduleId);
+
+            if (!card || !badge || !btn || !bar) return;
+
+            bar.style.width = percent + '%';
+
+            card.classList.remove('new-module', 'in-progress', 'completed');
+            btn.classList.remove('continue-btn', 'review-btn');
+
+            if (percent === 0) {
+                card.classList.add('new-module');
+                badge.textContent = 'NEW';
+                btn.textContent = '→ START';
+            } else if (percent < 100) {
+                card.classList.add('in-progress');
+                badge.textContent = percent + '%';
+                btn.textContent = '→ CONTINUE';
+                btn.classList.add('continue-btn');
+            } else {
+                card.classList.add('completed');
+                badge.textContent = '✓ COMPLETE';
+                btn.textContent = '★ REVIEW';
+                btn.classList.add('review-btn');
+            }
+        }
+
+        // Load progress for all modules
+        function loadProgress() {
+            Object.keys(moduleConfig).forEach(moduleId => {
+                const config = moduleConfig[moduleId];
+                const saved = localStorage.getItem(config.key);
+                
+                if (saved) {
+                    const state = JSON.parse(saved);
+                    const completed = state.completedSkills ? state.completedSkills.length : 0;
+                    const percent = Math.round((completed / config.total) * 100);
+                    updateModuleUI(moduleId, percent);
+                } else {
+                    updateModuleUI(moduleId, 0);
+                }
+            });
+
+            updateQuickStats();
+        }
+
+        function updateQuickStats() {
+            let totalCompleted = 0;
+            let totalXP = 0;
+
+            Object.keys(moduleConfig).forEach(moduleId => {
+                const config = moduleConfig[moduleId];
+                const saved = localStorage.getItem(config.key);
+                
+                if (saved) {
+                    const state = JSON.parse(saved);
+                    totalCompleted += state.completedSkills ? state.completedSkills.length : 0;
+                    totalXP += state.totalXp || 0;
+                }
+            });
+
+            animateNumber('total-completed', totalCompleted);
+            animateNumber('total-xp', totalXP);
+        }
+
+        function animateNumber(elementId, target) {
+            const el = document.getElementById(elementId);
+            const current = parseInt(el.textContent) || 0;
+            
+            if (current === target) return;
+            
+            const diff = target - current;
+            const steps = Math.min(Math.abs(diff), 20);
+            const increment = diff / steps;
+            let step = 0;
+
+            const interval = setInterval(() => {
+                step++;
+                if (step >= steps) {
+                    el.textContent = target;
+                    clearInterval(interval);
+                } else {
+                    el.textContent = Math.round(current + (increment * step));
+                }
+            }, 30);
+        }
+
+        // Launch module with loading animation
+        function launchModule(moduleType, cardElement) {
+            const config = moduleConfig[moduleType];
+            if (!config) return;
+
+            if (cardElement) {
+                cardElement.classList.add('loading');
+            }
+
+            setTimeout(() => {
+                window.location.href = config.url;
+            }, 300);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initCarousels();
+            loadProgress();
+            
+            // Handle window resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    ['approaches', 'texts'].forEach(id => {
+                        goToSlide(id, carousels[id].currentIndex);
+                    });
+                }, 100);
+            });
+        });
+
+        // Refresh progress periodically
+        setInterval(loadProgress, 3000);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                // Find which carousel is in view and navigate it
+                const approachesRect = document.getElementById('carousel-approaches').getBoundingClientRect();
+                const textsRect = document.getElementById('carousel-texts').getBoundingClientRect();
+                
+                if (approachesRect.top < window.innerHeight / 2 && approachesRect.bottom > window.innerHeight / 2) {
+                    moveCarousel('approaches', -1);
+                } else if (textsRect.top < window.innerHeight / 2 && textsRect.bottom > window.innerHeight / 2) {
+                    moveCarousel('texts', -1);
+                }
+            } else if (e.key === 'ArrowRight') {
+                const approachesRect = document.getElementById('carousel-approaches').getBoundingClientRect();
+                const textsRect = document.getElementById('carousel-texts').getBoundingClientRect();
+                
+                if (approachesRect.top < window.innerHeight / 2 && approachesRect.bottom > window.innerHeight / 2) {
+                    moveCarousel('approaches', 1);
+                } else if (textsRect.top < window.innerHeight / 2 && textsRect.bottom > window.innerHeight / 2) {
+                    moveCarousel('texts', 1);
+                }
+            }
+        });
+
+        console.log('%c🎮 LEARNING LIBRARY LOADED - CAROUSEL MODE', 'color: #0ff; font-size: 16px; font-weight: bold;');
+    </script>
+</body>
+</html>
