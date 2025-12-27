@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>GAMES PEOPLE PLAY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --primary: #fc0;
+            --secondary: #fd0;
+            --accent: #ff0;
+            --danger: #f00;
+            --bg-dark: #000;
+            --bg-card: #0a0a0a;
+            --bg-elevated: #111;
+            --border-subtle: #222;
+            --text-muted: #666;
+            
+            /* Mobile-first spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 24px;
+            --space-2xl: 32px;
+            
+            /* Touch-friendly sizing */
+            --touch-target: 44px;
+            --border-width: 3px;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            
+            /* Safe areas for notched phones */
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--bg-dark);
+            color: var(--primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-bottom: calc(70px + var(--safe-bottom));
+        }
+        
+        /* Subtle scanline effect - less intense for mobile */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.08) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Header - sticky with blur */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-top: calc(var(--space-md) + var(--safe-top));
+            border-bottom: var(--border-width) solid var(--primary);
+        }
+        
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 11px;
+            color: var(--secondary);
+            text-shadow: 2px 2px var(--danger), 0 0 20px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: var(--space-sm);
+            letter-spacing: 1px;
+        }
+        
+        /* XP Progress Bar */
+        .xp-section {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .xp-bar-outer {
+            background: var(--border-subtle);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-sm);
+            height: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .xp-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7px;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            white-space: nowrap;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xs);
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+        }
+        
+        .stat-label {
+            font-size: 5px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-size: 9px;
+            color: var(--accent);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: var(--space-md);
+            padding-left: calc(var(--space-md) + var(--safe-left));
+            padding-right: calc(var(--space-md) + var(--safe-right));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Path Indicator */
+        .path-indicator {
+            text-align: center;
+            font-size: 7px;
+            color: var(--text-muted);
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-sm);
+        }
+        
+        .path-name {
+            color: var(--accent);
+            font-size: 8px;
+        }
+        
+        /* Skill Cards Grid */
+        .skill-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .skill-card {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+        }
+        
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--border-subtle);
+            transition: background 0.2s;
+        }
+        
+        .skill-card.unlocked {
+            border-color: var(--primary);
+        }
+        
+        .skill-card.unlocked::before {
+            background: var(--primary);
+        }
+        
+        .skill-card.unlocked:active {
+            transform: scale(0.98);
+            background: #001a00;
+        }
+        
+        .skill-card.completed {
+            border-color: var(--accent);
+            background: rgba(255, 255, 0, 0.03);
+        }
+        
+        .skill-card.completed::before {
+            background: var(--accent);
+        }
+        
+        .skill-card.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .skill-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .skill-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .skill-title {
+            font-size: 8px;
+            color: var(--primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.4;
+        }
+        
+        .skill-card.completed .skill-title {
+            color: var(--accent);
+        }
+        
+        .skill-meta {
+            display: flex;
+            gap: var(--space-sm);
+            font-size: 6px;
+            color: var(--text-muted);
+        }
+        
+        .skill-xp {
+            color: var(--secondary);
+        }
+        
+        .skill-status {
+            margin-left: auto;
+            font-size: 16px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: var(--border-width) solid var(--primary);
+            padding: var(--space-sm);
+            padding-bottom: calc(var(--space-sm) + var(--safe-bottom));
+            z-index: 100;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 6px;
+            padding: var(--space-sm);
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: var(--radius-sm);
+        }
+        
+        .nav-btn:active {
+            background: rgba(0, 255, 0, 0.1);
+            transform: scale(0.95);
+        }
+        
+        .nav-btn .icon {
+            font-size: 20px;
+        }
+        
+        .nav-btn.home-btn {
+            color: var(--secondary);
+        }
+        
+        /* Modal - Full Screen on Mobile */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-dark);
+            z-index: 1000;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+        
+        .modal-overlay.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            min-height: 100%;
+            padding: var(--space-lg);
+            padding-top: calc(var(--space-lg) + var(--safe-top));
+            padding-bottom: calc(100px + var(--safe-bottom));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Lesson Header */
+        .lesson-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+        
+        .lesson-icon {
+            font-size: 40px;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .lesson-title {
+            font-size: 10px;
+            color: var(--secondary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.5;
+        }
+        
+        .lesson-subtitle {
+            font-size: 7px;
+            color: var(--accent);
+        }
+        
+        /* Teaching Section */
+        .teaching-section {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .teaching-text {
+            font-size: 9px;
+            line-height: 2;
+            color: var(--primary);
+            white-space: pre-wrap;
+        }
+        
+        /* Key Concepts */
+        .concepts-section {
+            margin-top: var(--space-xl);
+        }
+        
+        .concept-card {
+            background: var(--bg-dark);
+            border-left: 4px solid var(--accent);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        
+        .concept-title {
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .concept-text {
+            font-size: 8px;
+            line-height: 1.8;
+            color: var(--primary);
+            opacity: 0.9;
+        }
+        
+        /* Question Section */
+        .question-section {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .question-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: var(--space-xs);
+        }
+        
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-subtle);
+            border: 1px solid var(--text-muted);
+        }
+        
+        .progress-dot.current {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            box-shadow: 0 0 8px var(--secondary);
+        }
+        
+        .progress-dot.correct {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .progress-dot.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .score-display {
+            font-size: 7px;
+            color: var(--secondary);
+        }
+        
+        .score-value {
+            color: var(--accent);
+        }
+        
+        .question-text {
+            font-size: 10px;
+            line-height: 1.8;
+            color: var(--secondary);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--secondary);
+        }
+        
+        /* Answer Buttons */
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .answer-btn {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 8px;
+            line-height: 1.7;
+            padding: var(--space-lg);
+            text-align: left;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .answer-btn:active:not(.disabled) {
+            transform: scale(0.98);
+            background: #001a00;
+        }
+        
+        .answer-btn.selected {
+            border-color: var(--secondary);
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        .answer-btn.correct {
+            border-color: var(--primary);
+            background: rgba(0, 255, 0, 0.1);
+            animation: correctPulse 0.4s ease;
+        }
+        
+        .answer-btn.incorrect {
+            border-color: var(--danger);
+            background: rgba(255, 0, 0, 0.1);
+            animation: shake 0.4s ease;
+        }
+        
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        
+        /* Feedback */
+        .feedback-box {
+            margin-top: var(--space-lg);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            line-height: 1.8;
+            display: none;
+        }
+        
+        .feedback-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .feedback-box.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .feedback-box.incorrect {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        /* Modal Footer */
+        .modal-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-bottom: calc(var(--space-md) + var(--safe-bottom));
+            display: flex;
+            gap: var(--space-md);
+            z-index: 1001;
+        }
+        
+        .btn {
+            flex: 1;
+            font-family: inherit;
+            font-size: 8px;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: var(--touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .btn:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: #002200;
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-primary:active {
+            background: #003300;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+        
+        .btn-accent {
+            background: rgba(255, 255, 0, 0.1);
+            border: var(--border-width) solid var(--accent);
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Completion Screen */
+        .completion-screen {
+            text-align: center;
+            padding: var(--space-2xl) 0;
+        }
+        
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-lg);
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .completion-title {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        .completion-xp {
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats p {
+            font-size: 9px;
+            line-height: 2;
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* Empty state for when all skills completed */
+        .all-complete {
+            text-align: center;
+            padding: var(--space-2xl);
+            color: var(--accent);
+        }
+        
+        .all-complete-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .all-complete-text {
+            font-size: 9px;
+            line-height: 2;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            color: var(--primary);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Level badge in header */
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid var(--accent);
+            padding: 2px var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 7px;
+            color: var(--accent);
+        }
+        
+        /* Desktop enhancements */
+        @media (min-width: 768px) {
+            :root {
+                --space-md: 16px;
+                --space-lg: 20px;
+                --space-xl: 32px;
+            }
+            
+            .title {
+                font-size: 14px;
+            }
+            
+            .skill-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .skill-card:hover:not(.locked) {
+                transform: translateY(-2px);
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            }
+            
+            .teaching-text,
+            .question-text {
+                font-size: 10px;
+            }
+            
+            .answer-btn {
+                font-size: 9px;
+            }
+            
+            .answer-btn:hover:not(.disabled) {
+                background: #001a00;
+                border-color: var(--secondary);
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="title">🎭 GAMES PEOPLE PLAY 🎭</h1>
+            
+            <div class="xp-section">
+                <div class="xp-bar-outer">
+                    <div class="xp-bar-fill" id="xp-bar"></div>
+                    <div class="xp-text" id="xp-text">0 / 100 XP</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="level-display">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MASTERY</div>
+                    <div class="stat-value" id="mastery-display">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">STREAK</div>
+                    <div class="stat-value" id="streak-display">0🔥</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="path-indicator">
+            CURRENT PATH: <span class="path-name" id="current-path">FOUNDATIONS</span>
+        </div>
+        
+        <div class="skill-grid" id="skill-grid">
+            <!-- Skills populated by JS -->
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-buttons">
+            <button class="nav-btn home-btn" onclick="goHome()" aria-label="Go to Learning Hub">
+                <span class="icon">🏠</span>
+                <span>HOME</span>
+            </button>
+            <button class="nav-btn" onclick="saveProgress()" aria-label="Save progress">
+                <span class="icon">💾</span>
+                <span>SAVE</span>
+            </button>
+            <button class="nav-btn" onclick="loadProgress()" aria-label="Load progress">
+                <span class="icon">📁</span>
+                <span>LOAD</span>
+            </button>
+            <button class="nav-btn" onclick="resetProgress()" aria-label="Reset progress">
+                <span class="icon">🔄</span>
+                <span>RESET</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content" id="modal-content">
+            <!-- Content populated by JS -->
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // Game State
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            totalXp: 0,
+            streak: 0,
+            completedSkills: [],
+            skillProgress: {},
+            currentLesson: null,
+            currentQuestion: 0,
+            correctAnswers: 0,
+            questionResults: [] // Track each question result for progress dots
+        };
+        
+        // Skill Tree Data
+        const skillTree = [
+            // LEVEL 1: FOUNDATIONS
+            {
+                id: 'ego-states',
+                title: 'The Three Ego States',
+                icon: '👥',
+                level: 1,
+                xp: 20,
+                prereq: null,
+                lessons: [
+                    {
+                        title: 'Parent, Adult, Child',
+                        teaching: `Berne's foundational concept: Every person has THREE EGO STATES that shape how they communicate and relate.
+
+PARENT (P): Recordings of authority figures from childhood. Contains: values, rules, "shoulds," nurturing behaviors, critical judgments. Voice of tradition and authority.
+
+ADULT (A): Rational, objective, present-moment processor. Evaluates data, makes decisions, problem-solves. Not emotional, just factual. Computer-like.
+
+CHILD (C): Original feelings, spontaneity, creativity, needs. Contains: joy, fear, shame, playfulness, rebellion. Emotional self from childhood.
+
+These aren't roles we play but STATES we occupy. Can shift between them rapidly depending on stimulus. All three are necessary and valuable - goal is appropriate balance, not eliminating any.`,
+                        concepts: [
+                            {
+                                title: 'How to Recognize Ego States',
+                                text: 'PARENT: "You should...", "Always/Never...", finger wagging, nurturing tone. ADULT: "What are the facts?", calm inquiry, neutral tone. CHILD: "I want!", giggling, pouting, spontaneous emotion. Body language, tone, and word choice reveal which state is active.'
+                            },
+                            {
+                                title: 'Why This Matters Clinically',
+                                text: 'Most psychological problems involve: CONTAMINATED ADULT (Parent or Child beliefs masquerading as Adult logic), EXCLUDING states (only one state accessible), or CONSTANT CHILD (adult unable to access Adult state when needed). Treatment helps strengthen Adult, decontaminate thinking, access all states appropriately.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says: "I know I shouldn\'t feel this way, I\'m being ridiculous." Which ego state is speaking?',
+                                answers: [
+                                    { text: 'Adult - they\'re being rational', correct: false, feedback: 'Not Adult! Adult doesn\'t use "should" or judgmental language like "ridiculous." This is Parent criticizing Child.' },
+                                    { text: 'Parent criticizing Child - internal Parent is shaming their feelings', correct: true, feedback: 'EXACTLY! "Shouldn\'t feel" = Parent\'s rules about acceptable emotions. "Ridiculous" = Parent\'s judgment. Client\'s CHILD has feelings, internal PARENT attacks those feelings. This creates internal conflict and shame. Therapeutic intervention: help Adult mediate: "What IS the feeling (Adult observation)? What does Parent say about it? What does Child need?" Strengthen Adult\'s ability to evaluate: are Parent\'s rules helpful? Are Child\'s feelings valid? Usually: feelings ARE valid (Child is okay), Parent\'s criticism is internalized from childhood, Adult can choose different response.' },
+                                    { text: 'Child - they\'re expressing emotion', correct: false, feedback: 'Child has the feelings being referenced, but the SPEAKER here is Parent judging Child. "Shouldn\'t" is Parent vocabulary.' },
+                                    { text: 'All three at once', correct: false, feedback: 'While multiple states may be involved (Child feels, Parent judges), the SPEAKER in this moment is Parent. One state dominates communication at a time.' }
+                                ]
+                            },
+                            {
+                                question: 'What does it mean when someone is "stuck in Child"?',
+                                answers: [
+                                    { text: 'They\'re immature and need to grow up', correct: false, feedback: 'Judgmental framing! Being "stuck" isn\'t moral failure. It\'s psychological state - Adult isn\'t accessible or developed enough to regulate Child.' },
+                                    { text: 'Adult ego state isn\'t accessible - person responds from emotional Child state without Adult mediation, often due to trauma or stress', correct: true, feedback: 'YES! Person overwhelmed by Child feelings (fear, rage, shame) without Adult to evaluate/regulate. Common in: trauma survivors (Child state gets triggered, Adult goes offline), high stress (regression to Child), personality patterns (never developed strong Adult). Example: Adult criticism → immediate tears/rage/shutdown (Child response) vs. Adult pause, evaluate, respond appropriately. Treatment: strengthen Adult function, help person recognize when in Child, develop capacity to shift states. Not about eliminating Child (we NEED spontaneity, emotion) but accessing Adult when needed.' },
+                                    { text: 'They enjoy playing and being creative', correct: false, feedback: 'Healthy Child access (play, creativity) is GOOD! "Stuck in Child" means can\'t access Adult when Adult is needed (e.g., crisis, important decision).' },
+                                    { text: 'They\'re in touch with their inner child', correct: false, feedback: 'Being "stuck" is different from healthy access. Stuck = can\'t GET OUT of Child when situation requires Adult. Healthy = can move between states.' }
+                                ]
+                            },
+                            {
+                                question: 'Why is strengthening the Adult ego state important in therapy?',
+                                answers: [
+                                    { text: 'To get rid of Parent and Child', correct: false, feedback: 'Never eliminate states! All three are necessary. Adult mediates between them, doesn\'t replace them.' },
+                                    { text: 'Adult provides rational mediation between Parent rules and Child feelings - can evaluate which Parent messages to keep, which Child needs are valid', correct: true, feedback: 'CORE THERAPEUTIC GOAL! Adult is EXECUTIVE function that: evaluates Parent messages ("Is this rule helpful or harmful?"), validates Child feelings ("These feelings make sense"), makes conscious choices (not reactive), problem-solves, stays present. Example: Child feels angry, Parent says "anger is bad," Adult evaluates: "Anger is information. What\'s it telling me? How do I express it appropriately?" Person then CHOOSES response instead of: suppressing anger (obeying Parent), exploding (unchecked Child). Strong Adult = autonomy, self-regulation, conscious living.' },
+                                    { text: 'Adult is the only mature ego state', correct: false, feedback: 'All three states are part of mature functioning! Adult isn\'t "better" - it\'s different. Spontaneity (Child) and values (Parent) matter too.' },
+                                    { text: 'Therapy should make people more logical', correct: false, feedback: 'Not about pure logic! Adult uses logic but therapy also honors Child feelings and evaluates which Parent values serve the person. Integration, not just rationality.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'transactions',
+                title: 'Analyzing Transactions',
+                icon: '↔️',
+                level: 1,
+                xp: 25,
+                prereq: 'ego-states',
+                lessons: [
+                    {
+                        title: 'Complementary & Crossed',
+                        teaching: `TRANSACTION = unit of social interaction. One person's ego state addresses another person's ego state, gets response.
+
+COMPLEMENTARY TRANSACTION: Response comes from ego state that was addressed. Lines are parallel. Communication continues smoothly.
+Examples: 
+- Adult to Adult: "What time is it?" → "3 o'clock"
+- Parent to Child: "Clean your room!" → "Okay..." 
+- Child to Parent: "I need help!" → "I'll help you"
+
+CROSSED TRANSACTION: Response comes from DIFFERENT ego state than was addressed. Lines cross. Communication breaks down, conflict or misunderstanding results.
+Example: Adult to Adult: "Where are my keys?" → Parent to Child: "You're so irresponsible!" (Asked Adult, got Parent response)
+
+First rule of communication: As long as transactions remain complementary, communication can continue indefinitely. When transaction crosses, communication breaks.`,
+                        concepts: [
+                            {
+                                title: 'Why Crossed Transactions Matter',
+                                text: 'Most conflicts are CROSSED transactions. Person expects Adult response, gets Parent. Expects Parent response, gets rebellious Child. Therapeutic skill: identify the cross, help client recognize their pattern (do they always respond from Child when Adult is needed?), choose different ego state.'
+                            },
+                            {
+                                title: 'Clinical Application',
+                                text: 'When client describes conflict: diagram the transaction. Who spoke from which state? Who responded from which? Was it complementary or crossed? This reveals patterns: Does client\'s Child always hook others\' Parent? Does their Parent invite rebellion? Understanding pattern = changing it.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Partner A (Adult): "Can we talk about the budget?" Partner B (Child): "You\'re always criticizing me!" What happened?',
+                                answers: [
+                                    { text: 'Complementary transaction - Adult to Adult', correct: false, feedback: 'Not complementary! A addressed B\'s Adult but B responded from Child. Lines cross.' },
+                                    { text: 'Crossed transaction - A spoke Adult to Adult, B heard Parent to Child and responded from hurt Child', correct: true, feedback: 'PERFECT ANALYSIS! A\'s Adult made neutral inquiry. B\'s Child HEARD it as Parent criticism (probably due to history/sensitivity). B responded from wounded Child, not Adult. Transaction CROSSED. Result: communication breakdown. What A SAID (Adult: "let\'s discuss") ≠ what B HEARD (Parent: "you\'re bad with money"). Intervention: Help B recognize they heard Parent when A spoke Adult. Help B strengthen Adult to respond to actual message, not feared meaning. Help A ensure Adult message is clear, not Parent-contaminated.' },
+                                    { text: 'Partner B is being manipulative', correct: false, feedback: 'Not manipulation - genuine Child response to perceived Parent attack. B isn\'t being strategic, they\'re triggered.' },
+                                    { text: 'Both are in Adult', correct: false, feedback: 'A is in Adult but B responded from Child. That\'s the cross.' }
+                                ]
+                            },
+                            {
+                                question: 'Why do complementary transactions feel smooth even if they\'re problematic?',
+                                answers: [
+                                    { text: 'They\'re always healthy', correct: false, feedback: 'Not always healthy! Parent-Child complementary transactions can be dysfunctional (e.g., enabling, infantilizing) even though they feel smooth.' },
+                                    { text: 'Both parties are in expected ego states - even if dynamic is unhealthy (like Parent-Child dependency), there\'s no surprise or conflict', correct: true, feedback: 'EXACTLY! Complementary = expected, predictable, no disruption. But this can maintain dysfunction: Alcoholic Child: "I need help!" → Rescuing Parent: "I\'ll fix it for you" = complementary but enables addiction. Critical Parent: "You never do anything right" → Adapted Child: "You\'re right, I\'m sorry" = complementary but maintains abuse. Transactions flow smoothly because both play expected roles. No one crosses or challenges pattern. This is why dysfunction persists - it\'s COMFORTABLE (familiar, predictable). Treatment: help client see they can CROSS the transaction, choose different state, refuse to play complementary role.' },
+                                    { text: 'People are being authentic', correct: false, feedback: 'Complementary can be authentic OR scripted/defensive. Smoothness doesn\'t indicate authenticity, just predictability.' },
+                                    { text: 'No ego states are involved', correct: false, feedback: 'All transactions involve ego states! Complementary just means the states align as expected.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says: "My boss treats me like a child and I hate it." What\'s the TA analysis?',
+                                answers: [
+                                    { text: 'Boss is mean', correct: false, feedback: 'Too simplistic! TA analyzes the TRANSACTIONAL pattern, not just labeling behavior.' },
+                                    { text: 'Boss addresses client\'s Child from Parent. Client likely responds from Child (complementary) even though Adult would be more effective', correct: true, feedback: 'GREAT TA THINKING! Pattern: Boss Parent → Client Child (probably complementary, which is why it continues). Client FEELS infantilized but may be RESPONDING from Child (e.g., defensive, apologetic, rebellious) which reinforces boss\'s Parent. Intervention: "When boss speaks Parent to your Child, what happens? How do you respond? What if you responded from Adult instead?" Teach: Boss Parent: "You did this wrong" → Client Adult: "What specifically needs to change?" (refuses Child position). This CROSSES transaction, forces boss to engage Adult-Adult. Client can\'t control boss but can control their ego state.' },
+                                    { text: 'Client needs to find a new job', correct: false, feedback: 'Maybe, but TA offers intervention FIRST: change the transactional pattern. Client might recreate same dynamic at new job if they don\'t address their role.' },
+                                    { text: 'Boss and client are both in Adult', correct: false, feedback: 'No - boss is in Parent, client experiences being treated as Child. That\'s the issue.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'strokes',
+                title: 'Strokes & Recognition',
+                icon: '⭐',
+                level: 1,
+                xp: 30,
+                prereq: 'transactions',
+                lessons: [
+                    {
+                        title: 'The Need for Strokes',
+                        teaching: `STROKE = unit of recognition or attention. Can be verbal (compliment, criticism) or non-verbal (smile, touch, eye contact).
+
+Berne's radical claim: People NEED strokes to survive psychologically, just as infants need physical touch to thrive. "Stroke hunger" is fundamental human motivation.
+
+POSITIVE STROKES: Affirming, loving, appreciative. "Good job," hug, "I love you."
+NEGATIVE STROKES: Critical, painful, rejecting. "You're stupid," hit, ignoring.
+
+KEY PRINCIPLE: Negative strokes are better than NO strokes. People will provoke criticism, punishment, or conflict rather than be ignored. This explains much "bad" behavior - it's stroke-seeking.
+
+CONDITIONAL vs UNCONDITIONAL:
+- Conditional: "I love you when you..." (based on behavior)
+- Unconditional: "I love you because you exist" (based on being)
+
+Most people are STARVED for unconditional positive strokes. Settle for conditional positives or negative strokes.`,
+                        concepts: [
+                            {
+                                title: 'Stroke Economy',
+                                text: 'Society teaches restrictive rules about strokes: Don\'t give yourself strokes (self-praise is conceited). Don\'t ask for strokes you need (needy). Don\'t accept strokes offered (be modest). Don\'t reject strokes you don\'t want (be polite). Don\'t give strokes freely (save them). These rules create STROKE DEPRIVATION and psychological hunger.'
+                            },
+                            {
+                                title: 'Clinical Implications',
+                                text: 'Much pathology is stroke-seeking: attention-seeking behavior (any attention is better than none), staying in abusive relationships (negative strokes > no strokes), self-sabotage (negative strokes from self/others). Treatment: teach healthy stroke exchange, permission to ask for and accept positive strokes, develop internal stroke capacity.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Teenager repeatedly gets in trouble at school despite consequences. From stroke perspective, what\'s happening?',
+                                answers: [
+                                    { text: 'They\'re a bad kid who needs more punishment', correct: false, feedback: 'Punishment IS strokes! More punishment = more negative strokes = reinforcing behavior. Missing the TA analysis.' },
+                                    { text: 'Getting in trouble provides negative strokes (attention from teachers/parents) - better than being ignored. Behavior is stroke-seeking', correct: true, feedback: 'STROKE ANALYSIS! Teen learned: good behavior = ignored, bad behavior = attention (negative strokes). Unconsciously chose: negative attention > invisibility. Common pattern in children who feel unseen. Parents busy, distracted - child discovers misbehavior gets RESPONSE. Becomes stroke-seeking strategy. Intervention: flood with POSITIVE strokes for pro-social behavior, genuine attention when not acting out, teach to ask for strokes directly ("I need time with you"), reduce stroke-deprivation so negative stroke-seeking isn\'t necessary. Punishment alone fails because it PROVIDES strokes (negative), maintaining cycle.' },
+                                    { text: 'School is too strict', correct: false, feedback: 'May be true but misses the transactional analysis. Why does THIS teen keep provoking consequences? Stroke hunger.' },
+                                    { text: 'Teenager doesn\'t care about strokes', correct: false, feedback: 'Everyone needs strokes! Indifference to consequences means negative strokes are familiar/acceptable. Doesn\'t mean no stroke need.' }
+                                ]
+                            },
+                            {
+                                question: 'Client deflects every compliment: "Oh, it was nothing." What\'s the stroke dynamic?',
+                                answers: [
+                                    { text: 'They\'re humble and mature', correct: false, feedback: 'This is stroke rejection - violates natural stroke exchange. Not healthy humility but learned prohibition.' },
+                                    { text: 'Learned rule: "Don\'t accept strokes" (stroke economy). Prevents nourishment from positive strokes offered. Creates chronic stroke deprivation', correct: true, feedback: 'STROKE ECONOMY IN ACTION! Client follows rule: accepting compliments = conceited/arrogant. So deflects, rejects, minimizes. Result: STARVES even when positive strokes are offered. Like being hungry at buffet but not eating because "it\'s selfish." Therapeutic work: explore where rule came from (often family: "Don\'t get a big head"), give permission to RECEIVE strokes, practice saying "Thank you" to compliments (simple acceptance), notice internal resistance ("I feel wrong taking this in"). Breaking stroke economy rules is uncomfortable but necessary for stroke nourishment.' },
+                                    { text: 'They genuinely don\'t deserve compliments', correct: false, feedback: 'Stroke rejection happens regardless of whether compliment is "deserved." It\'s about rule against receiving, not accuracy of stroke.' },
+                                    { text: 'Other person is giving fake compliments', correct: false, feedback: 'Even if compliments are genuine, client can\'t receive them. That\'s the issue - blocks nourishment.' }
+                                ]
+                            },
+                            {
+                                question: 'Why would someone stay in a relationship where they\'re constantly criticized?',
+                                answers: [
+                                    { text: 'They like being criticized', correct: false, feedback: 'Not that they LIKE it - negative strokes are painful. But they\'re familiar and better than abandonment/emptiness.' },
+                                    { text: 'Negative strokes (criticism) are better than no strokes (being alone/ignored). Relationship provides stroke exchange even if painful', correct: true, feedback: 'STROKE HUNGER EXPLANATION! Person calculates (unconsciously): critical partner = regular negative strokes (painful but present), leaving = no strokes, potential loneliness, void. Chooses pain over emptiness. Especially if: grew up stroke-deprived, learned negative strokes are "normal," never experienced consistent positive strokes, fears abandonment more than criticism. Intervention: help client recognize they\'re settling for negative strokes, build capacity for self-stroking, develop positive stroke sources (friends, therapy, interests), challenge belief "harsh attention is better than none," eventually: leave OR partner changes stroke pattern. Key: address stroke deprivation or client will find another negative stroke source.' },
+                                    { text: 'They have low self-esteem', correct: false, feedback: 'True but incomplete. TA offers specific mechanism: stroke dynamics. Low self-esteem may result from chronic negative strokes/stroke deprivation.' },
+                                    { text: 'Love is supposed to hurt', correct: false, feedback: 'This belief may be present but TA explains WHY they believe it: learned negative strokes = love/attention. Can challenge belief by understanding stroke dynamics.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 2: INTERMEDIATE
+            {
+                id: 'life-positions',
+                title: 'Life Positions',
+                icon: '🎯',
+                level: 2,
+                xp: 35,
+                prereq: 'strokes',
+                lessons: [
+                    {
+                        title: 'I\'m OK, You\'re OK',
+                        teaching: `Berne identified FOUR LIFE POSITIONS - fundamental stances people take about self and others:
+
+1. I'M OK, YOU'RE OK: Healthy position. Both self and others are worthwhile. Basis for authentic relating, collaboration, Adult-Adult transactions. This is where we want to be.
+
+2. I'M NOT OK, YOU'RE OK: Depressive position. "I'm less than, you're better." Leads to: one-down stance, self-deprecation, Child seeking Parent approval, staying in bad relationships.
+
+3. I'M OK, YOU'RE NOT OK: Paranoid/blaming position. "I'm fine, you're the problem." Leads to: arrogance, blaming others, Critical Parent, refuses responsibility for problems.
+
+4. I'M NOT OK, YOU'RE NOT OK: Futility position. "Nothing matters, everyone's bad." Leads to: hopelessness, withdrawal, despair. "Why bother?" Dangerous - can lead to suicide or violence.
+
+Most people operate from one position habitually. Position is DECISION made early in life based on experiences with caregivers. Can be changed but requires conscious work.`,
+                        concepts: [
+                            {
+                                title: 'How Positions Form',
+                                text: 'Infant starts "I\'m OK, You\'re OK" (basic trust). If needs are met, position holds. If neglected, abused, inconsistently cared for: child decides "I\'m not OK" (something wrong with me) or "You\'re not OK" (can\'t trust others). These decisions become unconscious operating assumptions about self/world.'
+                            },
+                            {
+                                title: 'Therapeutic Goal',
+                                text: 'Move client toward "I\'m OK, You\'re OK." This doesn\'t mean everyone is perfect - means accepting self and others as worthwhile despite imperfections. Requires: Adult evaluation (not Parent judgment or Child shame), reality testing (challenging old decisions), new experiences (relationships that confirm OK-ness).'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client constantly apologizes, assumes everything is their fault, defers to others. What life position?',
+                                answers: [
+                                    { text: 'I\'m OK, You\'re OK', correct: false, feedback: 'No - healthy position involves mutual regard. This is one-down, self-blaming.' },
+                                    { text: 'I\'m Not OK, You\'re OK - feels inferior, others are better/right, seeks approval', correct: true, feedback: 'CLASSIC "I\'m Not OK, You\'re OK"! Client believes: others know better, I\'m less than, my needs don\'t matter, I must please to be acceptable. Results in: chronic apology, self-blame, difficulty setting boundaries, tolerating mistreatment. Formed from: childhood where worth was conditional, criticism without support, love was earned not given. Intervention: challenge position - "What evidence do you have you\'re Not OK? Is this Child decision or Adult reality?" Provide unconditional positive strokes, help client catch self-deprecation, practice Adult equality ("I\'m as worthwhile as you"), permission to have needs/boundaries.' },
+                                    { text: 'I\'m OK, You\'re Not OK', correct: false, feedback: 'Opposite! This position blames others. Client is blaming SELF, elevating others.' },
+                                    { text: 'I\'m Not OK, You\'re Not OK', correct: false, feedback: 'This is futility/hopelessness about both self and others. Client sees others as OK (better than self), just not self.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says: "Everyone is incompetent. I have to do everything myself or it won\'t get done right." Life position?',
+                                answers: [
+                                    { text: 'I\'m OK, You\'re Not OK - sees self as capable, others as deficient/untrustworthy', correct: true, feedback: 'TEXTBOOK "I\'m OK, You\'re Not OK"! Client elevated self, devalued others. Leads to: arrogance, control, inability to collaborate, Critical Parent dominance, loneliness (can\'t connect from superior position). Often masks insecurity but conscious experience is "I\'m right, they\'re wrong." Formed from: childhood where trust was betrayed, learned "only I can protect myself," or inflated by parents who said "you\'re better than others." Intervention: challenge - "Is it true NO ONE is competent? What\'s the cost of this position?" Explore fear beneath arrogance (often terror of vulnerability/depending on others), help develop realistic Adult assessment (people have different strengths), practice trusting small things to others.' },
+                                    { text: 'I\'m Not OK, You\'re OK', correct: false, feedback: 'Reversed! This client sees SELF as superior, others as inadequate.' },
+                                    { text: 'I\'m OK, You\'re OK', correct: false, feedback: 'Healthy position accepts both self and others. This is dismissive of others, not accepting.' },
+                                    { text: 'I\'m Not OK, You\'re Not OK', correct: false, feedback: 'Client sees self as OK (capable). It\'s others who are not OK in their view.' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s dangerous about "I\'m Not OK, You\'re Not OK" position?',
+                                answers: [
+                                    { text: 'It makes people too humble', correct: false, feedback: 'Not humility - it\'s DESPAIR. No hope in self or others. Very different from healthy humility.' },
+                                    { text: 'Complete futility - "nothing matters, no one is worthwhile." Can lead to suicide (if focus inward) or violence (if focus outward)', correct: true, feedback: 'MOST DANGEROUS POSITION! Person sees: self as worthless (Not OK), others as worthless (Not OK), no hope for change, no point in living/trying. Results: Suicide - "I\'m not OK, might as well die," Homicide/violence - "No one\'s OK, might as well destroy," Withdrawal - "Why bother with anything?" This is despair position. Intervention: URGENT - assess suicide/homicide risk, hospitalize if needed, intensive therapy to restore hope, challenge position ("Is this true?"), provide positive strokes, help find ONE thing that\'s OK (crack the position). Even small shift ("Maybe YOU\'re OK even if I\'m not") reduces danger.' },
+                                    { text: 'It makes people too confident', correct: false, feedback: 'Opposite! This is despair, no confidence in anyone/anything.' },
+                                    { text: 'People in this position are just realistic', correct: false, feedback: 'This is distorted thinking from despair, not Adult reality. Nihilism masquerading as realism. Requires challenge and treatment.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'games-concept',
+                title: 'Understanding Games',
+                icon: '🎮',
+                level: 2,
+                xp: 40,
+                prereq: 'life-positions',
+                lessons: [
+                    {
+                        title: 'Psychological Games',
+                        teaching: `GAME (Berne's definition): Series of complementary transactions leading to predictable outcome with HIDDEN AGENDA and PAYOFF. Not playful - actually destructive.
+
+Characteristics of Games:
+1. REPETITIVE - same pattern over and over
+2. Outside AWARENESS - players don't realize they're playing
+3. Has PAYOFF - reinforces life position, gets strokes, avoids intimacy
+4. Ends with BAD FEELING - anger, guilt, hurt, confusion
+
+Structure: Hook → Response → Switch → Crossup → Payoff
+
+Example: "Why Don't You, Yes But" Game
+- Hook: "I have this problem..."
+- Response: "Why don't you try X?"
+- Switch: "Yes but that won't work because..."
+- Crossup: Helper feels frustrated, gives up
+- Payoff: Player proves "nobody can help me" (reinforces position)
+
+Games are played from Child or Parent ego states, NOT Adult. Adult can recognize games but doesn't play them.`,
+                        concepts: [
+                            {
+                                title: 'Why People Play Games',
+                                text: 'Games provide: strokes (even negative), reinforcement of life position ("See, I\'m Not OK"), avoidance of intimacy (games create distance), structure (predictability), excitement (drama). Games are SUBSTITUTE for authentic relating. People learned them in childhood as survival strategies.'
+                            },
+                            {
+                                title: 'Stopping Games',
+                                text: 'Can\'t stop games by willpower - unconscious. Need: AWARENESS (recognize the pattern), Adult intervention (refuse to play expected role), intimacy (replace games with genuine connection), examine payoff (what does game provide? get needs met differently).'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client always creates drama right before therapy breakthrough. What\'s likely happening?',
+                                answers: [
+                                    { text: 'Bad luck with timing', correct: false, feedback: 'Pattern is too consistent for luck. This is game: creates crisis to avoid breakthrough (intimacy/change).' },
+                                    { text: 'Playing game to avoid intimacy/change - crisis provides excuse to retreat to familiar patterns, gets strokes, prevents vulnerability of growth', correct: true, feedback: 'GAME ANALYSIS! Pattern: approaching real change/intimacy → unconscious anxiety → create crisis (fight, relapse, emergency) → retreat from growth → familiar bad feeling (payoff). Why? Intimacy/change is SCARY (unknown, vulnerable). Games are SAFE (known, predictable). Crisis gets: attention/strokes, avoids scariness of breakthrough, proves "I can\'t change" (life position), maintains distance from therapist. Intervention: name pattern - "I notice whenever we get close to X, Y happens." Explore fear, resist getting hooked into crisis (stay Adult), empathize with scared Child, make breakthrough safer, address what game provides (strokes, structure) with healthier means.' },
+                                    { text: 'They need more skills before breakthrough', correct: false, feedback: 'Skills might help but missing game dynamic. This is AVOIDANCE pattern, not skill deficit.' },
+                                    { text: 'Therapist is pushing too hard', correct: false, feedback: 'Possible but doesn\'t explain client\'s predictable pattern. Client creates crisis as game move, whether therapist pushes or not.' }
+                                ]
+                            },
+                            {
+                                question: 'How is a psychological game different from ordinary conflict?',
+                                answers: [
+                                    { text: 'Games are worse', correct: false, feedback: 'Not necessarily more intense - different in STRUCTURE. Games are repetitive, unconscious, have hidden payoff. Conflicts can be conscious, direct, resolvable.' },
+                                    { text: 'Games are repetitive, unconscious, have hidden agenda and payoff. Conflicts can be one-time, conscious, direct, and resolved through Adult communication', correct: true, feedback: 'KEY DISTINCTION! GAME: same pattern repeats, players unaware of pattern, ulterior motive (reinforcing position, getting strokes), predictable bad feeling payoff, can\'t be resolved (because unconscious). CONFLICT: may be first time, both aware of disagreement, stated positions match real positions, can resolve through Adult discussion, leads to resolution or understanding. Example: GAME - couple fights about dishes every week, same script, ends with "you don\'t appreciate me" feeling. CONFLICT - disagree about vacation destination, discuss pros/cons, reach decision. Therapy: help clients recognize games (awareness), strengthen Adult (conscious choice), develop intimacy (replacement for games).' },
+                                    { text: 'Games are fun, conflicts aren\'t', correct: false, feedback: 'Despite name, games are NOT fun! They\'re compulsive, destructive patterns. "Game" is ironic - serious psychological traps.' },
+                                    { text: 'No difference', correct: false, feedback: 'Huge difference! Games are specific transactional patterns with unconscious payoffs. Not all conflict is game.' }
+                                ]
+                            },
+                            {
+                                question: 'Client plays "Kick Me" - repeatedly provokes others to reject them then feels hurt. What\'s the payoff?',
+                                answers: [
+                                    { text: 'They enjoy pain', correct: false, feedback: 'Pain isn\'t enjoyed - it\'s PAYOFF. Painful but serves function: confirms belief, gets strokes, feels familiar.' },
+                                    { text: 'Payoff: confirms "I\'m Not OK" life position, gets strokes (negative but attention), avoids intimacy (rejection prevents closeness)', correct: true, feedback: 'CLASSIC "KICK ME" ANALYSIS! Pattern: provoke → get rejected → feel hurt. WHY? PAYOFF serves multiple functions: 1) Confirms position - "See, I\'m Not OK, people reject me" (proves childhood belief), 2) Strokes - rejection is negative attention (better than none), 3) Avoids intimacy - if rejected, don\'t risk closeness (safer), 4) Familiar - hurt feels "right" (childhood template). Person isn\'t conscious of provoking or payoff - just feels "this always happens to me." Intervention: break pattern awareness ("I notice you often..." - name provocation), explore payoff ("What does getting rejected PROVE?"), challenge position ("What if you\'re OK and can be accepted?"), practice new behavior (don\'t provoke), tolerate intimacy (scarier than rejection).' },
+                                    { text: 'Other people are mean', correct: false, feedback: 'Client PROVOKES rejection - not just victim of meanness. Games involve both players. Must address client\'s role.' },
+                                    { text: 'No payoff - just bad pattern', correct: false, feedback: 'All games have payoff! That\'s what maintains them. Pattern persists BECAUSE of payoff, not despite it.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'drama-triangle',
+                title: 'The Drama Triangle',
+                icon: '🔺',
+                level: 2,
+                xp: 35,
+                prereq: 'games-concept',
+                lessons: [
+                    {
+                        title: 'Victim, Rescuer, Persecutor',
+                        teaching: `Stephen Karpman's DRAMA TRIANGLE - map of game roles (extension of Berne's work):
+
+Three roles people play in games:
+
+VICTIM: "Poor me" - helpless, oppressed, needs rescue. Actually often manipulative ("You have to help me!"). Not genuine victim - game player.
+
+RESCUER: "I'll save you" - helps without being asked, enables, feels superior. Actually keeps Victim helpless. Needs Victim to feel worthy.
+
+PERSECUTOR: "It's all your fault" - blames, criticizes, punishes. Sees others as wrong/bad. Often former Victim or Rescuer who got fed up.
+
+KEY: People ROTATE through roles! Rescuer becomes Persecutor ("After all I've done for you!"). Victim becomes Persecutor ("You never help me right!"). Persecutor becomes Victim ("Everyone's against me!").
+
+All three roles are GAMES - inauthentic positions from Parent or Child ego states. Adult doesn't play triangle - Adult genuinely helps (not Rescues), takes responsibility (not blames), asks for help directly (not plays Victim).`,
+                        concepts: [
+                            {
+                                title: 'Getting Off the Triangle',
+                                text: 'Exit requires Adult: Stop Rescuing (offer help only when asked, let people handle consequences). Stop Persecuting (express needs/feelings directly, don\'t blame). Stop Playing Victim (take responsibility, ask clearly for what you need). Hard because roles feel RIGHT and provide payoffs.'
+                            },
+                            {
+                                title: 'Why Families Stay on Triangle',
+                                text: 'Triangle is stable system - each role needs the others. Rescuer needs Victim to save. Persecutor needs Victim to blame. Victim needs Rescuer and Persecutor. If one person exits, others feel destabilized, may increase game intensity to pull person back. Family therapy: help everyone get off triangle together.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Partner always "helps" by doing things client didn\'t ask for, then resents client. What\'s happening?',
+                                answers: [
+                                    { text: 'Partner is thoughtful and kind', correct: false, feedback: 'Unsolicited help that leads to resentment is RESCUING (triangle role), not authentic helping.' },
+                                    { text: 'Partner is Rescuing (helping without being asked) then switching to Persecutor (resenting, blaming) - classic triangle rotation', correct: true, feedback: 'DRAMA TRIANGLE IN ACTION! Pattern: Partner Rescues ("I\'ll do this for you even though you didn\'t ask") → builds resentment ("You don\'t appreciate me") → switches to Persecutor ("After all I\'ve done, you\'re so ungrateful!"). Meanwhile client may be in Victim (accepts help, feels guilty) or switch to Persecutor ("I didn\'t ask you to do that!"). RESCUING isn\'t helping - it\'s: doing what wasn\'t requested, keeping other person "one-down," creating debt/obligation, feeling superior. Intervention: help partner exit Rescuer (only help when asked), teach client to ask directly (not accept Rescuing), both practice Adult communication ("Do you want help?" "Yes/No, thanks").' },
+                                    { text: 'Client is ungrateful', correct: false, feedback: 'This is Persecutor language! Both are playing triangle. Client may not have WANTED unrequested "help."' },
+                                    { text: 'This is healthy interdependence', correct: false, feedback: 'Healthy helping is requested, appreciated, mutual. This is game - unsolicited help → resentment = triangle dynamic.' }
+                                ]
+                            },
+                            {
+                                question: 'Why does Rescuing actually keep the Victim helpless?',
+                                answers: [
+                                    { text: 'Rescuing is mean', correct: false, feedback: 'Not mean - misguided. Feels helpful but creates dependency, prevents growth.' },
+                                    { text: 'Rescuer does for Victim what they could do themselves - prevents learning, maintains helplessness, keeps Victim in one-down position', correct: true, feedback: 'PRECISELY! Rescuing versus Helping: RESCUING - do for others what they can/should do for themselves, don\'t let them face consequences, need them to stay helpless (validates Rescuer), keeps Victim weak. HELPING - assist when genuinely needed, support person\'s competence, let them face manageable consequences, empower. Example: Adult child struggles financially. RESCUING: pay their bills (they never learn). HELPING: "I\'ll help you make a budget. You\'re capable of managing this." Rescuing NEEDS Victim to stay Victim (otherwise Rescuer has no role). Therapeutic stance: don\'t Rescue clients! Support their Adult competence, tolerate their struggle (builds strength), celebrate their growth (not dependency).' },
+                                    { text: 'Victims are beyond help', correct: false, feedback: 'No! People playing Victim ROLE can be empowered. It\'s the game role that\'s limiting, not the person\'s capacity.' },
+                                    { text: 'Rescuing makes people lazy', correct: false, feedback: 'Not laziness - learned helplessness. Rescuing teaches "I can\'t do this myself, I need saving." Undermines competence belief.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says: "I keep trying to help my friend but she won\'t change. I\'m ready to give up on her!" What triangle shift?',
+                                answers: [
+                                    { text: 'Rescuer (trying to help/fix friend) switching to Persecutor (blaming, threatening to abandon)', correct: true, feedback: 'TEXTBOOK TRIANGLE ROTATION! Pattern: Start as Rescuer - "I\'ll save you!" (unsolicited advice, trying to fix), Friend doesn\'t change (why would she? Didn\'t ask for saving), Rescuer frustrated → switches to Persecutor - "You won\'t change, I give up!" (blaming, abandoning). This is predictable triangle dynamic. Next: may become Victim ("She used me"), Friend may become Persecutor ("You never really helped"), etc. Intervention: help client exit triangle - "Did friend ASK for your help? What if you let her handle her life? What\'s YOUR life about?" Move from Rescuing to healthy boundaries: support without fixing, accept friend\'s choices, focus on own life, offer help only if requested.' },
+                                    { text: 'Client is being healthy by setting boundaries', correct: false, feedback: 'Healthy boundaries come from Adult. This is Persecutor blame/threat, not Adult boundary. "I give up on you" is abandonment, not limit.' },
+                                    { text: 'Friend is the problem', correct: false, feedback: 'Triangle involves BOTH people. Client chose to Rescue (not requested), now blames friend for "not changing." Both playing games.' },
+                                    { text: 'Client needs to try harder', correct: false, feedback: 'More Rescuing? No! Client needs to STOP Rescuing, get off triangle, respect friend\'s autonomy.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 3: ADVANCED  
+            {
+                id: 'scripts',
+                title: 'Life Scripts',
+                icon: '📜',
+                level: 3,
+                xp: 45,
+                prereq: 'drama-triangle',
+                lessons: [
+                    {
+                        title: 'The Unconscious Life Plan',
+                        teaching: `SCRIPT = unconscious life plan formed in childhood based on parental messages and early decisions. Like theater script - predetermined outcome.
+
+Script contains:
+- LIFE POSITION (I'm OK/Not OK, You're OK/Not OK)
+- MAIN THEME (what life is about - struggle, pleasure, waiting, etc.)
+- LIFE COURSE (how life will go - success, failure, tragic, happy)
+- ENDING (how it will turn out - early death, alone, triumph, mediocrity)
+
+Script is written by age 7 based on: Parental messages ("You're so smart," "You'll never amount to anything"), Early experiences (trauma, joy, neglect), Child's interpretation ("I must be bad," "I have to be perfect").
+
+Script is POWERFUL - people unconsciously live it out. Choose partners, careers, behaviors that FIT script. Script feels like "fate" or "just how I am" but it's actually learned program.
+
+Scripts can be WINNERS (successful, positive), LOSERS (tragic, failing), or NON-WINNERS (get by but no real fulfillment).`,
+                        concepts: [
+                            {
+                                title: 'Script Messages',
+                                text: 'Parents give ATTRIBUTIONS ("You\'re the smart one") and INJUNCTIONS ("Don\'t feel," "Don\'t be close"). Child accepts these as truth, builds script around them. Adult client may not remember messages consciously but script reveals them. Script analysis uncovers these hidden programs.'
+                            },
+                            {
+                                title: 'Changing Scripts',
+                                text: 'Script feels REAL but is actually DECISION made by child. Can be REDECIDED by Adult. Therapy: make script conscious, challenge child\'s conclusions, give permission for different life, support redecision, behavioral change to match new script. Hard because old script is comfortable, familiar, "who I am."'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client always sabotages success right before achieving goals. Script analysis would explore:',
+                                answers: [
+                                    { text: 'Whether they\'re lazy', correct: false, feedback: 'Not laziness! This is scripted behavior - unconscious program that says "don\'t succeed." Need to find script message.' },
+                                    { text: 'Early messages about success - did parents say "don\'t be successful" (injunction) or "you\'ll fail" (attribution)? What did child decide?', correct: true, feedback: 'SCRIPT ANALYSIS! Pattern (sabotaging success) suggests script message against succeeding. Explore: What did parents say about success? ("Don\'t outdo me," "Success is dangerous," "You\'re not capable"). What happened when you succeeded as child? (Parents felt threatened? Punished you? Ignored you?). What did you decide? ("If I succeed, I\'ll lose love/connection"). Script: "Don\'t succeed" or "You\'re a failure." Played out: get close to goal → anxiety → sabotage → familiar failure. Intervention: uncover message, challenge ("Is this still true?"), give permission ("You can succeed"), redecision ("I choose success"), support through anxiety of breaking script, celebrate not sabotaging.' },
+                                    { text: 'They just need better time management', correct: false, feedback: 'Skills won\'t override script! Sabotage is unconscious program, not skill deficit. Script must be addressed.' },
+                                    { text: 'Bad luck', correct: false, feedback: 'Pattern too consistent for luck. This is scripted - person unconsciously creates sabotage to fulfill script.' }
+                                ]
+                            },
+                            {
+                                question: 'What makes script so hard to change?',
+                                answers: [
+                                    { text: 'Script is genetic and unchangeable', correct: false, feedback: 'Scripts are learned, not genetic! Can be changed but it\'s difficult psychologically.' },
+                                    { text: 'Script formed in childhood feels like identity, reality, "how things are" - changing means questioning core beliefs, facing fear of unknown, risking loss of familiar (even if painful)', correct: true, feedback: 'WHY SCRIPTS PERSIST! Script = "who I am" (identity), "how life is" (reality), "what will happen" (predictability). Change requires: questioning beliefs ("Am I really unlovable?"), tolerating anxiety (new script = unknown, scary), grieving (loss of familiar identity, even if painful), risking (what if new script fails?), contradicting parents (script was their message - changing = defying them). Example: "Don\'t be close" script keeps relationships distant BUT safe, familiar, matches identity as "loner." Intimacy = terrifying, unknown, contradicts script. Therapy provides: safety to explore, challenge to old script, permission for new choices, support through anxiety of change, reinforcement of redecisions.' },
+                                    { text: 'People are stubborn', correct: false, feedback: 'Not stubbornness - psychological resistance rooted in identity, safety, familiarity. Change threatens core sense of self.' },
+                                    { text: 'Therapists don\'t try hard enough', correct: false, feedback: 'Not about therapist effort. Script change is client\'s work, extremely challenging because script = identity. Requires client readiness, courage, support.' }
+                                ]
+                            },
+                            {
+                                question: 'Client chooses same "type" of partner repeatedly despite bad outcomes. From script perspective:',
+                                answers: [
+                                    { text: 'They have bad taste', correct: false, feedback: 'Not taste - script! Pattern reveals unconscious program selecting partners who fit script roles.' },
+                                    { text: 'Partner choice fits script - selects people who will play complementary game roles, confirm life position, lead to scripted outcome', correct: true, feedback: 'SCRIPT IN PARTNER CHOICE! Pattern reveals: If script says "I\'m Not OK, You\'re OK" → choose critical partners (confirms position). If script says "Don\'t be close" → choose unavailable partners. If script ending is "tragic" → choose partners who will hurt them. If playing "Kick Me" → choose people who will reject them. Unconscious draws person to FAMILIAR dynamics, script-confirming situations. Even if painful, it FITS. Intervention: "Notice pattern - what role do these partners play in your script? What position do they confirm? What ending do they lead to?" Help see: not choosing partners despite script but BECAUSE OF script. Redecide script ("I can be OK," "Intimacy is safe"), choose different partners (Adult assessment not script pull), tolerate discomfort of healthy relationships (feels wrong because unfamiliar).' },
+                                    { text: 'Coincidence', correct: false, feedback: 'Pattern too consistent! Script unconsciously guides choices to familiar, script-confirming situations/people.' },
+                                    { text: 'All partners are the same', correct: false, feedback: 'Partners differ but client selects TYPE that fits script. It\'s the selection process (script-driven) that creates pattern.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'autonomy',
+                title: 'Achieving Autonomy',
+                icon: '🦅',
+                level: 3,
+                xp: 40,
+                prereq: 'scripts',
+                lessons: [
+                    {
+                        title: 'Script-Free Living',
+                        teaching: `AUTONOMY is Berne's therapeutic goal: freedom from script, games, and compulsive patterns. Autonomy has three components:
+
+1. AWARENESS: Living in present moment, perceiving reality clearly (not through script filter). Seeing what IS rather than what script says should be.
+
+2. SPONTANEITY: Choosing freely in the moment (not scripted responses). Accessing full range of ego states appropriately. Authentic self-expression.
+
+3. INTIMACY: Genuine connection without games, role-playing, or hidden agendas. Adult-Adult relating. Vulnerability and authenticity.
+
+Autonomous person: Knows their script but isn't controlled by it. Can play when appropriate but not compulsively. Lives consciously, makes real choices, relates authentically.
+
+This is rare. Most people are 95% scripted. Autonomy is ongoing practice, not permanent achievement. Requires constant awareness, choosing, relating.`,
+                        concepts: [
+                            {
+                                title: 'Awareness as Foundation',
+                                text: 'Can\'t change what you\'re not aware of. First step: recognize ego states, transactions, games, script patterns. This awareness creates CHOICE - instead of automatic script response, can pause and choose differently. Adult observation: "I\'m about to play this game. What if I don\'t?"'
+                            },
+                            {
+                                title: 'Intimacy Scares People',
+                                text: 'Genuine intimacy (game-free, authentic) is TERRIFYING for most people because: requires vulnerability (no defenses), can\'t predict outcome (no script), risks rejection (showing real self), demands Adult-Adult equality. Games feel safer - predictable, defended, scripted. Therapy helps tolerate intimacy\'s uncertainty.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says: "I catch myself about to do the old pattern and I can choose differently now." What capacity have they developed?',
+                                answers: [
+                                    { text: 'Denial', correct: false, feedback: 'Opposite! This is AWARENESS - seeing pattern in real-time, creating choice point. Foundation of autonomy.' },
+                                    { text: 'Awareness - can observe own process, recognize script/game moments, create space to choose differently', correct: true, feedback: 'AUTONOMY EMERGING! This is HUGE: person developed Adult observer - "I notice I\'m about to play Kick Me game" or "This is my script talking." Creates PAUSE between impulse and action. Space where choice lives. Before: automatic (script → behavior). Now: conscious (script urge → awareness → choice → different behavior). Still feels pull of script/game but doesn\'t have to obey. This is freedom. Strengthen by: celebrating awareness ("You noticed!"), supporting different choice, tolerating discomfort (new behavior feels wrong/scary), reinforcing Adult observer, noting cumulative changes. Eventually new choices become natural, script loosens, autonomy increases.' },
+                                    { text: 'Intellectualization', correct: false, feedback: 'Not just thinking ABOUT patterns - actually NOTICING in moment and CHOOSING differently. That\'s behavior change, not just analysis.' },
+                                    { text: 'Lying to themselves', correct: false, feedback: 'Why would this be deception? They\'re reporting genuine awareness and choice. This is growth.' }
+                                ]
+                            },
+                            {
+                                question: 'Why is intimacy (Berne\'s definition) so difficult for most people?',
+                                answers: [
+                                    { text: 'People are selfish', correct: false, feedback: 'Not selfishness - FEAR! Intimacy requires vulnerability which triggers survival fears learned in childhood.' },
+                                    { text: 'Intimacy requires vulnerability, authenticity, no games - this means unpredictability, risk of rejection, no script to follow. Games feel safer', correct: true, feedback: 'WHY INTIMACY IS RARE! Intimacy = game-free, authentic, vulnerable, Adult-Adult. This means: Can\'t hide (no games to protect), Can\'t predict (no script), Risk real rejection (showing true self not role), No payoffs (no game rewards), Unknown territory (unfamiliar). VS Games: familiar, predictable, defended, scripted, safe (emotionally if not relationally healthy). Most people WANT intimacy but CAN\'T tolerate it. Too scary. Therapy: build capacity for vulnerability, tolerate uncertainty, survive rejection (and discover self still intact), trust Adult judgment, experience intimacy in small doses (with therapist first), gradually expand capacity.' },
+                                    { text: 'Intimacy is impossible', correct: false, feedback: 'Difficult but not impossible! Some people achieve moments/relationships of real intimacy. It\'s the goal, requires work.' },
+                                    { text: 'People don\'t want intimacy', correct: false, feedback: 'Most DO want it (genuine connection) but fear it. Ambivalence: want closeness but terrified of vulnerability required.' }
+                                ]
+                            },
+                            {
+                                question: 'Client has worked through script, stopped games, increased awareness. They ask: "Does this ever get easier?" What\'s honest answer?',
+                                answers: [
+                                    { text: '"Yes, you\'re cured now"', correct: false, feedback: 'Dishonest! Autonomy is ongoing practice, not cure. Script/game impulses don\'t vanish, choice gets stronger.' },
+                                    { text: '"Autonomy is ongoing practice, not permanent state. Script urges persist but you get better at choosing differently. It\'s lifelong work but worth it"', correct: true, feedback: 'HONEST AUTONOMY TALK! Reality: Script doesn\'t disappear (formed in childhood, deeply embedded), Games still tempting (familiar, rewarding), Awareness requires vigilance (easy to slip back), Choice takes effort (especially under stress). BUT: Gets more natural (Adult strengthens with practice), Choices accumulate (new patterns form), Life improves (less suffering, more authenticity), Relapses decrease (catch yourself faster), Becomes "way of life" (conscious living vs automatic). Like physical fitness - must maintain, worth it, gets easier but never automatic. This is TRUTH vs false promise of "cure." Most autonomous people are still only 20-30% script-free - that\'s success! Not perfection but conscious living, real choices, genuine connection. Progress, not perfection.' },
+                                    { text: '"No, it\'s always hard so why bother"', correct: false, feedback: 'Nihilistic! While autonomy requires ongoing work, it DOES get more natural and life significantly improves. Worth the effort.' },
+                                    { text: '"You\'re doing it wrong if it\'s still difficult"', correct: false, feedback: 'Shame-inducing and false! Autonomy is inherently challenging (going against lifetime conditioning). Difficulty is normal, not failure.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'ta-integration',
+                title: 'TA Integration',
+                icon: '🔗',
+                level: 3,
+                xp: 50,
+                prereq: 'autonomy',
+                lessons: [
+                    {
+                        title: 'Applying TA Therapeutically',
+                        teaching: `TRANSACTIONAL ANALYSIS as complete therapeutic system:
+
+Assessment: What ego states dominate? What transactions occur? What games are played? What life position? What script?
+
+Intervention: Strengthen Adult, Decontaminate (remove Parent/Child intrusions into Adult), Stop games (awareness + choice), Challenge life position (Adult reality-testing), Redecide script (conscious choice over childhood decision).
+
+TA offers: Clear conceptual framework (clients understand easily), Practical tools (can observe own transactions), Hope (decisions can be changed), Responsibility (you chose, you can choose differently), Equality (Adult-Adult therapeutic relationship).
+
+Integration with other approaches: TA complements CBT (both emphasize awareness, choice), Psychodynamic (both explore childhood origins), Humanistic (both value authenticity), Systemic (TA analyzes family transactions).
+
+Ultimate goal: Help client become autonomous - aware, spontaneous, capable of intimacy. This is freedom from childhood programming.`,
+                        concepts: [
+                            {
+                                title: 'TA\'s Unique Contribution',
+                                text: 'Accessible language (Parent/Adult/Child vs id/ego/superego), Observable phenomena (can see transactions happening), Empowering framework (you made decisions, you can remake them), Social emphasis (transactions vs just intrapsychic), Practical tools (clients use TA concepts in daily life). Makes depth psychology accessible.'
+                            },
+                            {
+                                title: 'When TA Works Best',
+                                text: 'Clients who: want to understand patterns, can develop observer function, willing to take responsibility, interested in social dynamics, comfortable with conceptual frameworks. Less effective: severe trauma (need stabilization first), active psychosis, very young children, clients who need concrete behavioral interventions primarily.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client learns TA framework and starts analyzing everyone else\'s ego states. What\'s therapeutic concern?',
+                                answers: [
+                                    { text: 'They\'re learning well', correct: false, feedback: 'Using TA to analyze OTHERS is defensive - avoids own work. TA should illuminate self-awareness first.' },
+                                    { text: 'Using TA intellectually/defensively to analyze others instead of observing own patterns - Missing therapeutic point', correct: true, feedback: 'CRITICAL PARENT USING TA! Client weaponized framework: "You\'re in Child" = Critical Parent judgment, Analyzing others = avoids own patterns, Intellectual defense = protects from feeling, Superior stance = "I know TA, you don\'t." This MISSES TA\'s purpose: self-awareness, not others-analysis. Intervention: "I notice you\'re analyzing others. What about YOUR transactions? YOUR games? YOUR script?" Redirect focus inward, Address defense ("What does analyzing others help you avoid?"), Model Adult use of TA (non-judgmental self-observation), Confront arrogance gently. TA should increase humility ("I see my patterns") not superiority ("I see YOUR problems").' },
+                                    { text: 'TA is too complicated for them', correct: false, feedback: 'They clearly grasp concepts! Issue is APPLICATION - using defensively on others vs therapeutically on self.' },
+                                    { text: 'They should teach TA to others', correct: false, feedback: 'Before teaching others, need to apply to self, work through own patterns. Otherwise teaching from unexamined place.' }
+                                ]
+                            },
+                            {
+                                question: 'How does TA view the therapeutic relationship?',
+                                answers: [
+                                    { text: 'Therapist is Parent, client is Child', correct: false, feedback: 'No! This would be game. TA emphasizes Adult-Adult therapeutic relationship. Equality, collaboration.' },
+                                    { text: 'Ideally Adult-Adult: therapist and client collaborate as equals, both using Adult ego state to examine client\'s patterns', correct: true, feedback: 'TA THERAPEUTIC STANCE! Unlike: Psychoanalysis (expert interprets), Medical model (doctor treats patient), TA: Adult-Adult alliance - therapist isn\'t superior/expert, client isn\'t sick/inferior, collaborate to understand patterns, teach client to be own therapist (use TA themselves), mutual respect, shared language. Therapist\'s Adult helps client\'s Adult: observe ego states, recognize games, challenge script, make new decisions. NOT: Therapist Parent telling client Child what to do. This Adult-Adult stance is empowering: client learns tools, develops autonomy, becomes self-sufficient, internalizes therapist\'s Adult function. When therapy ends: client continues TA self-observation.' },
+                                    { text: 'Therapist should stay completely neutral', correct: false, feedback: 'Adult isn\'t neutral - it\'s engaged, collaborative, present. TA therapist actively teaches, challenges, supports from Adult.' },
+                                    { text: 'Relationship doesn\'t matter in TA', correct: false, feedback: 'Relationship is CENTRAL! Adult-Adult relating is model of intimacy client learns. Plus, transference analyzed through TA lens.' }
+                                ]
+                            },
+                            {
+                                question: 'Client has mastered TA concepts intellectually but behaviors unchanged. What\'s missing?',
+                                answers: [
+                                    { text: 'Nothing - intellectual understanding is enough', correct: false, feedback: 'Understanding alone doesn\'t change behavior! Need experiential work, choice, practice.' },
+                                    { text: 'Movement from Adult understanding to actual behavior change - awareness without choice/action won\'t shift patterns', correct: true, feedback: 'INTELLECTUAL VS BEHAVIORAL CHANGE! Client has: Adult awareness ("I see my games"), Cognitive understanding (knows TA framework), Analytical capacity (can diagram transactions). But LACKS: Actual different choices (still playing games), New behaviors (repeating old patterns), Emotional work (understanding without feeling), Risk-taking (safer to know than change). Intervention: "You understand your script. What would it take to LIVE differently? What stops you from choosing new behavior?" Move from: talking about patterns → catching them real-time, analyzing games → refusing to play them, understanding script → making different decisions. Bridge knowing to doing: behavioral experiments, emotion work (what\'s the fear?), support through discomfort of change, celebrate small behavioral shifts. Insight is necessary but insufficient - must become action.' },
+                                    { text: 'TA doesn\'t work for them', correct: false, feedback: 'TA framework is working (they learned it). Issue is incomplete - need to move from intellectual to behavioral/experiential.' },
+                                    { text: 'They need more TA education', correct: false, feedback: 'More concepts won\'t help! Need less education, more application. Know enough - need to DO differently.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+        
+        // Initialize UI
+        function initUI() {
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        function updateStats() {
+            const xpPercent = (gameState.xp / gameState.xpToNextLevel) * 100;
+            const mastery = Math.round((gameState.completedSkills.length / skillTree.length) * 100);
+            const currentPath = gameState.level <= 1 ? 'FOUNDATIONS' : gameState.level <= 2 ? 'INTERMEDIATE' : 'ADVANCED';
+            
+            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
+            document.getElementById('level-display').textContent = gameState.level;
+            document.getElementById('mastery-display').textContent = `${mastery}%`;
+            document.getElementById('streak-display').textContent = `${gameState.streak}🔥`;
+            document.getElementById('current-path').textContent = currentPath;
+        }
+        
+        function renderSkillGrid() {
+            const grid = document.getElementById('skill-grid');
+            grid.innerHTML = skillTree.map(skill => {
+                const isCompleted = gameState.completedSkills.includes(skill.id);
+                const isUnlocked = !skill.prereq || gameState.completedSkills.includes(skill.prereq);
+                
+                let status = '🔒';
+                let statusClass = 'locked';
+                
+                if (isCompleted) {
+                    status = '✓';
+                    statusClass = 'completed';
+                } else if (isUnlocked) {
+                    status = '→';
+                    statusClass = 'unlocked';
+                }
+                
+                return `
+                    <div class="skill-card ${statusClass}" 
+                         onclick="${isUnlocked ? `startSkill('${skill.id}')` : ''}"
+                         role="button"
+                         tabindex="${isUnlocked ? '0' : '-1'}"
+                         aria-label="${skill.title}${isCompleted ? ', completed' : isUnlocked ? ', available' : ', locked'}">
+                        <div class="skill-icon">${skill.icon}</div>
+                        <div class="skill-info">
+                            <div class="skill-title">${skill.title}</div>
+                            <div class="skill-meta">
+                                <span class="skill-xp">+${skill.xp} XP</span>
+                                <span>Level ${skill.level}</span>
+                            </div>
+                        </div>
+                        <div class="skill-status">${status}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add keyboard support
+            grid.querySelectorAll('.skill-card.unlocked').forEach(card => {
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+        }
+        
+        function startSkill(skillId) {
+            const skill = skillTree.find(s => s.id === skillId);
+            if (!skill) return;
+            
+            gameState.currentLesson = skill;
+            gameState.currentQuestion = 0;
+            gameState.correctAnswers = 0;
+            gameState.questionResults = [];
+            
+            showLesson(skill);
+        }
+        
+        function showLesson(skill) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            const lesson = skill.lessons[0];
+            
+            const concepts = lesson.concepts.map(c => `
+                <div class="concept-card">
+                    <div class="concept-title">📌 ${c.title}</div>
+                    <div class="concept-text">${c.text}</div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-icon">${skill.icon}</div>
+                    <h2 class="lesson-title">${lesson.title}</h2>
+                    <div class="lesson-subtitle">+${skill.xp} XP on completion</div>
+                </div>
+                
+                <div class="teaching-section">
+                    <div class="teaching-text">${lesson.teaching}</div>
+                </div>
+                
+                <div class="concepts-section">
+                    ${concepts}
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Back</button>
+                    <button class="btn btn-primary" onclick="startQuestions()">Start Quiz →</button>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.top = `-${window.scrollY}px`;
+        }
+        
+        function startQuestions() {
+            showQuestion(0);
+        }
+        
+        function showQuestion(index) {
+            const skill = gameState.currentLesson;
+            const lesson = skill.lessons[0];
+            const question = lesson.questions[index];
+            const content = document.getElementById('modal-content');
+            const total = lesson.questions.length;
+            
+            // Build progress dots
+            const dots = lesson.questions.map((_, i) => {
+                let dotClass = 'progress-dot';
+                if (i === index) dotClass += ' current';
+                else if (i < index) {
+                    dotClass += gameState.questionResults[i] ? ' correct' : ' incorrect';
+                }
+                return `<div class="${dotClass}"></div>`;
+            }).join('');
+            
+            const answers = question.answers.map((a, i) => `
+                <button class="answer-btn" onclick="selectAnswer(${i})" data-index="${i}">
+                    ${a.text}
+                </button>
+            `).join('');
+            
+            const scoreText = index > 0 
+                ? `<span class="score-display">Score: <span class="score-value">${gameState.correctAnswers}/${index}</span></span>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <h2 class="lesson-title">${skill.title}</h2>
+                    <div class="lesson-subtitle">Question ${index + 1} of ${total}</div>
+                </div>
+                
+                <div class="question-section">
+                    <div class="question-progress">
+                        <div class="progress-dots">${dots}</div>
+                        ${scoreText}
+                    </div>
+                    
+                    <div class="question-text">${question.question}</div>
+                    
+                    <div class="answers-list" id="answers-list">
+                        ${answers}
+                    </div>
+                    
+                    <div class="feedback-box" id="feedback"></div>
+                </div>
+                
+                <div class="modal-footer" id="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Exit</button>
+                    <div id="continue-container"></div>
+                </div>
+            `;
+            
+            // Store for answer checking
+            window.currentQuestionData = { question, index, total };
+        }
+        
+        function selectAnswer(answerIndex) {
+            const { question, index, total } = window.currentQuestionData;
+            const answer = question.answers[answerIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            const feedback = document.getElementById('feedback');
+            const continueContainer = document.getElementById('continue-container');
+            
+            // Disable all buttons
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            
+            // Mark selected answer
+            const selectedBtn = buttons[answerIndex];
+            
+            if (answer.correct) {
+                selectedBtn.classList.add('correct');
+                feedback.className = 'feedback-box correct show';
+                feedback.innerHTML = `✓ CORRECT! ${answer.feedback}`;
+                gameState.correctAnswers++;
+                gameState.questionResults.push(true);
+            } else {
+                selectedBtn.classList.add('incorrect');
+                feedback.className = 'feedback-box incorrect show';
+                feedback.innerHTML = `✗ ${answer.feedback}`;
+                gameState.questionResults.push(false);
+            }
+            
+            // Show continue button
+            const isLast = index >= total - 1;
+            continueContainer.innerHTML = `
+                <button class="btn btn-primary" onclick="${isLast ? 'completeSkill()' : 'nextQuestion()'}">
+                    ${isLast ? 'See Results →' : 'Continue →'}
+                </button>
+            `;
+        }
+        
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            showQuestion(gameState.currentQuestion);
+        }
+        
+        function completeSkill() {
+            const skill = gameState.currentLesson;
+            const total = skill.lessons[0].questions.length;
+            const score = Math.round((gameState.correctAnswers / total) * 100);
+            const xpEarned = skill.xp;
+            
+            // Award XP
+            gameState.xp += xpEarned;
+            gameState.totalXp += xpEarned;
+            
+            // Level up check
+            while (gameState.xp >= gameState.xpToNextLevel) {
+                gameState.xp -= gameState.xpToNextLevel;
+                gameState.level++;
+                gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+            }
+            
+            // Mark completed
+            if (!gameState.completedSkills.includes(skill.id)) {
+                gameState.completedSkills.push(skill.id);
+                gameState.streak++;
+            }
+            
+            // Find next skill
+            const currentIndex = skillTree.findIndex(s => s.id === skill.id);
+            const nextSkill = skillTree.slice(currentIndex + 1).find(s => {
+                if (!s.prereq) return true;
+                return gameState.completedSkills.includes(s.prereq);
+            });
+            
+            const content = document.getElementById('modal-content');
+            
+            const nextButton = nextSkill && !gameState.completedSkills.includes(nextSkill.id)
+                ? `<button class="btn btn-accent" onclick="startNextSkill('${nextSkill.id}')">
+                       Next: ${nextSkill.title} →
+                   </button>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="completion-screen">
+                    <div class="completion-icon">${skill.icon}</div>
+                    <h2 class="completion-title">SKILL MASTERED!</h2>
+                    <div class="completion-xp">+${xpEarned} XP EARNED</div>
+                    
+                    <div class="completion-stats">
+                        <p>Score: <span style="color: var(--accent);">${score}%</span> (${gameState.correctAnswers}/${total})</p>
+                        <p>Skill: "${skill.title}"</p>
+                        <p>Keep building your mastery!</p>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModalAndRefresh()">← Skill Tree</button>
+                    ${nextButton}
+                </div>
+            `;
+            
+            // Confetti!
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#fc0', '#fd0', '#ff0']
+                });
+            }
+            
+            saveProgress();
+        }
+        
+        function startNextSkill(skillId) {
+            closeModal();
+            setTimeout(() => startSkill(skillId), 200);
+        }
+        
+        function closeModal() {
+            const scrollY = document.body.style.top;
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.top = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+        
+        function closeModalAndRefresh() {
+            closeModal();
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        // Progress Management
+        function saveProgress() {
+            localStorage.setItem('gamesPeoplePlayAcademy', JSON.stringify(gameState));
+            showToast('💾 Progress saved!');
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('gamesPeoplePlayAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                updateStats();
+                renderSkillGrid();
+                showToast('✓ Progress loaded!');
+            } else {
+                showToast('No saved progress found');
+            }
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('gamesPeoplePlayAcademy');
+                location.reload();
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function goHome() {
+            window.location.href = 'learning-library-hub.html';
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('modal');
+            const isOpen = modal.classList.contains('active');
+            
+            if (e.key === 'Escape' && isOpen) {
+                closeModal();
+            }
+            
+            if (e.key === 'ArrowLeft' && !isOpen) {
+                moveCarousel(-1);
+            }
+            if (e.key === 'ArrowRight' && !isOpen) {
+                moveCarousel(1);
+            }
+        });
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const saved = localStorage.getItem('gamesPeoplePlayAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+            initUI();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>IN THE REALM OF HUNGRY GHOSTS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        :root {
+            --primary: #f90;
+            --secondary: #ff0;
+            --accent: #ff0;
+            --danger: #f00;
+            --bg-dark: #000;
+            --bg-card: #0a0a0a;
+            --bg-elevated: #111;
+            --border-subtle: #222;
+            --text-muted: #666;
+            
+            /* Mobile-first spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 24px;
+            --space-2xl: 32px;
+            
+            /* Touch-friendly sizing */
+            --touch-target: 44px;
+            --border-width: 3px;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            
+            /* Safe areas for notched phones */
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: var(--bg-dark);
+            color: var(--primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-bottom: calc(70px + var(--safe-bottom));
+        }
+        
+        /* Subtle scanline effect - less intense for mobile */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.08),
+                rgba(0, 0, 0, 0.08) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        /* Header - sticky with blur */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-top: calc(var(--space-md) + var(--safe-top));
+            border-bottom: var(--border-width) solid var(--primary);
+        }
+        
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 11px;
+            color: var(--secondary);
+            text-shadow: 2px 2px var(--danger), 0 0 20px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: var(--space-sm);
+            letter-spacing: 1px;
+        }
+        
+        /* XP Progress Bar */
+        .xp-section {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .xp-bar-outer {
+            background: var(--border-subtle);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-sm);
+            height: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .xp-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .xp-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 7px;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            white-space: nowrap;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xs);
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+        }
+        
+        .stat-label {
+            font-size: 5px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-size: 9px;
+            color: var(--accent);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: var(--space-md);
+            padding-left: calc(var(--space-md) + var(--safe-left));
+            padding-right: calc(var(--space-md) + var(--safe-right));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Path Indicator */
+        .path-indicator {
+            text-align: center;
+            font-size: 7px;
+            color: var(--text-muted);
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            border: 1px dashed var(--border-subtle);
+            border-radius: var(--radius-sm);
+        }
+        
+        .path-name {
+            color: var(--accent);
+            font-size: 8px;
+        }
+        
+        /* Skill Cards Grid */
+        .skill-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .skill-card {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: var(--touch-target);
+        }
+        
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--border-subtle);
+            transition: background 0.2s;
+        }
+        
+        .skill-card.unlocked {
+            border-color: var(--primary);
+        }
+        
+        .skill-card.unlocked::before {
+            background: var(--primary);
+        }
+        
+        .skill-card.unlocked:active {
+            transform: scale(0.98);
+            background: #001a00;
+        }
+        
+        .skill-card.completed {
+            border-color: var(--accent);
+            background: rgba(255, 255, 0, 0.03);
+        }
+        
+        .skill-card.completed::before {
+            background: var(--accent);
+        }
+        
+        .skill-card.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .skill-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .skill-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .skill-title {
+            font-size: 8px;
+            color: var(--primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.4;
+        }
+        
+        .skill-card.completed .skill-title {
+            color: var(--accent);
+        }
+        
+        .skill-meta {
+            display: flex;
+            gap: var(--space-sm);
+            font-size: 6px;
+            color: var(--text-muted);
+        }
+        
+        .skill-xp {
+            color: var(--secondary);
+        }
+        
+        .skill-status {
+            margin-left: auto;
+            font-size: 16px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: var(--border-width) solid var(--primary);
+            padding: var(--space-sm);
+            padding-bottom: calc(var(--space-sm) + var(--safe-bottom));
+            z-index: 100;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 6px;
+            padding: var(--space-sm);
+            min-width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: var(--radius-sm);
+        }
+        
+        .nav-btn:active {
+            background: rgba(0, 255, 0, 0.1);
+            transform: scale(0.95);
+        }
+        
+        .nav-btn .icon {
+            font-size: 20px;
+        }
+        
+        .nav-btn.home-btn {
+            color: var(--secondary);
+        }
+        
+        /* Modal - Full Screen on Mobile */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-dark);
+            z-index: 1000;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+        
+        .modal-overlay.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            min-height: 100%;
+            padding: var(--space-lg);
+            padding-top: calc(var(--space-lg) + var(--safe-top));
+            padding-bottom: calc(100px + var(--safe-bottom));
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Lesson Header */
+        .lesson-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-subtle);
+        }
+        
+        .lesson-icon {
+            font-size: 40px;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .lesson-title {
+            font-size: 10px;
+            color: var(--secondary);
+            margin-bottom: var(--space-xs);
+            line-height: 1.5;
+        }
+        
+        .lesson-subtitle {
+            font-size: 7px;
+            color: var(--accent);
+        }
+        
+        /* Teaching Section */
+        .teaching-section {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .teaching-text {
+            font-size: 9px;
+            line-height: 2;
+            color: var(--primary);
+            white-space: pre-wrap;
+        }
+        
+        /* Key Concepts */
+        .concepts-section {
+            margin-top: var(--space-xl);
+        }
+        
+        .concept-card {
+            background: var(--bg-dark);
+            border-left: 4px solid var(--accent);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        
+        .concept-title {
+            font-size: 8px;
+            color: var(--accent);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .concept-text {
+            font-size: 8px;
+            line-height: 1.8;
+            color: var(--primary);
+            opacity: 0.9;
+        }
+        
+        /* Question Section */
+        .question-section {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .question-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: var(--space-xs);
+        }
+        
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-subtle);
+            border: 1px solid var(--text-muted);
+        }
+        
+        .progress-dot.current {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            box-shadow: 0 0 8px var(--secondary);
+        }
+        
+        .progress-dot.correct {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .progress-dot.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .score-display {
+            font-size: 7px;
+            color: var(--secondary);
+        }
+        
+        .score-value {
+            color: var(--accent);
+        }
+        
+        .question-text {
+            font-size: 10px;
+            line-height: 1.8;
+            color: var(--secondary);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--secondary);
+        }
+        
+        /* Answer Buttons */
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .answer-btn {
+            background: var(--bg-card);
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 8px;
+            line-height: 1.7;
+            padding: var(--space-lg);
+            text-align: left;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .answer-btn:active:not(.disabled) {
+            transform: scale(0.98);
+            background: #001a00;
+        }
+        
+        .answer-btn.selected {
+            border-color: var(--secondary);
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        .answer-btn.correct {
+            border-color: var(--primary);
+            background: rgba(0, 255, 0, 0.1);
+            animation: correctPulse 0.4s ease;
+        }
+        
+        .answer-btn.incorrect {
+            border-color: var(--danger);
+            background: rgba(255, 0, 0, 0.1);
+            animation: shake 0.4s ease;
+        }
+        
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        
+        /* Feedback */
+        .feedback-box {
+            margin-top: var(--space-lg);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            line-height: 1.8;
+            display: none;
+        }
+        
+        .feedback-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .feedback-box.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .feedback-box.incorrect {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        /* Modal Footer */
+        .modal-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(10px);
+            padding: var(--space-md);
+            padding-bottom: calc(var(--space-md) + var(--safe-bottom));
+            display: flex;
+            gap: var(--space-md);
+            z-index: 1001;
+        }
+        
+        .btn {
+            flex: 1;
+            font-family: inherit;
+            font-size: 8px;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: var(--touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .btn:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: #002200;
+            border: var(--border-width) solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-primary:active {
+            background: #003300;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+        
+        .btn-accent {
+            background: rgba(255, 255, 0, 0.1);
+            border: var(--border-width) solid var(--accent);
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Completion Screen */
+        .completion-screen {
+            text-align: center;
+            padding: var(--space-2xl) 0;
+        }
+        
+        .completion-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-lg);
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .completion-title {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        .completion-xp {
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats {
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .completion-stats p {
+            font-size: 9px;
+            line-height: 2;
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* Empty state for when all skills completed */
+        .all-complete {
+            text-align: center;
+            padding: var(--space-2xl);
+            color: var(--accent);
+        }
+        
+        .all-complete-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .all-complete-text {
+            font-size: 9px;
+            line-height: 2;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            font-size: 8px;
+            color: var(--primary);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Level badge in header */
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid var(--accent);
+            padding: 2px var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 7px;
+            color: var(--accent);
+        }
+        
+        /* Desktop enhancements */
+        @media (min-width: 768px) {
+            :root {
+                --space-md: 16px;
+                --space-lg: 20px;
+                --space-xl: 32px;
+            }
+            
+            .title {
+                font-size: 14px;
+            }
+            
+            .skill-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .skill-card:hover:not(.locked) {
+                transform: translateY(-2px);
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            }
+            
+            .teaching-text,
+            .question-text {
+                font-size: 10px;
+            }
+            
+            .answer-btn {
+                font-size: 9px;
+            }
+            
+            .answer-btn:hover:not(.disabled) {
+                background: #001a00;
+                border-color: var(--secondary);
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="title">👻 IN THE REALM OF HUNGRY GHOSTS 👻</h1>
+            
+            <div class="xp-section">
+                <div class="xp-bar-outer">
+                    <div class="xp-bar-fill" id="xp-bar"></div>
+                    <div class="xp-text" id="xp-text">0 / 100 XP</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="level-display">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MASTERY</div>
+                    <div class="stat-value" id="mastery-display">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">STREAK</div>
+                    <div class="stat-value" id="streak-display">0🔥</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="path-indicator">
+            CURRENT PATH: <span class="path-name" id="current-path">FOUNDATIONS</span>
+        </div>
+        
+        <div class="skill-grid" id="skill-grid">
+            <!-- Skills populated by JS -->
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-buttons">
+            <button class="nav-btn home-btn" onclick="goHome()" aria-label="Go to Learning Hub">
+                <span class="icon">🏠</span>
+                <span>HOME</span>
+            </button>
+            <button class="nav-btn" onclick="saveProgress()" aria-label="Save progress">
+                <span class="icon">💾</span>
+                <span>SAVE</span>
+            </button>
+            <button class="nav-btn" onclick="loadProgress()" aria-label="Load progress">
+                <span class="icon">📁</span>
+                <span>LOAD</span>
+            </button>
+            <button class="nav-btn" onclick="resetProgress()" aria-label="Reset progress">
+                <span class="icon">🔄</span>
+                <span>RESET</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content" id="modal-content">
+            <!-- Content populated by JS -->
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // Game State
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            totalXp: 0,
+            streak: 0,
+            completedSkills: [],
+            skillProgress: {},
+            currentLesson: null,
+            currentQuestion: 0,
+            correctAnswers: 0,
+            questionResults: [] // Track each question result for progress dots
+        };
+        
+        // Skill Tree Data
+        const skillTree = [
+            // LEVEL 1: FOUNDATIONS
+            {
+                id: 'hungry-ghosts-concept',
+                title: 'Hungry Ghosts',
+                icon: '👻',
+                level: 1,
+                xp: 20,
+                prereq: null,
+                lessons: [
+                    {
+                        title: 'The Buddhist Metaphor',
+                        teaching: `HUNGRY GHOSTS are beings in Buddhist cosmology with large bellies and tiny mouths - eternally hungry, never satisfied. No matter how much they consume, the craving remains.
+
+Maté uses this as metaphor for ADDICTION: not just substance use, but any compulsive behavior seeking relief from pain. The addict is hungry ghost - pursuing satisfaction that always eludes, trapped in cycle of craving and temporary relief.
+
+Key insight: Addiction isn't about the substance or behavior itself. It's about WHAT YOU'RE TRYING TO ESCAPE. The drug/behavior is solution (however dysfunctional) to deeper problem: emotional pain, trauma, disconnection.`,
+                        concepts: [
+                            {
+                                title: 'Addiction as Adaptation',
+                                text: 'Addiction isn\'t moral failing or disease you "catch." It\'s ADAPTATION to unbearable circumstances. Child in chaotic/abusive home discovers substance/behavior that offers relief, control, or escape. This becomes survival strategy. Later becomes prison.'
+                            },
+                            {
+                                title: 'The Question to Ask',
+                                text: 'Not "Why the addiction?" but "Why the PAIN?" What happened to you that made escape necessary? What are you hungry for that you\'re trying to fill with substances, shopping, work, food, sex, screens?'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'A client says "I don\'t understand why I can\'t just stop drinking. I know it\'s ruining my life." From Maté\'s perspective, what\'s missing from their understanding?',
+                                answers: [
+                                    { text: 'They lack willpower and discipline', correct: false, feedback: 'This is moralistic view Maté rejects. Frames addiction as character flaw. Ignores that addiction serves function - it\'s solving problem (even as it creates worse ones).' },
+                                    { text: 'They haven\'t examined what pain the drinking is medicating - the emotional wound it temporarily soothes', correct: true, feedback: 'EXACTLY! Maté\'s core teaching: addiction is attempt to solve problem of emotional pain. Stopping the behavior (drinking) without addressing underlying pain is unsustainable. "Why the pain?" comes before "Why the addiction?" Need compassionate exploration of what drinking provides relief from.' },
+                                    { text: 'They need stronger consequences to motivate change', correct: false, feedback: 'Consequences rarely work for addiction. Person already knows it\'s "ruining life" but continues - this tells you the PAIN being escaped is worse than consequences. More punishment misses the point.' },
+                                    { text: 'They have a brain disease that makes stopping impossible', correct: false, feedback: 'While brain changes occur, framing as pure disease removes meaning and agency. Maté emphasizes: addiction develops in context of pain/trauma. It\'s biopsychosocial, not just biological.' }
+                                ]
+                            },
+                            {
+                                question: 'What does Maté mean by "Don\'t ask why the addiction, ask why the pain"?',
+                                answers: [
+                                    { text: 'Pain causes addiction automatically', correct: false, feedback: 'Not automatic causation. Many people experience pain without addiction. It\'s about: pain + lack of healthier coping + discovery of addictive solution = addiction develops.' },
+                                    { text: 'Addiction is attempt to solve problem of unbearable emotional pain - focus therapeutic work on the underlying wound, not just the behavior', correct: true, feedback: 'YES! Addiction is SOLUTION (dysfunctional, but solution nonetheless). Heroin addict Maté worked with said: "Drugs were the warmth I never got from my parents." If you only target behavior (stop using!) without addressing need (for warmth, safety, connection), you leave person with pain and no solution. Compassionate approach explores: What are you running from? What do you need that you\'re seeking through addiction?' },
+                                    { text: 'Physical pain leads to drug addiction', correct: false, feedback: 'Too literal. Maté focuses on EMOTIONAL/psychological pain - trauma, abuse, neglect, loss, chronic stress. Physical pain can be factor but emotional pain is core of his thesis.' },
+                                    { text: 'Addiction isn\'t real, only pain is', correct: false, feedback: 'No - addiction is real and devastating. Point is: it develops as RESPONSE to pain. Understanding this changes how we approach treatment (with compassion vs judgment).' }
+                                ]
+                            },
+                            {
+                                question: 'Client shares: "I had good childhood, my parents loved me. Why am I an addict?" How does Maté\'s framework help here?',
+                                answers: [
+                                    { text: 'They must be lying about their childhood', correct: false, feedback: 'Dismissive and unhelpful. Don\'t assume client is lying or in denial (though exploration might reveal things).' },
+                                    { text: 'Not all addiction stems from childhood; theirs must be purely genetic', correct: false, feedback: 'Maté emphasizes environmental/developmental factors heavily. While biology plays role, he focuses on early relational/emotional environment as primary.' },
+                                    { text: 'Explore what "love" meant in their family - was there attunement, emotional presence, safety to express needs? Good intentions don\'t equal emotional nourishment', correct: true, feedback: 'EXCELLENT! Maté distinguishes between parents\' INTENTIONS (they loved) and child\'s EXPERIENCE (did they feel seen, safe, attuned to?). Parents can "love" while being: emotionally absent, stressed, depressed, unable to attune. Child experiences this as lack. Also trauma isn\'t just abuse - it\'s lack of what SHOULD have been there. Explore: "What was your emotional experience? When you were hurt/scared/lonely, what happened? Were your feelings welcomed?"' },
+                                    { text: 'Their addiction must be mild if childhood was good', correct: false, feedback: 'Severity of addiction doesn\'t correlate simply with childhood. But Maté would still explore early emotional environment - often there\'s more there than surface "good childhood" suggests.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'trauma-not-events',
+                title: 'Trauma Redefined',
+                icon: '💔',
+                level: 1,
+                xp: 25,
+                prereq: 'hungry-ghosts-concept',
+                lessons: [
+                    {
+                        title: 'It\'s Not What Happened',
+                        teaching: `Maté redefines TRAUMA: Not the event itself, but what happens INSIDE you as result of event. Trauma is DISCONNECTION FROM SELF.
+
+When overwhelmed (by abuse, neglect, loss, or even chronic stress), you DISCONNECT from your authentic emotions, needs, and self to survive. This disconnection IS the trauma.
+
+Example: Child expresses anger → parent punishes/withdraws → child learns "my anger isn't acceptable" → suppresses anger to maintain connection → TRAUMA is this self-abandonment, not just the punishment itself.`,
+                        concepts: [
+                            {
+                                title: 'Trauma as Loss of Self',
+                                text: 'You lose access to: authentic feelings, bodily sensations, needs, boundaries, sense of safety in world. You become who you need to be for survival (pleasing, invisible, tough) and lose who you actually are. This fragmentation/disconnection is traumatic wound.'
+                            },
+                            {
+                                title: 'Attachment vs Authenticity',
+                                text: 'Children face impossible choice: be authentic (express real feelings/needs) and risk losing attachment (parent disapproves, withdraws), OR suppress authenticity to maintain attachment. When attachment threatened, child ALWAYS sacrifices self. This is adaptive but creates lifelong wound.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says "I wasn\'t abused or anything, I don\'t have trauma." What does Maté\'s definition suggest you explore?',
+                                answers: [
+                                    { text: 'Agree - no abuse means no trauma', correct: false, feedback: 'Maté expands trauma beyond abuse. Trauma can be: emotional neglect, chronic parental stress/depression, lack of attunement, having to suppress feelings. Absence of overt abuse doesn\'t mean absence of trauma.' },
+                                    { text: 'Whether they had to disconnect from parts of themselves (feelings, needs, authenticity) to maintain relationships or sense of safety', correct: true, feedback: 'PERFECT! Maté: trauma is WHAT HAPPENS INSIDE YOU. Questions to explore: "What feelings weren\'t okay in your family? What parts of you had to hide? When you were sad/angry/scared, what happened? Did anyone notice or care? Did you learn to push feelings down?" Trauma is this SELF-ABANDONMENT, not just dramatic events.' },
+                                    { text: 'They\'re repressing memories of abuse', correct: false, feedback: 'Don\'t assume repressed abuse. Maté\'s point: trauma happens in ORDINARY families too - through emotional unavailability, lack of attunement, chronic stress. Not everything is repressed abuse.' },
+                                    { text: 'Drop the trauma framework, it doesn\'t apply', correct: false, feedback: 'Trauma framework is broader than client realizes. Explore before dismissing. Often people discover: "Oh, I DID have to suppress huge parts of myself."' }
+                                ]
+                            },
+                            {
+                                question: 'Why does Maté say children choose attachment over authenticity?',
+                                answers: [
+                                    { text: 'Children are manipulative', correct: false, feedback: 'No! This is survival instinct, not manipulation. Child depends on caregivers for literal survival. Losing attachment = death (in child\'s psychobiological reality).' },
+                                    { text: 'Attachment to caregiver is biological survival necessity - child will sacrifice anything (including self) to maintain it', correct: true, feedback: 'YES! For infant/child, attachment to caregiver = survival. If expressing authentic self (anger, needs, big feelings) threatens this bond, child WILL suppress self. This isn\'t conscious choice - it\'s automatic adaptation. Child brain: "I can\'t lose my parent, so I\'ll lose myself instead." This sacrifice creates trauma wound.' },
+                                    { text: 'Parents force children to choose', correct: false, feedback: 'Parents often aren\'t conscious of this dynamic. They might be stressed, depressed, overwhelmed - not intentionally forcing choice. But child experiences: "my real feelings aren\'t welcome here" and adapts.' },
+                                    { text: 'Authenticity isn\'t important for children', correct: false, feedback: 'Authenticity IS developmentally crucial! When lost, creates fragmentation, chronic sense that "something\'s wrong with me," disconnection from body/feelings. This is why it\'s traumatic.' }
+                                ]
+                            },
+                            {
+                                question: 'Client realizes: "I always put others\' needs first, ignore my own feelings, say yes when I mean no." How does this relate to trauma as Maté defines it?',
+                                answers: [
+                                    { text: 'They\'re just a people-pleaser, not traumatized', correct: false, feedback: 'People-pleasing IS trauma response! It\'s suppressing authentic self (needs, boundaries, feelings) to maintain connection. This is exactly what Maté describes.' },
+                                    { text: 'This is trauma - they learned early that their authentic needs/feelings threatened attachment, so they suppress self to maintain relationships', correct: true, feedback: 'EXACTLY! This self-abandonment pattern (suppressing needs, ignoring feelings, over-giving) developed as adaptation: "If I show my real needs, I\'ll be rejected/abandoned. Better to be who others need me to be." The WOUND is this disconnection from self. Healing involves: reconnecting to authentic needs/feelings, learning it\'s safe to express them, building relationships that can handle your realness.' },
+                                    { text: 'They just need assertiveness training', correct: false, feedback: 'Skills help, but this is deeper than skill deficit. It\'s trauma-based pattern. Assertiveness training without addressing underlying wound (fear of abandonment, belief that real self is unacceptable) won\'t stick.' },
+                                    { text: 'Nothing wrong with being selfless', correct: false, feedback: 'Chronic self-abandonment isn\'t virtue - it\'s survival strategy that creates suffering. Healthy relationships require TWO authentic people, not one person erasing themselves.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'compassionate-inquiry',
+                title: 'Compassionate Inquiry',
+                icon: '🤍',
+                level: 1,
+                xp: 30,
+                prereq: 'trauma-not-events',
+                lessons: [
+                    {
+                        title: 'Curiosity Without Judgment',
+                        teaching: `COMPASSIONATE INQUIRY is Maté's therapeutic approach: investigating beneath behavior/symptoms with genuine curiosity and without judgment.
+
+Core stance: behaviors (addiction, self-harm, people-pleasing) aren't pathological - they're ADAPTIVE responses that made sense given circumstances. Approach with: "Of course you developed this. Given what you experienced, how else would you survive?"
+
+Questions focus on: What are you protecting yourself from? What would happen if you didn't do this behavior? What are you afraid to feel?`,
+                        concepts: [
+                            {
+                                title: 'The Three A\'s',
+                                text: 'ATTUNEMENT (deeply listening to emotional state beneath words). ACCEPTANCE (all feelings/parts welcome, no judgment). AUTHENTICITY (therapist brings real, human presence, not clinical distance). These create safety for client to explore what\'s been too painful to face.'
+                            },
+                            {
+                                title: 'Following the Thread',
+                                text: 'When client experiences emotion/sensation, STAY WITH IT. Don\'t rush to explain, fix, or move on. "What\'s that feeling? Where do you feel it in your body? If that feeling could speak, what would it say?" This leads to core wound.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client arrives late repeatedly. Compassionate Inquiry approach would be:',
+                                answers: [
+                                    { text: '"This is disrespectful. You need to be on time."', correct: false, feedback: 'Judgmental and punitive. Misses opportunity to understand meaning. Likely increases shame, doesn\'t create change.' },
+                                    { text: '"I notice you arrive late often. I\'m curious - when you think about being here on time, what comes up for you?"', correct: true, feedback: 'EXCELLENT! Non-judgmental curiosity. Opens exploration: What does being on time mean? Is there anxiety about therapy? Ambivalence? Control issue? Fear of dependency? The lateness is COMMUNICATION - be curious about what it\'s saying. Client might discover: "If I\'m on time, it means I need you, and needing people feels dangerous."' },
+                                    { text: 'Say nothing and accept the lateness', correct: false, feedback: 'Boundary needed, but also exploration. Can set limit ("We need to start on time") AND be curious about meaning.' },
+                                    { text: '"You must have been neglected as a child."', correct: false, feedback: 'Too interpretive, too fast. Doesn\'t honor client\'s process. Compassionate Inquiry starts with THEIR experience, not your theory.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says "I\'m fine" but looks tearful. What\'s Compassionate Inquiry response?',
+                                answers: [
+                                    { text: 'Accept "I\'m fine" at face value', correct: false, feedback: 'Misses the BODY communication. Tears are saying something different than words. Attunement means noticing this gap.' },
+                                    { text: '"You say you\'re fine, but I notice your eyes filling with tears. What\'s happening right now?"', correct: true, feedback: 'PERFECT! This: 1) Names the disconnection (words vs body), 2) Stays present-focused ("right now"), 3) Invites awareness without forcing. Client might discover: "I\'ve always had to say I\'m fine. No one wanted to hear otherwise." This is the wound - having to deny authentic emotional experience.' },
+                                    { text: '"You\'re obviously not fine. Why are you lying?"', correct: false, feedback: 'Confrontational, not compassionate. Creates defensiveness. Client isn\'t "lying" - they\'re disconnected from feelings (trauma response).' },
+                                    { text: 'Ignore the tears and move on', correct: false, feedback: 'Colluding with the disconnect. Compassionate Inquiry ATTUNES to what\'s really happening, including body signals.' }
+                                ]
+                            },
+                            {
+                                question: 'What makes Compassionate Inquiry different from CBT or traditional therapy?',
+                                answers: [
+                                    { text: 'It focuses on changing thoughts and behaviors', correct: false, feedback: 'This is CBT. Compassionate Inquiry goes deeper - to emotional wounds beneath behaviors. Change follows from reconnecting to disowned self, not from behavior modification.' },
+                                    { text: 'It maintains clinical distance and neutrality', correct: false, feedback: 'Opposite! Compassionate Inquiry emphasizes AUTHENTICITY - therapist as real, warm human (within boundaries). Connection heals, not clinical neutrality.' },
+                                    { text: 'It seeks the emotional wound beneath symptoms, stays with affect, and helps client reconnect to disowned parts of self', correct: true, feedback: 'YES! Compassionate Inquiry: 1) Views symptoms as adaptive (not pathology), 2) Curious about what behavior protects from, 3) Stays with uncomfortable feelings (doesn\'t rush to fix), 4) Helps client reclaim suppressed emotions/needs, 5) Emphasizes warm, attuned presence. Goal isn\'t symptom removal - it\'s reconnection to authentic self. When that happens, symptoms often naturally resolve.' },
+                                    { text: 'It only works with addiction', correct: false, feedback: 'While Maté developed it working with addiction, Compassionate Inquiry applies broadly - to any situation where person is disconnected from authentic self (most of us!).' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 2: INTERMEDIATE
+            {
+                id: 'brain-development',
+                title: 'Brain & Attachment',
+                icon: '🧠',
+                level: 2,
+                xp: 35,
+                prereq: 'compassionate-inquiry',
+                lessons: [
+                    {
+                        title: 'When the Brain Develops',
+                        teaching: `Maté emphasizes: brain development is EXPERIENCE-DEPENDENT, especially in first years. The brain you're born with is template - actual circuitry develops based on environment.
+
+Attunement (or lack of it) shapes: stress response systems, emotional regulation capacity, dopamine circuits, attachment patterns. This happens BEFORE conscious memory.
+
+Key: This isn't deterministic. Brain has plasticity throughout life. But understanding HOW early environment shapes neurobiology helps explain addiction vulnerability without blame.`,
+                        concepts: [
+                            {
+                                title: 'Stressed Parents, Stressed Babies',
+                                text: 'Infant\'s nervous system regulates through caregiver\'s. Chronically stressed/depressed/distracted parent = infant\'s stress system stays activated. This shapes: cortisol regulation, ability to self-soothe, baseline anxiety level. Not parent\'s fault, but has impact.'
+                            },
+                            {
+                                title: 'Dopamine and Attunement',
+                                text: 'Dopamine (reward/motivation chemical) circuits develop through: eye contact, attunement, play, joy. Lack of this = dopamine circuitry doesn\'t develop optimally. Later, substances/behaviors that spike dopamine feel like "coming home" - providing what development needed but didn\'t get.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Parent says "I was depressed when my child was a baby, but I still loved them. Did I cause their addiction?" What does Maté\'s framework suggest?',
+                                answers: [
+                                    { text: 'Yes, you caused it through your depression', correct: false, feedback: 'Too blaming and simplistic. Depression isn\'t choice. Maté emphasizes compassion for parents too - they were doing best they could given their own wounds/circumstances.' },
+                                    { text: 'No, addiction is genetic and has nothing to do with parenting', correct: false, feedback: 'Maté acknowledges biology but emphasizes environment. Depression didn\'t "cause" addiction, but lack of attunement during critical period can create vulnerability.' },
+                                    { text: 'Depression may have limited your capacity for attunement - not your fault, but had impact. Understanding this with compassion (for you and child) helps healing', correct: true, feedback: 'EXCELLENT! This holds complexity: 1) Parent\'s depression affected their CAPACITY to attune (hard to be emotionally present when depressed), 2) Infant experienced this as lack (not being seen/attuned to), 3) This shaped brain development and created vulnerability, 4) AND parent was doing best they could. No blame, but also honest about impact. Healing requires grieving what didn\'t happen, not assigning fault.' },
+                                    { text: 'The child is just using this as excuse', correct: false, feedback: 'Dismissive of real developmental impact. Early environment DOES shape brain. This isn\'t "excuse" - it\'s understanding mechanism without blame.' }
+                                ]
+                            },
+                            {
+                                question: 'How does understanding brain development change how we view addiction?',
+                                answers: [
+                                    { text: 'It proves addiction is brain disease beyond personal control', correct: false, feedback: 'Maté resists pure "disease model." Yes, brain changes occur, but they developed in CONTEXT. Understanding neurobiology doesn\'t remove meaning or possibility of healing.' },
+                                    { text: 'It shows how early environment shapes vulnerability, explains (not excuses) addiction, and points toward what\'s needed for healing: attunement, safety, reconnection', correct: true, feedback: 'YES! Neurobiological understanding: 1) Reduces shame ("You\'re not weak/bad, your brain adapted to circumstances"), 2) Explains why substances "work" (they activate dopamine circuits that didn\'t develop through attunement), 3) Points to healing: need attuned relationships, safety, reconnection to self - this can rewire brain (neuroplasticity). Understanding mechanism increases compassion without fatalism.' },
+                                    { text: 'It means people with addiction can\'t recover', correct: false, feedback: 'Opposite! Maté emphasizes neuroplasticity - brain CAN change with right environment (safety, attunement, somatic work, authentic connection). Early development isn\'t destiny.' },
+                                    { text: 'It\'s irrelevant - addiction is purely choice', correct: false, feedback: 'Ignores neuroscience. Brain development DOES matter. But Maté holds both: biology is real AND environment shapes biology AND change is possible.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says "My childhood shaped my brain wrong. I\'m broken." What\'s therapeutic response from Maté\'s perspective?',
+                                answers: [
+                                    { text: '"You\'re right, you\'re broken and can\'t change."', correct: false, feedback: 'Fatalistic and hopeless! Maté emphasizes neuroplasticity - brain can heal/change throughout life.' },
+                                    { text: '"Actually you\'re fine, brain is irrelevant."', correct: false, feedback: 'Dismisses real neurobiological impact. Development matters. But...' },
+                                    { text: '"Your brain adapted to survive difficult circumstances - that\'s not broken, that\'s brilliant. And brain has lifelong capacity to heal through: safety, attunement, reconnection to self."', correct: true, feedback: 'PERFECT! This: 1) Reframes adaptation as strength not brokenness, 2) Honors that environment DID shape brain, 3) Introduces hope through neuroplasticity, 4) Points toward what creates change: relational safety, emotional connection, authenticity. "You\'re not broken - you adapted brilliantly to impossible situation. Now let\'s create conditions for your brain to learn new patterns."' },
+                                    { text: '"Childhood doesn\'t matter, only present does."', correct: false, feedback: 'Maté deeply values understanding developmental origins. Past matters because it shaped present. But present also holds possibility for healing.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'self-compassion',
+                title: 'From Shame to Compassion',
+                icon: '💝',
+                level: 2,
+                xp: 30,
+                prereq: 'brain-development',
+                lessons: [
+                    {
+                        title: 'The Antidote to Shame',
+                        teaching: `Shame is CORE wound in addiction and trauma. Belief: "I am fundamentally defective, unlovable, wrong."
+
+Maté emphasizes: shame developed when child's authentic self was unacceptable. Child concludes: "Something's wrong with ME" (not "my environment failed to meet my needs"). This shame becomes internalized voice of self-hatred.
+
+SELF-COMPASSION is antidote: treating yourself with kindness you'd offer hurting friend. Recognizing: you're not defective, you were wounded. Your struggles make sense given what you experienced.`,
+                        concepts: [
+                            {
+                                title: 'Shame vs Guilt',
+                                text: 'GUILT: "I did something bad." Can motivate repair. SHAME: "I AM bad." Creates paralysis, self-hatred, more destructive behavior (confirming the belief). Addiction often attempt to escape shame, but creates more shame - vicious cycle.'
+                            },
+                            {
+                                title: 'Reparenting Yourself',
+                                text: 'If you didn\'t receive: unconditional acceptance, attunement, safety to have all feelings - you need to give this TO YOURSELF now. Internal voice shifts from harsh critic to compassionate presence. "Of course you\'re struggling. Anyone who experienced what you did would struggle. You\'re doing your best."'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client relapses after 3 months sober and says "I\'m such a failure. I\'ll never change. I\'m worthless." What does this reveal and how do you respond?',
+                                answers: [
+                                    { text: 'Agree - relapse proves they\'re not trying hard enough', correct: false, feedback: 'Colludes with shame! Increases self-hatred. This is opposite of therapeutic.' },
+                                    { text: 'Tell them "Don\'t be so hard on yourself" and move on', correct: false, feedback: 'Superficial reassurance. Doesn\'t address DEPTH of shame or where it came from.' },
+                                    { text: 'Recognize core shame wound (I AM worthless) and offer compassionate reframe: "You\'re not failure - you\'re human navigating incredibly hard struggle. What happened that led to relapse? What pain were you trying to escape?"', correct: true, feedback: 'YES! This: 1) Doesn\'t collude with shame (doesn\'t agree they\'re worthless), 2) Normalizes relapse as part of process (not proof of defectiveness), 3) Shifts from shame ("I\'m bad") to curiosity ("What happened? What hurt?"), 4) Models self-compassion. Also explore: Where did belief "I\'m worthless" originate? This is OLD message, not truth about who they are. Relapse is behavior, not identity.' },
+                                    { text: 'Focus only on preventing next relapse', correct: false, feedback: 'Behavioral focus misses emotional work. Without addressing shame wound, they\'re stuck in cycle: shame → escape through substance → more shame. Need to heal shame itself.' }
+                                ]
+                            },
+                            {
+                                question: 'Why is self-compassion especially hard for people with addiction/trauma?',
+                                answers: [
+                                    { text: 'They don\'t deserve compassion', correct: false, feedback: 'Everyone deserves compassion! This is shame talking, not truth.' },
+                                    { text: 'They internalized message that authentic self is unacceptable - compassion toward self feels foreign, even dangerous (might make them "weak" or lose motivation)', correct: true, feedback: 'EXACTLY! If you learned: "My needs are burden, my feelings are too much, real me is unlovable" → self-compassion feels WRONG. Harsh self-criticism feels familiar, "safe." Also fear: "If I\'m kind to myself, I\'ll become lazy/indulgent/lose control." This is internalized voice of harsh parent/environment. Healing involves: recognizing this voice isn\'t yours (it\'s what you absorbed), experimenting with self-kindness, discovering it doesn\'t make you weak - it makes you stronger.' },
+                                    { text: 'They\'re too damaged for self-compassion to work', correct: false, feedback: 'No one is "too damaged"! Self-compassion is ESPECIALLY crucial for deep wounds. It\'s never too late.' },
+                                    { text: 'Self-compassion is selfish', correct: false, feedback: 'This is internalized shame speaking. Self-compassion isn\'t selfish - it\'s foundation for healthy relationships and sustainable recovery. Can\'t give from empty well.' }
+                                ]
+                            },
+                            {
+                                question: 'Client says "If I stop hating myself, I\'ll just get worse. The self-criticism keeps me in line." How do you respond?',
+                                answers: [
+                                    { text: '"You\'re right, you need harsh self-criticism."', correct: false, feedback: 'Colludes with internalized abuse! Self-hatred doesn\'t create lasting change - it creates suffering and often MORE destructive behavior.' },
+                                    { text: '"Actually research shows self-compassion is more effective motivator than self-criticism. Shame paralyzes, compassion mobilizes. Would you berate friend this way?"', correct: true, feedback: 'EXCELLENT! This: 1) Educates (research supports self-compassion as change mechanism), 2) Reframes (not indulgence, but effective strategy), 3) Perspective shift ("Would you treat friend this way?"). Add: "The harsh voice you\'re afraid to lose isn\'t helping - it\'s the PROBLEM. It\'s the internalized voice of whoever taught you that you weren\'t good enough. Letting go of it isn\'t becoming undisciplined - it\'s reclaiming your life from internalized abuse."' },
+                                    { text: '"Self-compassion and accountability are opposites."', correct: false, feedback: 'False! Self-compassion ENHANCES accountability. When you don\'t hate yourself for mistakes, you can actually face them, learn, and change. Shame creates defensive avoidance.' },
+                                    { text: 'Tell them they don\'t really hate themselves', correct: false, feedback: 'Don\'t dismiss their experience. They DO have harsh inner critic. Help them see: this voice developed for reason (protection), but now it\'s causing harm. They can develop different relationship with themselves.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'authenticity-healing',
+                title: 'Returning to Authenticity',
+                icon: '✨',
+                level: 2,
+                xp: 35,
+                prereq: 'self-compassion',
+                lessons: [
+                    {
+                        title: 'Reclaiming the Lost Self',
+                        teaching: `Healing isn't about becoming someone new - it's RETURNING to who you were before you had to adapt/hide/disconnect.
+
+Trauma meant sacrificing authenticity. Recovery means reclaiming it: reconnecting to your real feelings, needs, desires, boundaries. Learning it's safe to be yourself.
+
+This is terrifying because: being authentic once felt like threat to survival. Your psyche learned: "real me is dangerous/unlovable." Healing requires testing whether this is still true (it's not).`,
+                        concepts: [
+                            {
+                                title: 'The Body Knows',
+                                text: 'Authentic feelings/needs live in BODY, not head. Reconnecting to self means: feeling sensations, trusting gut, listening to what body is communicating. Trauma disconnected you from body (too painful to feel). Healing reconnects you.'
+                            },
+                            {
+                                title: 'Needs Are Not Weakness',
+                                text: 'If you learned needs are burden/shameful, you suppress them. But NEEDS ARE HUMAN. Everyone needs: safety, connection, to be seen, to matter, to express feelings. Denying needs doesn\'t make them go away - drives them underground where they emerge as addiction/illness. Healing means honoring needs.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client says "I don\'t even know who I am anymore. I\'ve been who others needed me to be for so long." What\'s the therapeutic path forward?',
+                                answers: [
+                                    { text: 'Tell them who they are based on assessment', correct: false, feedback: 'You can\'t tell someone who they are! This is journey THEY must take. Your role: create safety, guide exploration, bear witness.' },
+                                    { text: 'Dismiss this as overdramatic', correct: false, feedback: 'This is REAL and profound! Loss of self is central trauma wound. Honor it.' },
+                                    { text: 'Begin exploration: "Let\'s discover together. What are you feeling right now, in your body? When do you feel most alive? What do you want that you\'ve never let yourself want?"', correct: true, feedback: 'PERFECT! Path to authentic self: 1) START WITH BODY (feelings/sensations are gateway to self), 2) Explore without judgment (all desires/feelings welcome), 3) Small experiments (express need, set boundary - see what happens), 4) Notice: "This feels true" vs "This is who I should be." Authentic self reveals slowly through: safety, exploration, permission to want/feel/need. Therapist creates container for this discovery.' },
+                                    { text: 'Suggest they do personality quiz', correct: false, feedback: 'Too superficial! Authentic self isn\'t personality type. It\'s deeper: your essential aliveness, what\'s true for YOU beneath conditioning.' }
+                                ]
+                            },
+                            {
+                                question: 'Why is authenticity described as "terrifying" even though it\'s healing?',
+                                answers: [
+                                    { text: 'It\'s not actually terrifying, people are just being dramatic', correct: false, feedback: 'It IS genuinely terrifying! Dismissing this invalidates real fear based on real history.' },
+                                    { text: 'Being authentic once meant losing love/safety - psyche still believes this, so dropping defenses feels like life threat', correct: true, feedback: 'YES! Child learned: "Real me → rejection/punishment/abandonment." This was REAL threat to survival. Even though circumstances changed (you\'re adult now), nervous system still carries this terror. Being authentic feels like: walking off cliff, exposing vulnerable underbelly, inviting attack. It\'s not dramatic - it\'s traumatic memory stored in body. Healing requires: gradually testing whether it\'s safe now (in small doses), having therapist/safe people prove they can handle your realness, building evidence: "I can be myself AND be loved."' },
+                                    { text: 'Authenticity IS actually dangerous and should be avoided', correct: false, feedback: 'No! While being authentic has risks (some people won\'t accept it), suppressing authenticity creates worse suffering: disconnection from self, addiction, illness, empty life. Risks of authenticity < cost of inauthenticity.' },
+                                    { text: 'Fear is just resistance to change', correct: false, feedback: 'Dismissive of trauma-based fear. This isn\'t generic change resistance - it\'s body memory that authenticity = danger. Needs compassionate working through, not dismissal.' }
+                                ]
+                            },
+                            {
+                                question: 'Client starts expressing anger (which they\'ve always suppressed) but feels overwhelming guilt. What\'s happening?',
+                                answers: [
+                                    { text: 'Their anger is inappropriate and they should suppress it again', correct: false, feedback: 'No! Anger is valid emotion. If they learned it\'s unacceptable, reclaiming it is HEALING even if uncomfortable.' },
+                                    { text: 'They\'re becoming their authentic self - anger was always there but forbidden. Guilt is old message that this feeling is wrong', correct: true, feedback: 'EXACTLY! This is classic healing process: 1) Permission to feel authentic emotion (anger), 2) Old prohibition activates ("This is bad/wrong/dangerous"), 3) Guilt as internalized voice of whoever punished the anger originally. Therapeutic work: "Anger is valid human emotion. What happened when you were angry as child? Who taught you it wasn\'t okay? That person/message is still operating inside you, but it\'s not TRUTH. Your anger makes sense. Let\'s explore what it\'s telling you." Gradually, guilt lessens as client integrates: "I can be angry AND be okay."' },
+                                    { text: 'Feeling guilty means they shouldn\'t have expressed anger', correct: false, feedback: 'Guilt is DATA about old conditioning, not sign they did wrong. If you always feel guilty expressing needs/anger/boundaries, that tells you: these were forbidden in your development. Don\'t let guilt re-suppress authentic self.' },
+                                    { text: 'They need anger management', correct: false, feedback: 'This might eventually be helpful (if expressing anger destructively), but first: validate that anger is ALLOWED, explore what it\'s communicating, work through guilt. Can\'t manage anger if you believe having it is wrong.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // LEVEL 3: ADVANCED
+            {
+                id: 'societal-context',
+                title: 'Culture of Disconnection',
+                icon: '🌍',
+                level: 3,
+                xp: 40,
+                prereq: 'authenticity-healing',
+                lessons: [
+                    {
+                        title: 'Beyond Individual Pathology',
+                        teaching: `Maté situates addiction/trauma in SOCIETAL CONTEXT: we live in culture that creates conditions for addiction through: materialism, disconnection, stress, inequality, lack of community.
+
+Addiction isn't just individual pathology - it's symptom of sick society. Culture that values: productivity over presence, consumption over connection, image over authenticity - creates epidemic of emptiness.
+
+He connects: colonial trauma, poverty, racism, capitalism's demands → chronic stress → disconnection from self/others → addiction vulnerability.`,
+                        concepts: [
+                            {
+                                title: 'Dislocation',
+                                text: 'Modern life creates DISLOCATION: from land, from community, from meaningful work, from our bodies, from authentic relating. We\'re disconnected at societal level. Addiction is attempt to soothe pain of this mass dislocation. Can\'t just treat individual - must address systemic causes.'
+                            },
+                            {
+                                title: 'Intergenerational Trauma',
+                                text: 'Trauma passes through generations: colonized/enslaved peoples carry wounds in their bodies/communities. This isn\'t metaphor - it\'s biological (epigenetics) and social (poverty, discrimination continue trauma). Indigenous peoples\' high addiction rates = response to ongoing colonial violence, not individual failing.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Why does Maté emphasize societal context, not just individual psychology?',
+                                answers: [
+                                    { text: 'To excuse addiction by blaming society', correct: false, feedback: 'Not about excuse or blame. It\'s about understanding FULL PICTURE. Individual AND systemic factors both matter. Ignoring context creates incomplete, often victim-blaming understanding.' },
+                                    { text: 'Because addiction rates correlate with social conditions (poverty, trauma, inequality) - treating only individual misses root causes and perpetuates harm', correct: true, feedback: 'YES! Maté shows: addiction clusters where there\'s: poverty, historical trauma (Indigenous communities, inner cities), war, displacement, discrimination. This isn\'t coincidence. If we only say "those individuals are sick" we: 1) Miss that environment CREATE vulnerability, 2) Pathologize communities, 3) Ignore that healing requires addressing systemic issues (housing, healthcare, ending discrimination, economic justice). Can treat individuals AND advocate for systemic change.' },
+                                    { text: 'Society is entirely to blame, individuals have no responsibility', correct: false, feedback: 'Maté holds both: environment shapes vulnerability AND individuals have agency in healing. Not either/or. Context matters without removing personal responsibility for recovery.' },
+                                    { text: 'It\'s not relevant, addiction is purely biological', correct: false, feedback: 'Biology matters but develops in SOCIAL CONTEXT. Can\'t separate brain from environment that shaped it. Maté is biopsychosocial, not purely biological.' }
+                                ]
+                            },
+                            {
+                                question: 'How does understanding intergenerational trauma change treatment approach?',
+                                answers: [
+                                    { text: 'It doesn\'t - just treat the individual in front of you', correct: false, feedback: 'Intergenerational trauma context DOES matter! Shapes: what client carries, what healing requires, how you understand their struggle.' },
+                                    { text: 'Recognize client carries not just personal history but collective/ancestral wounds - healing may involve: cultural reconnection, addressing ongoing oppression, community healing, honoring resilience', correct: true, feedback: 'PERFECT! For example, Indigenous client with addiction: yes, explore personal history, AND understand this exists in context of: genocide, forced assimilation, stolen children, ongoing discrimination. Healing might include: reconnecting to cultural practices, ceremony, language, community, land. Addressing shame by reframing: not "you\'re weak" but "you carry wound of what was done to your people - and you\'re survivor." Also: advocate against systems still causing harm. Individual therapy + addressing systemic injustice.' },
+                                    { text: 'Tell them their problems aren\'t real, just historical', correct: false, feedback: 'No! Historical trauma is REAL and present in body/psyche. Not dismissing - honoring full scope of what they\'re navigating.' },
+                                    { text: 'Only focus on history, not present', correct: false, feedback: 'Balance needed. Historical context informs understanding, but also work with present: current pain, relationships, possibilities for healing now.' }
+                                ]
+                            },
+                            {
+                                question: 'Maté works in Vancouver\'s Downtown Eastside with extreme poverty/addiction. What does this inform about addiction?',
+                                answers: [
+                                    { text: 'Addiction only happens to poor people', correct: false, feedback: 'Addiction crosses all socioeconomic classes. But extreme poverty/trauma creates conditions where addiction is MORE likely and consequences MORE severe.' },
+                                    { text: 'Addiction is response to conditions (poverty, trauma, lack of opportunity, ongoing violence) - treating addiction without addressing these conditions is insufficient', correct: true, feedback: 'YES! Maté saw: people using substances to numb: childhood abuse, poverty, homelessness, chronic pain, racism, violence. "Treatment" that just says "stop using" without addressing: housing, trauma, healthcare, economic opportunity, safety - doesn\'t work. Compassionate response: 1) Meet immediate needs (housing, harm reduction), 2) Trauma therapy, 3) Address social determinants (poverty, discrimination), 4) Build community. Can\'t separate addiction from context of suffering that created it.' },
+                                    { text: 'Poor people are morally weaker', correct: false, feedback: 'Classist and wrong! Poverty creates chronic stress/trauma/lack of resources. Addiction in this context is ADAPTIVE response to unbearable conditions, not moral failing.' },
+                                    { text: 'Nothing can be done for people in extreme poverty', correct: false, feedback: 'Maté demonstrates: COMPASSION makes difference. Housing first, harm reduction, treating people with dignity, addressing trauma - these help. It\'s harder without resources, but not hopeless.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'harm-reduction',
+                title: 'Harm Reduction Philosophy',
+                icon: '🛡️',
+                level: 3,
+                xp: 45,
+                prereq: 'societal-context',
+                lessons: [
+                    {
+                        title: 'Meeting People Where They Are',
+                        teaching: `HARM REDUCTION: approach that meets people where they are, without requiring abstinence. Goal is reducing harm, not forcing sobriety.
+
+Principles: 
+1) Dignity and respect for drug users
+2) Commitment to reducing harm, not eliminating use
+3) Person-centered (they decide goals)
+4) Pragmatic (what actually works)
+5) Non-judgmental
+
+Examples: Clean needles, safe injection sites, medication-assisted treatment. These keep people ALIVE and connected to services while they're still using.`,
+                        concepts: [
+                            {
+                                title: 'Abstinence vs Harm Reduction',
+                                text: 'Abstinence model: "Stop using or we can\'t help you." Harm reduction: "We\'ll help you regardless of whether you stop. Your life has value even if you\'re using." Harm reduction is MORE effective - keeps people alive, builds trust, creates pathways to healing when/if they\'re ready.'
+                            },
+                            {
+                                title: 'Why It Works',
+                                text: 'Shame and coercion DEEPEN addiction. Compassion and meeting basic needs create conditions for change. When person feels: seen, valued, safe, cared for (even while using) - they\'re more likely to eventually move toward healing. Can\'t shame someone into wellness.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'Client continues using while in therapy. Traditional approach says "You can\'t be in therapy while using." Harm reduction says:',
+                                answers: [
+                                    { text: 'Same thing - discharge them until they\'re clean', correct: false, feedback: 'This is abstinence-only thinking Maté critiques. Abandoning people while they\'re using: 1) Increases danger (no connection to services), 2) Deepens shame, 3) Often leads to death. Harm reduction says: stay connected.' },
+                                    { text: '"Let\'s work together regardless. Your use tells me about pain you\'re in. How can we reduce harm while we explore what drives the using?"', correct: true, feedback: 'EXACTLY! Harm reduction in therapy: 1) Continue relationship (connection heals), 2) Don\'t require abstinence to deserve help, 3) Explore function (what does using provide?), 4) Reduce harm (safer use practices, overdose prevention), 5) Address underlying pain, 6) Support when/if they want to reduce/stop, but don\'t make it condition. Research shows: harm reduction MORE effective than abstinence-only. Compassion > coercion.' },
+                                    { text: 'Enable their addiction by not setting boundaries', correct: false, feedback: 'Harm reduction isn\'t "enabling" - it\'s recognizing: person will use regardless. Better to keep them alive and connected than abandon them. Can have boundaries (no using in session) while maintaining relationship.' },
+                                    { text: 'Tell them using is fine and they should continue', correct: false, feedback: 'Not about encouraging use! It\'s about: not making abstinence prerequisite for care, reducing harm while person still using, addressing root causes, supporting ANY movement toward wellness.' }
+                                ]
+                            },
+                            {
+                                question: 'Why do harm reduction advocates support safe injection sites?',
+                                answers: [
+                                    { text: 'To encourage more drug use', correct: false, feedback: 'No! Safe injection sites REDUCE: overdose deaths, disease transmission, public drug use. Don\'t increase drug use. People use anyway - safer to do it supervised than in alley.' },
+                                    { text: 'Because keeping people alive and healthy is more important than forcing abstinence - can\'t recover if you\'re dead', correct: true, feedback: 'EXACTLY! Safe injection sites: 1) PREVENT DEATH (staff reverse overdoses), 2) Reduce infection (clean equipment), 3) Build relationships (connecting people to services), 4) Dignity (treating people as humans, not criminals). Philosophy: You can\'t recover if you\'re dead. Meeting basic needs (safety, healthcare, human connection) creates conditions for eventual healing. Research proves: safe injection sites save lives, don\'t increase use, increase treatment entry.' },
+                                    { text: 'To save money on emergency services', correct: false, feedback: 'This IS benefit (fewer ER visits/ambulances), but primary motivation is COMPASSION - valuing lives of drug users, reducing suffering.' },
+                                    { text: 'Because all drug use is fine', correct: false, feedback: 'Harm reduction isn\'t pro-drug. It\'s pro-PEOPLE. Recognizes: drug use is response to pain, people deserve care regardless of use status, abstinence-only approaches fail and kill people.' }
+                                ]
+                            },
+                            {
+                                question: 'Someone argues "Harm reduction gives up on people, enables addiction." How does Maté\'s framework respond?',
+                                answers: [
+                                    { text: 'Agree - it does enable', correct: false, feedback: 'Disagree! Evidence shows harm reduction MORE effective than abstinence-only at: keeping people alive, building trust, eventually reducing use.' },
+                                    { text: '"Harm reduction BELIEVES in people - believes their lives have value NOW, not just if they get clean. Abandoning people while they use is what gives up."', correct: true, feedback: 'PERFECT! Reframe: 1) Abstinence-only says "You only deserve help if you stop" = conditional care, gives up on people who can\'t/won\'t stop immediately. 2) Harm reduction says "You deserve care, period" = unconditional care, NEVER gives up. 3) Research: harm reduction works better! More people eventually reduce/stop use when met with compassion vs coercion. 4) "Enabling" language pathologizes compassion. If someone\'s using to escape unbearable pain, meeting them with judgment increases pain → increases use. Meeting with compassion → reduces pain → eventually reduces need for escape.' },
+                                    { text: 'Ignore the criticism', correct: false, feedback: 'Engage it! Many people genuinely don\'t understand harm reduction. Education needed. Share evidence of effectiveness, philosophy of dignity, reality that abstinence-only kills people.' },
+                                    { text: 'Argue that all drug use is good', correct: false, feedback: 'Strawman. Harm reduction doesn\'t claim drug use is good. It claims: 1) People using drugs are human and deserve care, 2) Reducing harm is better than nothing, 3) Compassion works better than coercion.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'integration-mastery',
+                title: 'Integration & Practice',
+                icon: '🎓',
+                level: 3,
+                xp: 50,
+                prereq: 'harm-reduction',
+                lessons: [
+                    {
+                        title: 'Bringing It All Together',
+                        teaching: `Maté's framework integrates:
+- Trauma as disconnection from self
+- Addiction as attempt to soothe pain of disconnection
+- Brain development shaped by early environment
+- Compassionate inquiry as therapeutic approach
+- Self-compassion as healing mechanism
+- Societal context of suffering
+- Harm reduction as ethical imperative
+
+Clinical application: hold ALL of this simultaneously. See person in front of you as: wounded child who adapted brilliantly, adult with agency, being shaped by systems of oppression, carrying hope for healing.`,
+                        concepts: [
+                            {
+                                title: 'The Both/And Practice',
+                                text: 'Hold complexity: behavior is problematic AND makes sense, person has responsibility AND isn\'t to blame, biology is real AND environment shaped it, individual work matters AND systemic change is needed. Resist simplification. Truth is layered.'
+                            },
+                            {
+                                title: 'Continuous Compassion',
+                                text: 'For client: meeting them with curiosity not judgment, seeing their humanity beneath behavior. For self: recognizing YOUR wounds/triggers, staying in your own therapy, forgiving your limits. For society: advocating for justice while holding complexity of how we all participate in harm.'
+                            }
+                        ],
+                        questions: [
+                            {
+                                question: 'How do you hold: "This person\'s behavior is causing harm" AND "This person deserves compassion"?',
+                                answers: [
+                                    { text: 'You can\'t - pick one', correct: false, feedback: 'Both/and thinking is essential! Reality is: harmful behavior AND deserving of compassion can coexist.' },
+                                    { text: 'Recognize behavior can be problematic while person remains human with dignity - set boundaries while maintaining connection and understanding', correct: true, feedback: 'YES! Example: Client steals from family to fund addiction. 1) Behavior IS harmful (acknowledge this), 2) AND behavior makes sense given: desperation of addiction, pain they\'re escaping, limited coping. 3) Can say: "This behavior damages relationships and trust" (truth) while also: "I understand you\'re in enormous pain" (compassion). 4) Boundaries (family might need to limit access to valuables) while maintaining relationship ("We still love you, we\'re here"). This is both/and: accountability + compassion. One without other fails.' },
+                                    { text: 'Compassion means accepting all behavior', correct: false, feedback: 'No! Compassion and boundaries aren\'t opposites. You can be compassionate WHILE setting limits. "I care about you AND I can\'t let you..." Limits with love.' },
+                                    { text: 'Focus only on behavior, not the person', correct: false, feedback: 'Missing the person behind behavior creates dehumanization. Need to hold both: behavior (address it) AND person (honor their humanity).' }
+                                ]
+                            },
+                            {
+                                question: 'What\'s most important when applying Maté\'s work clinically?',
+                                answers: [
+                                    { text: 'Memorizing all his concepts', correct: false, feedback: 'Concepts matter but aren\'t enough. Heart of work is stance of compassionate curiosity.' },
+                                    { text: 'Your own healing work - can\'t offer compassion to others without developing it for yourself first', correct: true, feedback: 'CRUCIAL! Maté emphasizes: therapists need own therapy, self-compassion, ongoing work. If you haven\'t: explored YOUR wounds, developed compassion for YOUR struggles, reconnected to YOUR authentic self - you can\'t guide others there. Your unhealed places will: trigger you, create blind spots, cause you to judge what you haven\'t accepted in yourself. This work is as much about YOUR humanity as theory. Stay humble, stay in therapy, keep growing.' },
+                                    { text: 'Having all the answers', correct: false, feedback: 'Opposite of Maté\'s approach! Compassionate Inquiry is NOT KNOWING - staying curious, following client\'s thread, being comfortable with mystery. Certainty often blocks real understanding.' },
+                                    { text: 'Fixing people', correct: false, feedback: 'Can\'t fix people. Your job: create safety, offer compassionate presence, help them reconnect to self. THEY do the healing. You witness and support.' }
+                                ]
+                            },
+                            {
+                                question: 'Someone asks: "What\'s the main takeaway from Hungry Ghosts?" What do you say?',
+                                answers: [
+                                    { text: '"Addiction is a disease you catch."', correct: false, feedback: 'Maté resists simple disease model. Emphasizes: trauma, environment, disconnection from self.' },
+                                    { text: '"Addiction is response to pain - ask not why the addiction, but why the pain. Healing requires: compassion for self and others, addressing trauma, reconnecting to authentic self."', correct: true, feedback: 'PERFECT summary! Core messages: 1) Addiction = attempt to escape pain of disconnection/trauma, 2) Question isn\'t "why addiction" but "why pain" (what happened?), 3) Shame deepens addiction, compassion heals, 4) Need to reconnect to authentic self (reclaim what was lost), 5) Individual AND systemic work needed, 6) Meet people where they are (harm reduction), 7) All of us hungry ghosts seeking what we didn\'t get - this is human condition. Book is ultimately about: universal need for love, attunement, authenticity, and what happens when these needs go unmet.' },
+                                    { text: '"Poor people are addicts."', correct: false, feedback: 'Classist distortion! Addiction crosses all classes. Maté worked with extreme poverty to show: conditions matter. But addiction isn\'t about class - it\'s about pain.' },
+                                    { text: '"Just love yourself and addiction goes away."', correct: false, feedback: 'Too simplistic! Self-compassion is crucial but not magic cure. Healing is complex, requires: therapy, often medication, community, addressing trauma, sometimes spiritual practice, building life worth being present for. No single solution.' }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+        
+        // Initialize UI
+        function initUI() {
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        function updateStats() {
+            const xpPercent = (gameState.xp / gameState.xpToNextLevel) * 100;
+            const mastery = Math.round((gameState.completedSkills.length / skillTree.length) * 100);
+            const currentPath = gameState.level <= 1 ? 'FOUNDATIONS' : gameState.level <= 2 ? 'INTERMEDIATE' : 'ADVANCED';
+            
+            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+            document.getElementById('xp-text').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
+            document.getElementById('level-display').textContent = gameState.level;
+            document.getElementById('mastery-display').textContent = `${mastery}%`;
+            document.getElementById('streak-display').textContent = `${gameState.streak}🔥`;
+            document.getElementById('current-path').textContent = currentPath;
+        }
+        
+        function renderSkillGrid() {
+            const grid = document.getElementById('skill-grid');
+            grid.innerHTML = skillTree.map(skill => {
+                const isCompleted = gameState.completedSkills.includes(skill.id);
+                const isUnlocked = !skill.prereq || gameState.completedSkills.includes(skill.prereq);
+                
+                let status = '🔒';
+                let statusClass = 'locked';
+                
+                if (isCompleted) {
+                    status = '✓';
+                    statusClass = 'completed';
+                } else if (isUnlocked) {
+                    status = '→';
+                    statusClass = 'unlocked';
+                }
+                
+                return `
+                    <div class="skill-card ${statusClass}" 
+                         onclick="${isUnlocked ? `startSkill('${skill.id}')` : ''}"
+                         role="button"
+                         tabindex="${isUnlocked ? '0' : '-1'}"
+                         aria-label="${skill.title}${isCompleted ? ', completed' : isUnlocked ? ', available' : ', locked'}">
+                        <div class="skill-icon">${skill.icon}</div>
+                        <div class="skill-info">
+                            <div class="skill-title">${skill.title}</div>
+                            <div class="skill-meta">
+                                <span class="skill-xp">+${skill.xp} XP</span>
+                                <span>Level ${skill.level}</span>
+                            </div>
+                        </div>
+                        <div class="skill-status">${status}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add keyboard support
+            grid.querySelectorAll('.skill-card.unlocked').forEach(card => {
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+        }
+        
+        function startSkill(skillId) {
+            const skill = skillTree.find(s => s.id === skillId);
+            if (!skill) return;
+            
+            gameState.currentLesson = skill;
+            gameState.currentQuestion = 0;
+            gameState.correctAnswers = 0;
+            gameState.questionResults = [];
+            
+            showLesson(skill);
+        }
+        
+        function showLesson(skill) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            const lesson = skill.lessons[0];
+            
+            const concepts = lesson.concepts.map(c => `
+                <div class="concept-card">
+                    <div class="concept-title">📌 ${c.title}</div>
+                    <div class="concept-text">${c.text}</div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-icon">${skill.icon}</div>
+                    <h2 class="lesson-title">${lesson.title}</h2>
+                    <div class="lesson-subtitle">+${skill.xp} XP on completion</div>
+                </div>
+                
+                <div class="teaching-section">
+                    <div class="teaching-text">${lesson.teaching}</div>
+                </div>
+                
+                <div class="concepts-section">
+                    ${concepts}
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Back</button>
+                    <button class="btn btn-primary" onclick="startQuestions()">Start Quiz →</button>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.top = `-${window.scrollY}px`;
+        }
+        
+        function startQuestions() {
+            showQuestion(0);
+        }
+        
+        function showQuestion(index) {
+            const skill = gameState.currentLesson;
+            const lesson = skill.lessons[0];
+            const question = lesson.questions[index];
+            const content = document.getElementById('modal-content');
+            const total = lesson.questions.length;
+            
+            // Build progress dots
+            const dots = lesson.questions.map((_, i) => {
+                let dotClass = 'progress-dot';
+                if (i === index) dotClass += ' current';
+                else if (i < index) {
+                    dotClass += gameState.questionResults[i] ? ' correct' : ' incorrect';
+                }
+                return `<div class="${dotClass}"></div>`;
+            }).join('');
+            
+            const answers = question.answers.map((a, i) => `
+                <button class="answer-btn" onclick="selectAnswer(${i})" data-index="${i}">
+                    ${a.text}
+                </button>
+            `).join('');
+            
+            const scoreText = index > 0 
+                ? `<span class="score-display">Score: <span class="score-value">${gameState.correctAnswers}/${index}</span></span>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="lesson-header">
+                    <h2 class="lesson-title">${skill.title}</h2>
+                    <div class="lesson-subtitle">Question ${index + 1} of ${total}</div>
+                </div>
+                
+                <div class="question-section">
+                    <div class="question-progress">
+                        <div class="progress-dots">${dots}</div>
+                        ${scoreText}
+                    </div>
+                    
+                    <div class="question-text">${question.question}</div>
+                    
+                    <div class="answers-list" id="answers-list">
+                        ${answers}
+                    </div>
+                    
+                    <div class="feedback-box" id="feedback"></div>
+                </div>
+                
+                <div class="modal-footer" id="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">← Exit</button>
+                    <div id="continue-container"></div>
+                </div>
+            `;
+            
+            // Store for answer checking
+            window.currentQuestionData = { question, index, total };
+        }
+        
+        function selectAnswer(answerIndex) {
+            const { question, index, total } = window.currentQuestionData;
+            const answer = question.answers[answerIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            const feedback = document.getElementById('feedback');
+            const continueContainer = document.getElementById('continue-container');
+            
+            // Disable all buttons
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            
+            // Mark selected answer
+            const selectedBtn = buttons[answerIndex];
+            
+            if (answer.correct) {
+                selectedBtn.classList.add('correct');
+                feedback.className = 'feedback-box correct show';
+                feedback.innerHTML = `✓ CORRECT! ${answer.feedback}`;
+                gameState.correctAnswers++;
+                gameState.questionResults.push(true);
+            } else {
+                selectedBtn.classList.add('incorrect');
+                feedback.className = 'feedback-box incorrect show';
+                feedback.innerHTML = `✗ ${answer.feedback}`;
+                gameState.questionResults.push(false);
+            }
+            
+            // Show continue button
+            const isLast = index >= total - 1;
+            continueContainer.innerHTML = `
+                <button class="btn btn-primary" onclick="${isLast ? 'completeSkill()' : 'nextQuestion()'}">
+                    ${isLast ? 'See Results →' : 'Continue →'}
+                </button>
+            `;
+        }
+        
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            showQuestion(gameState.currentQuestion);
+        }
+        
+        function completeSkill() {
+            const skill = gameState.currentLesson;
+            const total = skill.lessons[0].questions.length;
+            const score = Math.round((gameState.correctAnswers / total) * 100);
+            const xpEarned = skill.xp;
+            
+            // Award XP
+            gameState.xp += xpEarned;
+            gameState.totalXp += xpEarned;
+            
+            // Level up check
+            while (gameState.xp >= gameState.xpToNextLevel) {
+                gameState.xp -= gameState.xpToNextLevel;
+                gameState.level++;
+                gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+            }
+            
+            // Mark completed
+            if (!gameState.completedSkills.includes(skill.id)) {
+                gameState.completedSkills.push(skill.id);
+                gameState.streak++;
+            }
+            
+            // Find next skill
+            const currentIndex = skillTree.findIndex(s => s.id === skill.id);
+            const nextSkill = skillTree.slice(currentIndex + 1).find(s => {
+                if (!s.prereq) return true;
+                return gameState.completedSkills.includes(s.prereq);
+            });
+            
+            const content = document.getElementById('modal-content');
+            
+            const nextButton = nextSkill && !gameState.completedSkills.includes(nextSkill.id)
+                ? `<button class="btn btn-accent" onclick="startNextSkill('${nextSkill.id}')">
+                       Next: ${nextSkill.title} →
+                   </button>`
+                : '';
+            
+            content.innerHTML = `
+                <div class="completion-screen">
+                    <div class="completion-icon">${skill.icon}</div>
+                    <h2 class="completion-title">SKILL MASTERED!</h2>
+                    <div class="completion-xp">+${xpEarned} XP EARNED</div>
+                    
+                    <div class="completion-stats">
+                        <p>Score: <span style="color: var(--accent);">${score}%</span> (${gameState.correctAnswers}/${total})</p>
+                        <p>Skill: "${skill.title}"</p>
+                        <p>Keep building your mastery!</p>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModalAndRefresh()">← Skill Tree</button>
+                    ${nextButton}
+                </div>
+            `;
+            
+            // Confetti!
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#f90', '#ff0', '#f00']
+                });
+            }
+            
+            saveProgress();
+        }
+        
+        function startNextSkill(skillId) {
+            closeModal();
+            setTimeout(() => startSkill(skillId), 200);
+        }
+        
+        function closeModal() {
+            const scrollY = document.body.style.top;
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.top = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+        
+        function closeModalAndRefresh() {
+            closeModal();
+            updateStats();
+            renderSkillGrid();
+        }
+        
+        // Progress Management
+        function saveProgress() {
+            localStorage.setItem('hungryGhostsAcademy', JSON.stringify(gameState));
+            showToast('💾 Progress saved!');
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('hungryGhostsAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                updateStats();
+                renderSkillGrid();
+                showToast('✓ Progress loaded!');
+            } else {
+                showToast('No saved progress found');
+            }
+        }
+        
+        function resetProgress() {
+            if (confirm('Reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('hungryGhostsAcademy');
+                location.reload();
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function goHome() {
+            window.location.href = 'learning-library-hub.html';
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('modal');
+            const isOpen = modal.classList.contains('active');
+            
+            if (e.key === 'Escape' && isOpen) {
+                closeModal();
+            }
+            
+            if (e.key === 'ArrowLeft' && !isOpen) {
+                moveCarousel(-1);
+            }
+            if (e.key === 'ArrowRight' && !isOpen) {
+                moveCarousel(1);
+            }
+        });
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const saved = localStorage.getItem('hungryGhostsAcademy');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+            initUI();
+        });
+    </script>
+</body>
+</html>
